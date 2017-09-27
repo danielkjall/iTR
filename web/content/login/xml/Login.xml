@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XML Spy v3.0 NT (http://www.xmlspy.com) by Fredrik Björk (Ericsson Radio System, Wii, Linkoping) -->
+<?xml-stylesheet type="text/xsl" href="C:\Program\Apache Group\jakarta-tomcat\webapps\ITR\content\login\xsl\en_HTML_Login.xsl"?>
+<LOGIN>
+	<link-href>../include/EricssonPortal.css</link-href>
+	<field-userid>User Id:</field-userid>
+	<field-password>Password:</field-password>
+	<body-background>../images/BILLOG11.gif</body-background>
+	<hidden-targetPage>portal.ui.frames.CarPortal</hidden-targetPage>
+	<form-action>portal.ui.login.LoginVerifier</form-action>
+	<page-title>Login</page-title>
+</LOGIN>

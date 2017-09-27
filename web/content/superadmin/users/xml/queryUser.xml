@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XML Spy v3.0 NT (http://www.xmlspy.com) by Fredrik Björk (Ericsson Radio System, Wii, Linkoping) -->
+<response version="1.0">
+	<exception_occured>false</exception_occured>
+	<companyparent>
+		<item>
+			<value>null</value>
+			<text>No parent</text>
+			<selected>true</selected>
+		</item>
+		<item>
+			<value>1</value>
+			<text>Intiro Development AB</text>
+		</item>
+		<item>
+			<value>2</value>
+			<text>World Class</text>
+		</item>
+		<item>
+			<value>3</value>
+			<text>CyberCom AB</text>
+		</item>
+		<item>
+			<value>4</value>
+			<text>HIQ</text>
+		</item>
+	</companyparent>
+	<title>Edit</title>
+	<mode>Edit</mode>
+	<company>
+		<compid>2</compid>
+		<name>Intiro</name>
+		<invoiceaddressrow1>Repslagargatan 10</invoiceaddressrow1>
+		<invoiceaddressrow2>Rad 2</invoiceaddressrow2>
+		<invoiceaddressrow3>Rad 3</invoiceaddressrow3>
+		<visitaddressrow1>Visitgatan 123</visitaddressrow1>
+		<visitaddressrow2>Rad 2</visitaddressrow2>
+		<visitaddressrow3>Rad 3</visitaddressrow3>
+		<contacts>
+			<name>contact1</name>
+			<position>small boss</position>
+			<contactid>0</contactid>
+		</contacts>
+		<contacts>
+			<name>contact2</name>
+			<position>big boss</position>
+			<contactid>1</contactid>
+		</contacts>
+		<contacts>
+			<name>contact3</name>
+			<position>no boss</position>
+			<contactid>2</contactid>
+		</contacts>
+		<projects>
+			<name>proj1</name>
+			<projectid>0</projectid>
+		</projects>
+		<projects>
+			<name>proj2</name>
+			<projectid>1</projectid>
+		</projects>
+		<projects>
+			<name>proj3</name>
+			<projectid>2</projectid>
+		</projects>
+	</company>
+</response>

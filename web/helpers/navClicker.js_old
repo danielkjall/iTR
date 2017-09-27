@@ -1,0 +1,13 @@
+function navClicker(navtext, arrow) {
+
+	if(navtext.style.display == ''){
+alert('1');
+		navtext.style.display = 'none';
+		arrow.src  = '../images/pil.gif';	
+	}
+	else {
+alert('2');
+		navtext.style.display = '';
+		arrow.src='../images/downpil.gif';
+	}
+}

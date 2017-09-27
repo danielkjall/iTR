@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XML Spy v3.0 NT (http://www.xmlspy.com) by Dan the man (Ericsson Radio System, Wii, Linkoping) -->
+<response>
+	<userid>116046</userid>
+	<username>Daniel Kjäll</username>
+	<row>
+		<weekno>47</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week1</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>48</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week2 gk</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>49</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week3</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>49</weekno>
+		<weekpart>2</weekpart>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week4</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>50</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week5</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>51</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week6</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+	<row>
+		<weekno>52</weekno>
+		<weekpart>1</weekpart>
+		<mo>8</mo>
+		<tu>10</tu>
+		<we>10</we>
+		<th>10</th>
+		<fr>10</fr>
+		<sa>8</sa>
+		<su>8</su>
+		<weeksum>45</weeksum>
+		<expectedhours>40</expectedhours>
+		<weekcomment>My first week7</weekcomment>
+		<diffhours>5</diffhours>
+	</row>
+</response>

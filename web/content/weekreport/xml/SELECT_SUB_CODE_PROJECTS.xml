@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="C:\Program\Apache Group\jakarta-tomcat\webapps\ITR\content\timereport\xsl\en_HTML_SELECT_PROJECT.xsl"?>
+<response>
+	<userid>116046</userid>
+	<username>Daniel Kjäll</username>
+	<projectcode>511111</projectcode>
+	<projectdesc>Project description</projectdesc>
+	<subprojcode>
+		<subcode>53330</subcode>
+		<desc>description1</desc>
+	</subprojcode>
+	<subprojcode>
+		<subcode>53331</subcode>
+		<desc>description2</desc>
+	</subprojcode>
+	<subprojcode>
+		<subcode>53332</subcode>
+		<desc>Project description3</desc>
+	</subprojcode>
+	<subprojcode>
+		<subcode>53333</subcode>
+		<desc>description4</desc>
+	</subprojcode>
+	<subprojcode>
+		<subcode>53334</subcode>
+		<desc>description5</desc>
+	</subprojcode>
+</response>

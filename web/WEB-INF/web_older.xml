@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <description>
+      ITR Intiro Time Reporting
+    </description>
+    <display-name>ITR</display-name>
+    
+    <!-- Define example application events listeners -->
+    <listener>
+        <listener-class>listeners.ContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>listeners.SessionListener</listener-class>
+    </listener>
+
+    <!-- JSPC servlet mappings start -->
+    
+<!--
+Automatically created by Apache Jakarta Tomcat JspC.
+Place this fragment in the web.xml before all icon, display-name,
+description, distributable, and context-param elements.
+-->
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.activitySelector_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.activitySelector_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.approveWeek_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.approveWeek_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.approveWeekResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.approveWeekResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.editWeek_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.editWeek_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.projectSelector_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.projectSelector_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.weekreport.viewWeeks_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.weekreport.viewWeeks_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmails_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeEmails_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmailsQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeEmailsQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmailsResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeEmailsResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhones_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changePhones_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhonesQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changePhonesQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhonesResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changePhonesResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsers_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeUsers_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsersQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeUsersQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsersResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.users.changeUsersResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivities_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjectActivities_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjects_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjects_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectsQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjectsQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectsResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projects.changeProjectsResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembers_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projectmember.changeProjectMembers_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContacts_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.contacts.changeContacts_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContactsQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.contacts.changeContactsQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContactsResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.contacts.changeContactsResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompanies_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.companies.changeCompanies_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompaniesQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.companies.changeCompaniesQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompaniesResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.companies.changeCompaniesResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivity_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.activity.changeActivity_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivityQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.activity.changeActivityQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivityResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.superadmin.activity.changeActivityResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.setting.changepassword.changePassword_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.setting.changepassword.changePassword_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.setting.changepassword.changePasswordResult_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.setting.changepassword.changePasswordResult_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.login.login_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.login.login_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.login.logout_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.login.logout_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.login.test_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.login.test_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.login.test2_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.login.test2_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.generatereport.listReports_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.generatereport.listReports_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.generatereport.monthly.monthlyReport_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.generatereport.monthly.monthlyReport_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.generatereport.monthly.monthlyReportQuery_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.generatereport.monthly.monthlyReportQuery_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.frames.cornerFrame_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.frames.cornerFrame_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.frames.frameset_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.frames.frameset_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.frames.mainFrame_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.frames.mainFrame_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.frames.navigationBar_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.frames.navigationBar_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.frames.topFrame_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.frames.topFrame_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.error.errorPage_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.error.errorPage_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.admin.admin_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.admin.admin_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.admin.weeksApproved_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.admin.weeksApproved_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.content.admin.weeksNeedingSubmit_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.content.admin.weeksNeedingSubmit_jsp</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.activitySelector_jsp</servlet-name>
+        <url-pattern>/content/weekreport/activitySelector.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.approveWeek_jsp</servlet-name>
+        <url-pattern>/content/weekreport/approveWeek.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.approveWeekResult_jsp</servlet-name>
+        <url-pattern>/content/weekreport/approveWeekResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.editWeek_jsp</servlet-name>
+        <url-pattern>/content/weekreport/editWeek.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.projectSelector_jsp</servlet-name>
+        <url-pattern>/content/weekreport/projectSelector.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.weekreport.viewWeeks_jsp</servlet-name>
+        <url-pattern>/content/weekreport/viewWeeks.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmails_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeEmails.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmailsQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeEmailsQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeEmailsResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeEmailsResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhones_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changePhones.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhonesQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changePhonesQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changePhonesResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changePhonesResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsers_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeUsers.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsersQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeUsersQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.users.changeUsersResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/users/changeUsersResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivities_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjectActivities.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjectActivitiesQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectActivitiesResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjectActivitiesResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjects_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjects.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectsQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjectsQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projects.changeProjectsResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projects/changeProjectsResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembers_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projectmember/changeProjectMembers.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projectmember/changeProjectMembersQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.projectmember.changeProjectMembersResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/projectmember/changeProjectMembersResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContacts_jsp</servlet-name>
+        <url-pattern>/content/superadmin/contacts/changeContacts.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContactsQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/contacts/changeContactsQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.contacts.changeContactsResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/contacts/changeContactsResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompanies_jsp</servlet-name>
+        <url-pattern>/content/superadmin/companies/changeCompanies.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompaniesQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/companies/changeCompaniesQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.companies.changeCompaniesResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/companies/changeCompaniesResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivity_jsp</servlet-name>
+        <url-pattern>/content/superadmin/activity/changeActivity.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivityQuery_jsp</servlet-name>
+        <url-pattern>/content/superadmin/activity/changeActivityQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.superadmin.activity.changeActivityResult_jsp</servlet-name>
+        <url-pattern>/content/superadmin/activity/changeActivityResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.setting.changepassword.changePassword_jsp</servlet-name>
+        <url-pattern>/content/setting/changepassword/changePassword.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.setting.changepassword.changePasswordResult_jsp</servlet-name>
+        <url-pattern>/content/setting/changepassword/changePasswordResult.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.login.login_jsp</servlet-name>
+        <url-pattern>/content/login/login.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.login.logout_jsp</servlet-name>
+        <url-pattern>/content/login/logout.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.login.test_jsp</servlet-name>
+        <url-pattern>/content/login/test.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.login.test2_jsp</servlet-name>
+        <url-pattern>/content/login/test2.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.generatereport.listReports_jsp</servlet-name>
+        <url-pattern>/content/generatereport/listReports.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.generatereport.monthly.monthlyReport_jsp</servlet-name>
+        <url-pattern>/content/generatereport/monthly/monthlyReport.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.generatereport.monthly.monthlyReportQuery_jsp</servlet-name>
+        <url-pattern>/content/generatereport/monthly/monthlyReportQuery.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.frames.cornerFrame_jsp</servlet-name>
+        <url-pattern>/content/frames/cornerFrame.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.frames.frameset_jsp</servlet-name>
+        <url-pattern>/content/frames/frameset.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.frames.mainFrame_jsp</servlet-name>
+        <url-pattern>/content/frames/mainFrame.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.frames.navigationBar_jsp</servlet-name>
+        <url-pattern>/content/frames/navigationBar.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.frames.topFrame_jsp</servlet-name>
+        <url-pattern>/content/frames/topFrame.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.error.errorPage_jsp</servlet-name>
+        <url-pattern>/content/error/errorPage.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.admin.admin_jsp</servlet-name>
+        <url-pattern>/content/admin/admin.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.admin.weeksApproved_jsp</servlet-name>
+        <url-pattern>/content/admin/weeksApproved.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.content.admin.weeksNeedingSubmit_jsp</servlet-name>
+        <url-pattern>/content/admin/weeksNeedingSubmit.jsp</url-pattern>
+    </servlet-mapping>
+
+<!--
+All session-config, mime-mapping, welcome-file-list, error-page, taglib,
+resource-ref, security-constraint, login-config, security-role,
+env-entry, and ejb-ref elements should follow this fragment.
+-->
+
+    <!-- JSPC servlet mappings end -->
+
+    <!-- servlet mappings start -->
+    	<servlet>
+		<servlet-name>ITRInitServlet</servlet-name>
+		<servlet-class>com.intiro.itr.ITRInitServlet</servlet-class>
+	<!--	<load-on-startup>1</load-on-startup>-->
+	</servlet>
+	<servlet>
+		<servlet-name>LoginView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.login.LoginView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>LoginVerifier</servlet-name>
+		<servlet-class>com.intiro.itr.ui.login.LoginVerifier</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>TimePortal</servlet-name>
+		<servlet-class>com.intiro.itr.ui.frames.TimePortal</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CornerFrame</servlet-name>
+		<servlet-class>com.intiro.itr.ui.frames.CornerFrame</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>NavigationFrame</servlet-name>
+		<servlet-class>com.intiro.itr.ui.frames.NavigationFrame</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>TopFrame</servlet-name>
+		<servlet-class>com.intiro.itr.ui.frames.TopFrame</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>MainFrame</servlet-name>
+		<servlet-class>com.intiro.itr.ui.frames.MainFrame</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>LogView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.LogView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>LogoutView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.logout.LogoutView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ErrorViewer</servlet-name>
+		<servlet-class>com.intiro.itr.ui.error.ErrorViewer</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PasswordChangerView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.setting.PasswordChangerView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ChangePasswordActivator</servlet-name>
+		<servlet-class>com.intiro.itr.ui.setting.PasswordChangerActivator</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProfileChangerView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.setting.ProfileChangerView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProfileChangerActivator</servlet-name>
+		<servlet-class>com.intiro.itr.ui.setting.ProfileChangerActivator</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>WeekReportEditorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.weekreport.WeekReportEditorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>WeekReportListView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.weekreport.WeekReportListView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>SaveSubmitWeekReport</servlet-name>
+		<servlet-class>com.intiro.itr.ui.weekreport.SaveSubmitWeekReport</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectSelectorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.weekreport.ProjectSelectorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjSubCodeSelectorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.weekreport.ProjSubCodeSelectorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ListReportsView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.ListReportsView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>GeneralQueryProfileView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.general.GeneralQueryProfileView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>VacationQueryProfileView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.vacation.VacationQueryProfileView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>MonthlyQueryProfileView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.monthly.MonthlyQueryProfileView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>GeneralReportView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.general.GeneralReportView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>VacationReportView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.vacation.VacationReportView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>MonthlyReportView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.generatereport.monthly.MonthlyReportView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>UserEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.UserEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>UserQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.UserQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>UserEditActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.UserEditActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>EmailEditorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.EmailEditorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PhoneEditorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.PhoneEditorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PhoneQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.PhoneQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>EmailQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.EmailQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>EmailSaveActivator</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.EmailSaveActivator</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PhoneSaveActivator</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.users.PhoneSaveActivator</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectMembersQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectMembesrQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectActivityActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectActivityActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectActivitiesQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectActivitiesQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectActivitiesEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectActivitiesEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectMembersEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projectmember.ProjectMembersEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectMembersActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projectmember.ProjectMembersActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectEditActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectEditActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ProjectEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.projects.ProjectEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ApproveWeeksView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.admin.ApproveWeeksView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CompanyQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.companies.CompanyQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CompanyEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.companies.CompanyEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CompanyEditActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.companies.CompanyEditActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ActivityQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.activity.ActivityQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ActivityEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.activity.ActivityEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ActivityEditActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.activity.ActivityEditActivatorView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ContactQueryView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.contacts.ContactQueryView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ContactEditView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.contacts.ContactEditView</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ContactEditActivatorView</servlet-name>
+		<servlet-class>com.intiro.itr.ui.superadmin.contacts.ContactEditActivatorView</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+          <servlet-name>LoginVerifier</servlet-name>
+          <url-pattern>/servlet/LoginVerifier</url-pattern>
+        </servlet-mapping>
+        <servlet-mapping>
+          <servlet-name>ErrorViewer</servlet-name>
+          <url-pattern>/servlet/ErrorViewer</url-pattern>
+        </servlet-mapping>
+    <!-- servlet mappings end -->
+    
+    <jsp-config>
+        <taglib>
+	    <taglib-uri>
+	       http://jakarta.apache.org/tomcat/debug-taglib
+	    </taglib-uri>
+	    <taglib-location>
+	       /WEB-INF/jsp/debug-taglib.tld
+	    </taglib-location>
+	</taglib>
+    </jsp-config>
+</web-app>

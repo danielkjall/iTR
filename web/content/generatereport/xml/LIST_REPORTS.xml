@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<response>
+<!-- THese reports are disabled since they have some bugs
+	<report>
+		<name>General report</name>
+		<description>A generell time report,  on time spent on different projects and activities.</description>
+		<target>GeneralQueryProfileView</target>
+	</report>
+	<report>
+		<name>Vacation report</name>
+		<description>Here you can get information about your how long your vacation is and how much remin.</description>
+		<target>VacationQueryProfileView</target>
+	</report>
+-->
+	<report>
+		<name>Monthly report</name>
+		<description>Billing information and total revenue per month.</description>
+		<target>MonthlyQueryProfileView</target>
+	</report>
+</response>

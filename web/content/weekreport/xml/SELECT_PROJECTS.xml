@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="C:\Program\Apache Group\jakarta-tomcat\webapps\ITR\content\timereport\xsl\en_HTML_SELECT_PROJECT.xsl"?>
+<response>
+	<userid>116046</userid>
+	<username>Daniel Kjäll</username>
+	<proj>
+		<code>53330</code>
+		<desc>Project description1</desc>
+	</proj>
+	<proj>
+		<code>53331</code>
+		<desc>Project description2</desc>
+	</proj>
+	<proj>
+		<code>53332</code>
+		<desc>Project description3</desc>
+	</proj>
+	<proj>
+		<code>53333</code>
+		<desc>Project description4</desc>
+	</proj>
+	<proj>
+		<code>53334</code>
+		<desc>Project description5</desc>
+	</proj>
+	<proj>
+		<code>53335</code>
+		<desc>Project description6</desc>
+	</proj>
+	<proj>
+		<code>53336</code>
+		<desc>Project description7</desc>
+	</proj>
+	<proj>
+		<code>53337</code>
+		<desc>Project description8</desc>
+	</proj>
+</response>

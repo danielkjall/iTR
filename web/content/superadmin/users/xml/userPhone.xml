@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XML Spy v3.0 NT (http://www.xmlspy.com) by Fredrik Björk (Ericsson Radio System, Wii, Linkoping) -->
+<response>
+	<activatedusers>
+		<item>
+			<value>1</value>
+			<text>Daniel Kjäll</text>
+		</item>
+		<item>
+			<value>2</value>
+			<text>Robert Johansson</text>
+		</item>
+		<item>
+			<value>3</value>
+			<text>Fredrik Björk</text>
+		</item>
+	</activatedusers>
+	<deactivatedusers>
+		<item>
+			<value>1</value>
+			<text>Olof Altenstedt</text>
+		</item>
+		<item>
+			<value>2</value>
+			<text>Johan Andersson</text>
+		</item>
+		<item>
+			<value>3</value>
+			<text>Klas Händel</text>
+		</item>
+	</deactivatedusers>
+</response>

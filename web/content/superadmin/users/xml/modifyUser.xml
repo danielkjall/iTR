@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XML Spy v3.0 NT (http://www.xmlspy.com) by Fredrik Björk (Ericsson Radio System, Wii, Linkoping) -->
+<response>
+	<firstname>Daniel</firstname>
+	<lastname>Kjäll</lastname>
+	<skinid>1</skinid>
+	<languageid>1</languageid>
+	<companyid>1</companyid>
+	<yearlyvacation>30</yearlyvacation>
+	<savedvacation>5</savedvacation>
+	<remainingvacation>35</remainingvacation>
+	<moneyovertime>25</moneyovertime>
+	<vacationovertime>30</vacationovertime>
+	<createddate>2000-12-12</createddate>
+	<activated>true</activated>
+	<activateddate>2001-01-12</activateddate>
+	<deactivateddate>2001-01-11</deactivateddate>
+	<phone>
+		<phoneid>3</phoneid>
+		<desc>home phone</desc>
+		<no>+46-(0)31-154020</no>
+	</phone>
+	<phone>
+		<phoneid>4</phoneid>
+		<desc>job phone</desc>
+		<no>+46-(0)31-154021</no>
+	</phone>
+	<phone>
+		<phoneid>5</phoneid>
+		<desc>mobil phone</desc>
+		<no>+46-(0)31-154023</no>
+	</phone>
+	<email>
+		<emailid>3</emailid>
+		<desc>home email</desc>
+		<adress>danielkjall@hotmail.com1</adress>
+	</email>
+	<email>
+		<emailid>4</emailid>
+		<desc>job email</desc>
+		<adress>danielkjall@hotmail.com2</adress>
+	</email>
+	<email>
+		<emailid>5</emailid>
+		<desc>other email</desc>
+		<adress>danielkjall@hotmail.com3</adress>
+	</email>
+</response>
