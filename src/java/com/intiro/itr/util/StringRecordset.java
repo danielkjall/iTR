@@ -11,6 +11,7 @@ package com.intiro.itr.util;
 import com.intiro.toolbox.log.IntiroLog;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 import java.util.*;
 
@@ -60,6 +61,11 @@ public class StringRecordset {
 
       for (int j = 1; j <= fieldCount; j++) {
         String value = rs.getString(j);
+        
+        if(rsMeta.getColumnType(j) == java.sql.Types.DATE || rsMeta.getColumnType(j) == java.sql.Types.TIMESTAMP) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+            value = sdf.format(rs.getDate(j));
+        }
 
         // Check if the database value is null
         if (rs.wasNull() || value.equalsIgnoreCase("null")) {
