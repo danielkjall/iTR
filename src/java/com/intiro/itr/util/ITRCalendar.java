@@ -1,6 +1,8 @@
 package com.intiro.itr.util;
 
-import com.intiro.itr.util.log.IntiroLog;
+import com.intiro.toolbox.log.IntiroLog;
+import java.text.SimpleDateFormat;
+
 import java.util.*;
 
 public class ITRCalendar extends GregorianCalendar {
@@ -49,26 +51,8 @@ public class ITRCalendar extends GregorianCalendar {
    * Get Calendar date in store format. Format: [YEAR-MONTH-DATE] 20 december 2000 -> 2000-12-20
    */
   public String getCalendarInStoreFormat() {
-    StringBuffer retval = new StringBuffer();
-
-    retval.append(getYear());
-    retval.append(DATE_SEPARATOR_LINE);
-
-    if (getMonth() < 10) {
-      retval.append("0");
-    }
-
-    retval.append(getMonth());
-    retval.append(DATE_SEPARATOR_LINE);
-
-    if (getDate() < 10) {
-      retval.append("0");
-    }
-
-    retval.append(getDate());
-
-    //IntiroLog.detail(getClass().getName()+".getCalendarInStoreFormat(): retval  = " + retval.toString());
-    return retval.toString();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    return sdf.format(getTime());
   }
 
   //------------------------------------------ START CONVENIENT SET AND GET METHODS ----------------------------------------
