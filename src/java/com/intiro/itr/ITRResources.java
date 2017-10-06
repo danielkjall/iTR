@@ -1,11 +1,3 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr;
 
 import com.intiro.itr.db.DBConstants;
@@ -13,8 +5,6 @@ import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
 
 public class ITRResources {
-
-  //~ Instance/static variables ........................................................................................
 
   //DEBUG
   public final static boolean DEBUG = true;
@@ -39,21 +29,16 @@ public class ITRResources {
   //CONSTANTS FOR SESSION
   public static final String MESSAGE_TO_LOGOUT_USER = "message_to_logout_user";
   public static final String ITR_PERIOD_END_TYPE = "1";
-  
+
+  //SETTINGS
+  private static String webITRRoot = null;
+  private static String periodEndType = "1";
   private static String itrSkin = null;
   private static String language = "en";
   private static String languageCode = "1";
   private static String protocol = null;
   private static String realITRRoot = null;
 
-
-  //SETTINGS
-  private static String webITRRoot = null;
-  private static String periodEndType ="1";
-
-  //~ Methods ..........................................................................................................
-
-  //File separator
   public static String getDefaultFileSeparator() {
     return System.getProperty("file.separator");
   }
@@ -105,7 +90,7 @@ public class ITRResources {
   public static String getDefaultWebITRRootDir() {
     return webITRRoot;
   }
-  
+
   public static void setDefaultPeriodEndType(String type) {
     periodEndType = type;
   }
@@ -113,13 +98,10 @@ public class ITRResources {
   public static String getDefaultPeriodEndType() {
     return periodEndType;
   }
-  
 
   public void load() {
-    DBQueries query = new DBQueries();
-
     try {
-      StringRecordset rs = query.getSettings();
+      StringRecordset rs = DBQueries.getProxy().getSettings();
 
       if (!rs.getEOF()) {
         setDefaultRealITRRootDir(rs.getField(DBConstants.SETTINGS_REALROOTDIR));

@@ -1,22 +1,13 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.weekreport;
 
 import com.intiro.itr.db.*;
 import com.intiro.itr.util.*;
 import com.intiro.itr.util.personalization.*;
 import com.intiro.itr.util.xml.*;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 import java.util.*;
 
 public class Weeks extends DynamicXMLCarrier {
-  // ~ Instance/static variables ........................................................................................
 
   static final String XML_MODE_END = "</mode>";
   static final String XML_MODE_START = "<mode>";
@@ -28,29 +19,30 @@ public class Weeks extends DynamicXMLCarrier {
   String mode = "";
   String title = "Title not set";
   // week reports
-  Vector<WeekReport> weekReports = new Vector<WeekReport>();
+  ArrayList<WeekReport> weekReports = new ArrayList<>();
 
-  // ~ Constructors .....................................................................................................
   /**
    * Constructor I for Weeks.
-   * 
-   * @param profile
-   *          the UserProfile for the current user.
-   * @exception XMLBuilderException
-   *              if something goes wrong.
+   *
+   * @param profile the UserProfile for the current user.
+   * @param mode
+   * @exception XMLBuilderException if something goes wrong.
    */
   public Weeks(UserProfile profile, String mode) throws XMLBuilderException {
     super(profile);
-    weekReports = new Vector<WeekReport>();
+    weekReports = new ArrayList<>();
     this.mode = mode;
   }
 
-  // ~ Methods ..........................................................................................................
   /**
    * Loads the weeks with depending on the mode that is set.
+   *
+   * @param year
+   * @return
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-  public Vector load(String year) throws XMLBuilderException {
-    Vector retval = null;
+  public ArrayList load(String year) throws XMLBuilderException {
+    ArrayList retval = null;
 
     if (mode.equalsIgnoreCase("submitted")) {
       retval = loadSubmitted(year);
@@ -65,7 +57,10 @@ public class Weeks extends DynamicXMLCarrier {
 
   /**
    * Make xml of weeks.
+   *
+   * @throws java.lang.Exception
    */
+  @Override
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -88,7 +83,7 @@ public class Weeks extends DynamicXMLCarrier {
 
     /* User name */
     xmlDoc.append(XML_USERNAME_START);
-    xmlDoc.append(getUserProfile().getFirstName() + " " + getUserProfile().getLastName());
+    xmlDoc.append(getUserProfile().getFirstName()).append(" ").append(getUserProfile().getLastName());
     xmlDoc.append(XML_USERNAME_END);
 
     /* week reports */
@@ -114,7 +109,7 @@ public class Weeks extends DynamicXMLCarrier {
   /**
    * Loads week six month in to the future.
    */
-  private Vector loadFuture() throws XMLBuilderException {
+  private ArrayList loadFuture() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".loadFuture(): Entering");
     }
@@ -169,14 +164,14 @@ public class Weeks extends DynamicXMLCarrier {
   /**
    * Loads submitted weeks.
    */
-  private Vector loadSubmitted() throws XMLBuilderException {
+  private ArrayList loadSubmitted() throws XMLBuilderException {
     return loadSubmitted("");
   }
 
   /**
    * Loads submitted weeks.
    */
-  private Vector loadSubmitted(String year) throws XMLBuilderException {
+  private ArrayList loadSubmitted(String year) throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".loadSubmitted()(): Submitted");
     }
@@ -185,7 +180,7 @@ public class Weeks extends DynamicXMLCarrier {
 
     try {
       //StringRecordset rs = dbQuery.getSubmittedWeeks(getUserProfile().getUserId(), year, false, false);
-      StringRecordset rs = dbQuery.getSubmittedWeeksThick(getUserProfile().getUserId(), year, false, false);
+      StringRecordset rs = DBQueries.getProxy().getSubmittedWeeksThick(getUserProfile().getUserId(), year, false, false);
       int lastCalendarWeekId = -1;
 
       while (!rs.getEOF()) {
@@ -213,59 +208,15 @@ public class Weeks extends DynamicXMLCarrier {
 
       return weekReports;
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".loadSubmitted(): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".loadSubmitted(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
-//  private Vector loadSubmittedPerformance() throws XMLBuilderException {
-//    if (IntiroLog.d()) {
-//      IntiroLog.detail(getClass(), getClass().getName() + ".loadSubmitted()(): Submitted");
-//    }
-//
-//    title = "Submitted";
-//
-//    try {
-//      StringRecordset rs = dbQuery.getSubmittedWeeksThick(getUserProfile().getUserId(), false, false);
-//      //int lastCalendarWeekId = -1;
-//
-//      while (!rs.getEOF()) {
-//        int calendarWeekId = Integer.parseInt(rs.getField("itr_userweekid"));
-//
-//        /* Only make a new WeekReport if we have a new week. */
-//        //if (calendarWeekId != lastCalendarWeekId) {
-//        //lastCalendarWeekId = calendarWeekId;
-//
-//        ITRCalendar fromDate = new ITRCalendar(rs.getField(DBConstants.CALENDARWEEK_FROM_DATE));
-//        ITRCalendar toDate = new ITRCalendar(rs.getField(DBConstants.CALENDARWEEK_TO_DATE));
-//        WeekReport oneWeekReport = new WeekReport(getUserProfile(), fromDate, toDate, "View");
-//        oneWeekReport.load(rs, calendarWeekId);
-//
-//        /* Add weekreport to week reports */
-//        weekReports.add(oneWeekReport);
-//        //}
-//
-//        //rs.moveNext();
-//      }
-//
-//      rs.close();
-//
-//      return weekReports;
-//    } catch (Exception e) {
-//      if (IntiroLog.e()) {
-//        IntiroLog.error(getClass(), getClass().getName() + ".loadSubmitted(): ERROR FROM DATABASE, exception = " + e.getMessage());
-//      }
-//      throw new XMLBuilderException(e.getMessage());
-//    }
-//  }
-
   /**
    * Loads week that needs to be done.
    */
-  private Vector loadTodo() throws XMLBuilderException {
+  private ArrayList loadTodo() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".loadTodo(): Entering");
     }
@@ -298,7 +249,7 @@ public class Weeks extends DynamicXMLCarrier {
     return weekReports;
   }
 
-  private Vector loadTodoPerformance() throws XMLBuilderException {
+  private ArrayList loadTodoPerformance() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".loadTodoPerformance(): Entering");
     }
@@ -307,7 +258,7 @@ public class Weeks extends DynamicXMLCarrier {
     ITRCalendar currentDate = usersActivationDate.cloneCalendar();
 
     WeekReport temp = new WeekReport(getUserProfile(), currentDate.getFromDateForWeekPart(), currentDate.getToDateForWeekPart(), "Edit");
-    HashMap<String, String> alreadySubmittedWeeksHash = temp.alreadySubmittedWeeksAsHashmap(getUserProfile().getUserId());
+    Map<String, String> alreadySubmittedWeeksHash = temp.alreadySubmittedWeeksAsHashmap(getUserProfile().getUserId());
 
     /* First create all weeks between activation and now. */
     while (true) {
@@ -342,7 +293,7 @@ public class Weeks extends DynamicXMLCarrier {
   /**
    * @return Returns the weekReports.
    */
-  public Vector<WeekReport> getWeekReports() {
+  public ArrayList<WeekReport> getWeekReports() {
     return weekReports;
   }
 }

@@ -1,14 +1,4 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.superadmin.projects;
-
-import java.util.Vector;
 
 import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.logic.project.ProjectMember;
@@ -17,11 +7,10 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.List;
 
 public class ProjectEditor extends DynamicXMLCarrier {
-
-  //~ Instance/static variables ........................................................................................
 
   static final String XML_ASSIGNED_PROJECTMEMBERS_END = "</assigned>";
   static final String XML_ASSIGNED_PROJECTMEMBERS_START = "<assigned>";
@@ -49,11 +38,10 @@ public class ProjectEditor extends DynamicXMLCarrier {
   protected String projectId = "";
 
   //Members
-  protected Vector projectMembers = null;
+  protected List<ProjectMember> projectMembers = null;
   protected String title = "";
 
   //~ Constructors .....................................................................................................
-
   public ProjectEditor(UserProfile profile, String mode, String projectId) throws XMLBuilderException {
     super(profile);
 
@@ -65,18 +53,15 @@ public class ProjectEditor extends DynamicXMLCarrier {
         inAddMode = true;
         mode = "Add";
         title = "Add";
-      }
-      else if (mode.indexOf("Edit") != -1) {
+      } else if (mode.indexOf("Edit") != -1) {
         inEditMode = true;
         mode = "Edit";
         title = "Edit";
-      }
-      else if (mode.indexOf("View") != -1) { //view mode
+      } else if (mode.indexOf("View") != -1) { //view mode
         inViewMode = true;
         mode = "View";
         title = "View";
-      }
-      else { //delete mode
+      } else { //delete mode
         inDeleteMode = true;
         mode = "Delete";
         title = "Delete";
@@ -88,16 +73,16 @@ public class ProjectEditor extends DynamicXMLCarrier {
     this.mode = mode;
     this.projectId = projectId;
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): projectId = " + projectId);
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): projectId = " + projectId);
     }
 
     //Load the project to edit, view
     Project oneProject = new Project(getUserProfile()); //TODO CHANGE CONSTRUTOR CALL
 
     if (inEditMode || inViewMode || inDeleteMode) {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + projectId + ", inAddMode =  " + inAddMode);
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + projectId + ", inAddMode =  " + inAddMode);
       }
 
       oneProject.load(projectId);
@@ -109,8 +94,7 @@ public class ProjectEditor extends DynamicXMLCarrier {
     if (inAddMode) {
       this.companyCombo = new CompanyCombo(getUserProfile());
       companyCombo.load();
-    }
-    else {
+    } else {
       this.companyCombo = new CompanyCombo(getUserProfile(), false);
       companyCombo.load(oneProject.getCompanyId());
     }
@@ -126,15 +110,14 @@ public class ProjectEditor extends DynamicXMLCarrier {
   }
 
   //~ Methods ..........................................................................................................
-
   public Project getModifiedProject() {
     return oneProject;
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
@@ -175,10 +158,7 @@ public class ProjectEditor extends DynamicXMLCarrier {
         }
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Assigned part., exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Assigned part., exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
 
@@ -200,60 +180,70 @@ public class ProjectEditor extends DynamicXMLCarrier {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(StringBuffer): xmlDoc = " + xmlDoc);
     }
   }
+
   /**
    * @return Returns the companyCombo.
    */
   public CompanyCombo getCompanyCombo() {
     return companyCombo;
   }
+
   /**
    * @return Returns the inAddMode.
    */
   public boolean isInAddMode() {
     return inAddMode;
   }
+
   /**
    * @return Returns the inDeleteMode.
    */
   public boolean isInDeleteMode() {
     return inDeleteMode;
   }
+
   /**
    * @return Returns the inEditMode.
    */
   public boolean isInEditMode() {
     return inEditMode;
   }
+
   /**
    * @return Returns the inViewMode.
    */
   public boolean isInViewMode() {
     return inViewMode;
   }
+
   /**
    * @return Returns the mode.
    */
   public String getMode() {
     return mode;
   }
+
   /**
    * @return Returns the oneProject.
    */
   public Project getOneProject() {
     return oneProject;
   }
+
   /**
    * @return Returns the projectId.
    */
   public String getProjectId() {
     return projectId;
   }
+
   /**
    * @return Returns the projectMembers.
    */
-  public Vector getProjectMembers() {
+  public List<ProjectMember> getProjectMembers() {
     return projectMembers;
   }
+
   /**
    * @return Returns the title.
    */

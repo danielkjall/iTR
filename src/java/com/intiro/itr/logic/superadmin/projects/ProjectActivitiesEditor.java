@@ -1,15 +1,6 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Olof Altenstedt
- * @version       1.0
- */
 package com.intiro.itr.logic.superadmin.projects;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
 import com.intiro.itr.logic.activity.Activity;
 import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.logic.project.ProjectActivity;
@@ -18,11 +9,10 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.List;
 
 public class ProjectActivitiesEditor extends DynamicXMLCarrier {
-
-  //~ Instance/static variables ........................................................................................
 
   static final String XML_ACTIVITY_END = "</activity>";
   static final String XML_ACTIVITY_START = "<activity>";
@@ -38,14 +28,12 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
   static final String XML_PROJECT_START = "<project>";
   static final String XML_TITLE_END = "</title>";
   static final String XML_TITLE_START = "<title>";
-  protected Vector <ProjectActivity> assignedActivities = new Vector <ProjectActivity> ();
-  protected Vector <Activity> availableActivities = new Vector <Activity> ();
+  protected List<ProjectActivity> assignedActivities = new ArrayList<>();
+  protected List<Activity> availableActivities = new ArrayList<>();
   protected CompanyCombo companyCombo = null;
   protected Project oneProject = null;
   protected int projectId = -1;
   protected String title = "Edit Activities";
-
-  //~ Constructors .....................................................................................................
 
   public ProjectActivitiesEditor(UserProfile profile, int projectId) throws XMLBuilderException {
     super(profile);
@@ -64,7 +52,6 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
   }
 
   //~ Methods ..........................................................................................................
-
   /**
    * Set Activity.
    */
@@ -78,7 +65,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
     oneA.setDescription(onePA.getDescription());
 
     /* TODO: add the entry sorted on code */
-    availableActivities.addElement(oneA);
+    availableActivities.add(oneA);
   }
 
   /**
@@ -93,7 +80,9 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
     for (int i = 0; i < availableActivities.size(); i++) {
       oneA = availableActivities.get(i);
 
-      if (oneA != null && oneA.getId() == id) { return oneA; }
+      if (oneA != null && oneA.getId() == id) {
+        return oneA;
+      }
     }
 
     return null;
@@ -106,7 +95,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
   /**
    * Get ProjectActivities.
    */
-  public Vector getProjectActivities() {
+  public List<ProjectActivity> getProjectActivities() {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getProjectActivities(): Entering");
     }
@@ -125,7 +114,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
     onePA.setProjectId(this.getProjectId());
 
     /* TODO: add the entry sorted on code */
-    assignedActivities.addElement(onePA);
+    assignedActivities.add(onePA);
   }
 
   /**
@@ -140,7 +129,9 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
     for (int i = 0; i < assignedActivities.size(); i++) {
       onePA = assignedActivities.get(i);
 
-      if (onePA != null && onePA.getId() == id && onePA.getStillAssigned()) { return onePA; }
+      if (onePA != null && onePA.getId() == id && onePA.getStillAssigned()) {
+        return onePA;
+      }
     }
 
     return null;
@@ -214,25 +205,21 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
         if (onePA != null) {
           if (onePA.getStillAssigned()) {
             onePA.save();
-          }
-          else {
+          } else {
             onePA.delete();
           }
         }
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
@@ -263,7 +250,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
 
     /*Assigned activities*/
 
-    /* This is created in the Project.toXML() class instead!
+ /* This is created in the Project.toXML() class instead!
      xmlDoc.append(XML_ASSIGNED_ACTIVITIES_START);
      try {
      ProjectActivity onePA = null;
@@ -282,7 +269,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
      xmlDoc.append(XML_ASSIGNED_ACTIVITIES_END);
      */
 
-    /*Available activities*/
+ /*Available activities*/
     xmlDoc.append(XML_AVAILABLE_ACTIVITIES_START);
 
     try {
@@ -298,10 +285,7 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
         }
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Assigned part. ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Assigned part. ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
 
@@ -310,34 +294,39 @@ public class ProjectActivitiesEditor extends DynamicXMLCarrier {
     /*Get end of document*/
     builder.getEndOfDocument(xmlDoc);
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".toXML(StringBuffer): xmlDoc = " + xmlDoc.toString());
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".toXML(StringBuffer): xmlDoc = " + xmlDoc.toString());
     }
   }
+
   /**
    * @return Returns the assignedActivities.
    */
-  public Vector<ProjectActivity> getAssignedActivities() {
+  public List<ProjectActivity> getAssignedActivities() {
     return assignedActivities;
   }
+
   /**
    * @return Returns the availableActivities.
    */
-  public Vector<Activity> getAvailableActivities() {
+  public List<Activity> getAvailableActivities() {
     return availableActivities;
   }
+
   /**
    * @return Returns the companyCombo.
    */
   public CompanyCombo getCompanyCombo() {
     return companyCombo;
   }
+
   /**
    * @return Returns the oneProject.
    */
   public Project getOneProject() {
     return oneProject;
   }
+
   /**
    * @return Returns the title.
    */

@@ -55,8 +55,8 @@ public class ITRInitServlet implements org.glassfish.api.Startup {
 //      stop = new Date().getTime();
 //      sum = (stop - start) / 1000;
 //
-//      if (IntiroLog.t()) {
-//        IntiroLog.trace(getClass(), getClass().getName() + ".init(): Finish the init of the itr: It took " + sum + " seconds");
+//      if (IntiroLog.d()) {
+//        IntiroLog.detail(getClass(), getClass().getName() + ".init(): Finish the init of the itr: It took " + sum + " seconds");
 //      }
 //    } catch (Exception e) {
 //      System.out.println("ERROR i startup class: " + e.getMessage());

@@ -18,13 +18,13 @@ response.addHeader("Cache-Control","no-store");
         }
       
       Common common = new Common(userProfile);
-      Vector users = common.getUsersList(year);
+      ArrayList users = common.getUsersList(year);
       
     
       ApprovedWeeks xmlCarrier = new ApprovedWeeks(userProfile, "View");
 
       /*Load the week reports and save them in the session object*/
-      Vector weeks = xmlCarrier.load(year,userId);
+      ArrayList weeks = xmlCarrier.load(year,userId);
       session.setAttribute(ITRResources.ITR_WEEK_REPORTS, weeks);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

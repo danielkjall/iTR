@@ -12,7 +12,7 @@ response.addHeader("Cache-Control","no-store");
       ApproveWeeks xmlCarrier = new ApproveWeeks(userProfile, "Approve");
 
       /*Load the week reports and save them in the session object*/
-      Vector weeks = xmlCarrier.load();
+      ArrayList weeks = xmlCarrier.load();
       session.setAttribute(ITRResources.ITR_WEEK_REPORTS, weeks);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

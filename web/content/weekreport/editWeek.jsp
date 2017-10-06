@@ -20,7 +20,7 @@
     boolean copyFromSubmitted = false;
     String mode = request.getParameter("mode");
     String weekComment = "";
-    Vector weekReports = new Vector();
+    ArrayList weekReports = new ArrayList();
 
 	  UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
 	  WeekReport aWeek = (WeekReport) session.getAttribute(ITRResources.ITR_WEEK_REPORT);
@@ -32,7 +32,7 @@
       if (action != null && action.equalsIgnoreCase("start")) {
 
         //Fetch week reports from session
-        weekReports = (Vector) session.getAttribute(ITRResources.ITR_WEEK_REPORTS);
+        weekReports = (ArrayList) session.getAttribute(ITRResources.ITR_WEEK_REPORTS);
 
         int weekReportsIndex = Integer.parseInt(request.getParameter("row"));
         aWeek = (WeekReport) weekReports.get(weekReportsIndex);

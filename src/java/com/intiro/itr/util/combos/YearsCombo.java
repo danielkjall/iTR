@@ -1,58 +1,50 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Olof Altenstedt
- * @version       1.0
- */
 package com.intiro.itr.util.combos;
 
+import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.xml.XMLCombo;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class YearsCombo extends XMLCombo {
 
-  //~ Constructors .....................................................................................................
-
   /**
-   * Constructor I for YearsCombo.
-   * Creates a combo with a value = "null" and text = "Select Year".
-   * @param   profile         the UserProfile of the user.
+   * Constructor I for YearsCombo. Creates a combo with a value = "null" and text = "Select Year".
+   *
+   * @param profile the UserProfile of the user.
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public YearsCombo(UserProfile profile) throws XMLBuilderException {
     this(profile, "Select Year");
   }
 
   /**
-   * Constructor II for YearsCombo.
-   * Creates a combo with a value = "null" and text = "---------",
-   * if makeNullEntry is true.
-   * @param   profile         the UserProfile of the user.
-   * @param   makeNullEntry   a boolean specifying if empty entry should be added.
+   * Constructor II for YearsCombo. Creates a combo with a value = "null" and text = "---------", if makeNullEntry is true.
+   *
+   * @param profile the UserProfile of the user.
+   * @param makeNullEntry a boolean specifying if empty entry should be added.
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public YearsCombo(UserProfile profile, boolean makeNullEntry) throws XMLBuilderException {
     super(profile, makeNullEntry);
   }
 
   /**
-   * Constructor III for YearsCombo.
-   * Creates a combo with a value = "null" and text = nameOnNullEntry.
-   * @param profile           the UserProfile of the user.
-   * @param nameOnNullEntry   a String specifying the name on the entry with value "null".
+   * Constructor III for YearsCombo. Creates a combo with a value = "null" and text = nameOnNullEntry.
+   *
+   * @param profile the UserProfile of the user.
+   * @param nameOnNullEntry a String specifying the name on the entry with value "null".
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public YearsCombo(UserProfile profile, String nameOnNullEntry) throws XMLBuilderException {
     super(profile, nameOnNullEntry);
   }
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = dbQuery.getReportYears();
+      StringRecordset rs = DBQueries.getProxy().getReportYears();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField("year"), rs.getField("year"));

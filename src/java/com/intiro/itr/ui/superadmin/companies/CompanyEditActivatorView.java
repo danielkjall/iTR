@@ -1,18 +1,9 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Fredrik Bjork
- * @version       1.0
- */
 package com.intiro.itr.ui.superadmin.companies;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.logic.superadmin.companies.CompanyEditor;
 import com.intiro.itr.ui.ITRServlet;
@@ -21,19 +12,17 @@ import com.intiro.itr.ui.constants.URLs;
 import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * Servlet that handles saving or adding of a user.
  *
- * This servlet does not display anything, it collects the information from the incoming form
- * and calls the save method on the user, followed by a redirecting of the logged in superadministator
- * to UserQueryView.
+ * This servlet does not display anything, it collects the information from the incoming form and calls the save method on the user,
+ * followed by a redirecting of the logged in superadministator to UserQueryView.
  */
 public class CompanyEditActivatorView extends ITRServlet implements URLs, Commands {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -53,8 +42,8 @@ public class CompanyEditActivatorView extends ITRServlet implements URLs, Comman
       /*Create an output page*/
       //Page page = new Page(request);
       //page = null;
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Page created");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Page created");
       }
 
       HttpSession session = request.getSession(false);
@@ -77,13 +66,12 @@ public class CompanyEditActivatorView extends ITRServlet implements URLs, Comman
       if (save != null && save.length() > 0) {
         mode = save.trim();
         bSave = true;
-      }
-      else if (delete != null && delete.length() > 0) {
+      } else if (delete != null && delete.length() > 0) {
         mode = delete.trim();
         bDelete = true;
       }
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Mode = " + mode + ", bsave = " + bSave + ", bDelete = " + bDelete + ", save = " + save + ", delete = " + delete);
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Mode = " + mode + ", bsave = " + bSave + ", bDelete = " + bDelete + ", save = " + save + ", delete = " + delete);
       }
       if (bDelete) {
         CompanyEditor companyEditor = (CompanyEditor) session.getAttribute(ITRResources.ITR_MODIFIED_COMPANY);
@@ -92,8 +80,7 @@ public class CompanyEditActivatorView extends ITRServlet implements URLs, Comman
         if (retVal == false) {
           new Exception("Can not delete Company with company id = " + companyEditor.getModifiedCompany().getCompanyId() + ". ");
         }
-      }
-      else if (bSave) {
+      } else if (bSave) {
         if (request.getParameter("name") != null && request.getParameter("name").length() > 0) {
           name = request.getParameter("name");
         }
@@ -142,11 +129,8 @@ public class CompanyEditActivatorView extends ITRServlet implements URLs, Comman
 
       reAuthenticate(request, response, getServletContext(), "No Session - reauthenticate");
 
-      return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;
@@ -162,9 +146,9 @@ public class CompanyEditActivatorView extends ITRServlet implements URLs, Comman
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
     }
-    return;
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): Entering doPost");

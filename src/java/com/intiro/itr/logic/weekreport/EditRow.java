@@ -12,7 +12,7 @@ import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.combos.TimeTypeCombo;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class EditRow extends Row {
 

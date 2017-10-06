@@ -5,7 +5,7 @@
 package com.intiro.itr.logic.weekreport;
 
 import com.intiro.itr.util.personalization.UserProfile;
-import java.util.Vector;
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

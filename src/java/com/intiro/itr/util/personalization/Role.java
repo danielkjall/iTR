@@ -1,37 +1,29 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.util.personalization;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Role {
 
-  //~ Instance/static variables ........................................................................................
-
-  boolean isAdmin = false;
-  boolean isEmployee = false;
-  boolean isSuperAdmin = false;
-  boolean isUnderConsultant = false;
-  Vector modules = new Vector();
-  String name = "";
-  int roleId = -1;
-  int userId = -1;
-  int userRoleId = -1;
-
-  //~ Methods ..........................................................................................................
+  public static final String CACHE_ALL_ROLE = "CACHE_ALL_ROLE";
+  private boolean isAdmin = false;
+  private boolean isEmployee = false;
+  private boolean isSuperAdmin = false;
+  private boolean isUnderConsultant = false;
+  private ArrayList<Module> modules = new ArrayList<>();
+  private String name = "";
+  private int roleId = -1;
+  private int userId = -1;
+  private int userRoleId = -1;
 
   //ADMIN
   public boolean isAdmin() {
@@ -43,47 +35,22 @@ public class Role {
     return isEmployee;
   }
 
-  /**
-   * Sets the Id.
-   *
-   * @param   an int containing the Id.
-   */
   public void setId(int Id) {
     this.userRoleId = Id;
   }
 
-  /**
-   * Get the Id.
-   *
-   * @return   an int containing the id.
-   */
   public int getId() {
     return userRoleId;
   }
 
-  /**
-   * Get the modules that the role is authorized for.
-   *
-   * @return   a Vector containing the names of the modules.
-   */
-  public Vector getModules() {
+  public ArrayList getModules() {
     return modules;
   }
 
-  /**
-   * Sets the name of the role.
-   *
-   * @param   a String containing the name of the role.
-   */
   public void setName(String name) {
     this.name = name;
   }
 
-  /**
-   * Get the name of the role.
-   *
-   * @return   a String containing the name of the role.
-   */
   public String getName() {
     return name;
   }
@@ -91,7 +58,8 @@ public class Role {
   /**
    * Check if this Role is authorized to use the Module with supplied moduleId.
    *
-   * @param        moduleId, an int specifying the module to check for.
+   * @param moduleId, an int specifying the module to check for.
+   * @return
    */
   public boolean isRoleAuthorizedForModule(int moduleId) {
     boolean retval = false;
@@ -107,20 +75,10 @@ public class Role {
     return retval;
   }
 
-  /**
-   * Sets the roleId of the role.
-   *
-   * @param   an int containing the roleId of the role.
-   */
   public void setRoleId(int roleId) {
     this.roleId = roleId;
   }
 
-  /**
-   * Get the roleId of the role.
-   *
-   * @return   an int containing the roleId of the role.
-   */
   public int getRoleId() {
     return roleId;
   }
@@ -135,27 +93,63 @@ public class Role {
     return isUnderConsultant;
   }
 
-  /**
-   * Sets the userId of the role.
-   *
-   * @param   an int containing the userId of the role.
-   */
   public void setUserId(int userId) {
     this.userId = userId;
   }
 
-  /**
-   * Get the userId of the role.
-   *
-   * @return   an int containing the userId of the role.
-   */
   public int getUserId() {
     return userId;
   }
 
-  /**
-   * Load the role for the userid.
-   */
+  public static Map<Integer, ArrayList<Role>> loadAllRoles() throws XMLBuilderException {
+    Map<Integer, ArrayList<Role>> retval = new HashMap<>();
+
+    try {
+      Map<Integer, ArrayList<Role>> cached = ItrCache.get(CACHE_ALL_ROLE);
+      if (cached != null) {
+        return cached;
+      }
+
+      Map<Integer, ArrayList<Module>> mapModules = Module.loadAllModules();
+
+      StringRecordset rs = DBQueries.getProxy().getRoleForUser(null);
+      while (!rs.getEOF()) {
+        Role aRole = new Role();
+        aRole.setName(rs.getField(DBConstants.ROLES_NAME));
+        aRole.setRoleId(Integer.parseInt(rs.getField(DBConstants.USERROLES_ROLESID_FK)));
+        aRole.setUserId(Integer.parseInt(rs.getField(DBConstants.USERROLES_USERID_FK)));
+        aRole.setId(Integer.parseInt(rs.getField(DBConstants.USERROLES_ID_PK)));
+
+        if (aRole.getRoleId() == 1) { // Super Admin
+          aRole.setSuperAdmin();
+        } else if (aRole.getRoleId() == 2) { //Admin
+          aRole.setAdmin();
+        } else if (aRole.getRoleId() == 3) { //Employee
+          aRole.setEmployee();
+        } else if (aRole.getRoleId() == 4) { //Under Consultant
+          aRole.setUnderConsultant();
+        }
+        aRole.modules = mapModules.get(aRole.getRoleId());
+
+        Integer key = aRole.getUserId();
+        if (retval.containsKey(key)) {
+          retval.put(aRole.getUserId(), new ArrayList<>());
+        }
+        retval.get(key).add(aRole);
+
+        rs.moveNext();
+      }
+
+    } catch (Exception e) {
+      IntiroLog.criticalError(Role.class, Role.class.getName() + ".loadAllRoles(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      throw new XMLBuilderException(e.getMessage());
+    }
+
+    final int TenHours = 1 * 60 * 60 * 10;
+    ItrCache.put(CACHE_ALL_ROLE, retval, TenHours);
+    return retval;
+  }
+
   public void load(String userId) throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".load(): Entering");
@@ -165,7 +159,7 @@ public class Role {
     clear();
 
     try {
-      StringRecordset rs = new DBQueries().getRoleForUser(userId);
+      StringRecordset rs = DBQueries.getProxy().getRoleForUser(userId);
 
       if (!rs.getEOF()) {
         setName(rs.getField(DBConstants.ROLES_NAME));
@@ -175,31 +169,22 @@ public class Role {
 
         if (getRoleId() == 1) { // Super Admin
           setSuperAdmin();
-        }
-        else if (getRoleId() == 2) { //Admin
+        } else if (getRoleId() == 2) { //Admin
           setAdmin();
-        }
-        else if (getRoleId() == 3) { //Employee
+        } else if (getRoleId() == 3) { //Employee
           setEmployee();
-        }
-        else if (getRoleId() == 4) { //Under Consultant
+        } else if (getRoleId() == 4) { //Under Consultant
           setUnderConsultant();
         }
       }
 
       modules = Module.load(getRoleId());
     } catch (Exception e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".load(String userId): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".load(String userId): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
-  /**
-   * Save the role.
-   */
   public void save() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
@@ -209,32 +194,23 @@ public class Role {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute dbExecute = new DBExecute();
-        dbExecute.updateUserRoleConnection(this);
+        DBExecute.getProxy().updateUserRoleConnection(this);
       } catch (Exception e) {
-        if (IntiroLog.ce()) {
-          IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception	= " + e.getMessage());
-        }
-
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception	= " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
-    }
-    else {
+    } else {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        DBQueries dbQuery = new DBQueries();
-        StringRecordset rs = dbQuery.makeNewUserRoleConnectionAndFetchId(this);
+        StringRecordset rs = DBQueries.getProxy().makeNewUserRoleConnectionAndFetchId(this);
 
         if (!rs.getEOF()) {
           setId(Integer.parseInt(rs.getField("maxId")));
         }
       } catch (Exception e) {
-        if (IntiroLog.ce()) {
-          IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception	= " + e.getMessage());
-        }
-
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception	= " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
     }
@@ -259,11 +235,8 @@ public class Role {
     isUnderConsultant = true;
   }
 
-  /**
-   * Clear the roles.
-   */
   void clear() {
-    modules = new Vector();
+    modules = new ArrayList();
     isUnderConsultant = false;
     isEmployee = false;
     isAdmin = false;

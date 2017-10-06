@@ -1,20 +1,10 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.login;
 
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.ui.ITRServlet;
 import com.intiro.itr.ui.Page;
@@ -24,18 +14,14 @@ import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.ClientInfo;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.StaticXMLCarrier;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * Shows the login dialog.
  */
 public class LoginView extends ITRServlet implements URLs {
 
-  //~ Methods ..........................................................................................................
-
-  /**
-   * ...
-   */
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Entering");
@@ -47,10 +33,10 @@ public class LoginView extends ITRServlet implements URLs {
      }catch(Exception e){}
      IntiroLog.getInstance().setLoggingLevel(1);
      */
-    /*Setting ITRResources.getWebitrRootDir() if not set through itr.properties file.*/
-    /*WebitrRootDir is set when the first visitor comes to the itr.*/
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): ITRResources.getDefaultWebitrRootDir() = " + ITRResources.getDefaultWebITRRootDir());
+ /*Setting ITRResources.getWebitrRootDir() if not set through itr.properties file.*/
+ /*WebitrRootDir is set when the first visitor comes to the itr.*/
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): ITRResources.getDefaultWebitrRootDir() = " + ITRResources.getDefaultWebITRRootDir());
     }
     if (ITRResources.getDefaultWebITRRootDir() == null || ITRResources.getDefaultWebITRRootDir().length() == 0) {
       StringBuffer sb = new StringBuffer();
@@ -59,8 +45,8 @@ public class LoginView extends ITRServlet implements URLs {
       sb.append("/");
       ITRResources.setDefaultWebITRRootDir(sb.toString());
 
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Setting ITRResources.getRealitrRootDir() to " + sb.toString());
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Setting ITRResources.getRealitrRootDir() to " + sb.toString());
       }
     }
 
@@ -81,8 +67,8 @@ public class LoginView extends ITRServlet implements URLs {
       /*Create an output page*/
       Page page = new Page(request);
 
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Page created");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Page created");
       }
 
       /*Creating ClientInfo and storing it in Session*/
@@ -101,15 +87,15 @@ public class LoginView extends ITRServlet implements URLs {
       response.setContentType(userProfile.getClientInfo().getContentType());
 
       /*Creating XSLFormatedArea*/
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Creating XSLFormatedArea");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Creating XSLFormatedArea");
       }
 
       StaticXMLCarrier xmlCarrier = new StaticXMLCarrier(LOGIN_XML, userProfile);
 
       /*Create XSLFormatedArea*/
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Creating XSLFormatedArea");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Creating XSLFormatedArea");
       }
 
       XSLFormatedArea xslArea = new XSLFormatedArea(xmlCarrier, LOGIN_HTML_XSL);
@@ -117,8 +103,7 @@ public class LoginView extends ITRServlet implements URLs {
       /*Try to retrieve login message from session or request*/
       if ((String) request.getAttribute(ITRResources.LOGIN_MESSAGE) != null) {
         xslArea.addParameter("loginMessage", "'" + (String) request.getAttribute(ITRResources.LOGIN_MESSAGE) + "'");
-      }
-      else if (session.getAttribute(ITRResources.LOGIN_MESSAGE) != null) {
+      } else if (session.getAttribute(ITRResources.LOGIN_MESSAGE) != null) {
         xslArea.addParameter("loginMessage", "'" + session.getAttribute(ITRResources.LOGIN_MESSAGE) + "'");
       }
 
@@ -135,9 +120,7 @@ public class LoginView extends ITRServlet implements URLs {
         IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): OutputStream is flushed");
       }
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): Entering catch Exception: " + exception.getMessage());
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): Entering catch Exception: " + exception.getMessage());
 
       /*Create errorHandler*/
       UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
@@ -154,10 +137,10 @@ public class LoginView extends ITRServlet implements URLs {
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
 
-      return;
     }
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     doGet(request, response);
   }

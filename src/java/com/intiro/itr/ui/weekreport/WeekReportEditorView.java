@@ -1,21 +1,11 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.weekreport;
 
 import java.io.PrintWriter;
-import java.util.Vector;
-
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.logic.weekreport.Row;
 import com.intiro.itr.logic.weekreport.WeekReport;
@@ -27,15 +17,14 @@ import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.ui.xsl.XSLFormatedArea;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * This servlet creates the week report to look at or to edit.
  */
 public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -56,7 +45,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
     boolean copyFromSubmitted = false;
     String mode = request.getParameter("mode");
     String weekComment = "";
-    Vector weekReports = new Vector();
+    ArrayList weekReports;
 
     try {
       out = response.getWriter();
@@ -82,7 +71,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
       if (action != null && action.equalsIgnoreCase("start")) {
 
         //Fetch week reports from session
-        weekReports = (Vector) session.getAttribute(ITRResources.ITR_WEEK_REPORTS);
+        weekReports = (ArrayList) session.getAttribute(ITRResources.ITR_WEEK_REPORTS);
 
         int weekReportsIndex = Integer.parseInt(request.getParameter("row"));
         xmlCarrier = (WeekReport) weekReports.get(weekReportsIndex);
@@ -93,10 +82,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
         if (xmlCarrier.getRows() != null && xmlCarrier.getRows().size() == 0 && copyFromSubmitted) {
           xmlCarrier.loadWeekWithLatestSubmittedWeek();
         }
-      }
-
-      /*ADD A ROW*/
-      else if (action != null && action.equalsIgnoreCase("addrow")) {
+      } /*ADD A ROW*/ else if (action != null && action.equalsIgnoreCase("addrow")) {
 
         /*set parameters*/
         if (request.getParameter("mo") != null && request.getParameter("mo").length() > 0) {
@@ -151,8 +137,8 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
         /*Add the new row to your WeekReportEditor*/
         xmlCarrier.addRow(newRow);
 
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): action = " + action + ", newRow.toString() = " + newRow.toString());
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): action = " + action + ", newRow.toString() = " + newRow.toString());
         }
 
         /*Recalculate summary rows*/
@@ -161,10 +147,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): action = " + action + ", xmlCarrier.getEditRow().toString() = " + xmlCarrier.getEditRow().toString());
         }
-      }
-
-      /*PROJECT SELECTED*/
-      else if (action != null && action.equalsIgnoreCase("projSelected")) {
+      } /*PROJECT SELECTED*/ else if (action != null && action.equalsIgnoreCase("projSelected")) {
 
         /*Set parameters*/
         if (request.getParameter("projSubId") != null && request.getParameter("projSubId").length() > 0) {
@@ -181,10 +164,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): action = " + action + ", xmlCarrier.getEditRow().toString() = " + xmlCarrier.getEditRow().toString());
         }
-      }
-
-      /*EDIT A ROW*/
-      else if (action != null && action.equalsIgnoreCase("editRow")) {
+      } /*EDIT A ROW*/ else if (action != null && action.equalsIgnoreCase("editRow")) {
 
         /*set parameters*/
         if (request.getParameter("row") != null && request.getParameter("row").length() > 0) {
@@ -215,10 +195,7 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): action = " + action + ", xmlCarrier.getEditRow().toString() = " + xmlCarrier.getEditRow().toString());
         }
-      }
-
-      /*REMOVE A ROW*/
-      else if (action != null && action.equalsIgnoreCase("removeRow")) {
+      } /*REMOVE A ROW*/ else if (action != null && action.equalsIgnoreCase("removeRow")) {
 
         /*set parameters*/
         if (request.getParameter("row") != null && request.getParameter("row").length() > 0) {
@@ -236,25 +213,22 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
 
         /*Recalculate summary rows*/
         xmlCarrier.getSumRows().calcSum(xmlCarrier.getRows());
-      }
-      else if (action != null && action.equalsIgnoreCase("cancelSubmit")) {
+      } else if (action != null && action.equalsIgnoreCase("cancelSubmit")) {
         xmlCarrier.setSubmitErrorOccurred(false);
       }
 
       /*END ACTION*/
 
-      /*Create an XSLFormatedArea and add it to the page*/
+ /*Create an XSLFormatedArea and add it to the page*/
       XSLFormatedArea xslWeek = null;
 
       if (mode != null && mode.equalsIgnoreCase("submitted")) {
         //xslWeek = new XSLFormatedArea(xmlCarrier, REPORT_VIEW_APPROVE_WEEK_HTML_XSL);
         session.setAttribute(ITRResources.ITR_WEEK_REPORT, xmlCarrier);
         getServletConfig().getServletContext().getRequestDispatcher("../content/weekreport/approveWeek.jsp").forward(request, response);
-      }
-      else if (mode != null && mode.equalsIgnoreCase("approve")) {
+      } else if (mode != null && mode.equalsIgnoreCase("approve")) {
         xslWeek = new XSLFormatedArea(xmlCarrier, REPORT_VIEW_APPROVE_WEEK_HTML_XSL);
-      }
-      else {
+      } else {
         xslWeek = new XSLFormatedArea(xmlCarrier, REPORT_EDIT_WEEK_HTML_XSL);
       }
 
@@ -275,12 +249,8 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
       }
 
       reAuthenticate(request, response, getServletContext(), "No Session - reauthenticate");
-
-      return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;
@@ -295,11 +265,10 @@ public class WeekReportEditorView extends ITRServlet implements URLs, Commands {
       errorHandler.setErrorMessage("A problem occured when trying to display the " + getClass().getName() + " page.");
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
-
-      return;
     }
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): Entering doPost");

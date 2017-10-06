@@ -1,41 +1,28 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.util.xsl;
 
 import java.io.File;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.util.personalization.ClientInfo;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class DefaultXSLCarrier implements XSLCarrier {
 
-  //~ Instance/static variables ........................................................................................
-
   private StringBuffer sbXSLFile = null;
   private String xslFile = null;
-
-  //~ Constructors .....................................................................................................
 
   public DefaultXSLCarrier(String xslFile) {
     this.xslFile = xslFile;
     sbXSLFile = new StringBuffer(xslFile);
   }
 
-  //~ Methods ..........................................................................................................
-
   /**
    * Return a correct webpath to the xsl when parsing on server.
-   * @param userProfile        a UserProfile with settings.
+   *
+   * @param userProfile a UserProfile with settings.
    * @return a String, specifying the correct webpath to the xsl file.
    */
+  @Override
   public String handleClientXSL(UserProfile userProfile) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".handleClientXSL(): Entering");
@@ -52,12 +39,10 @@ public class DefaultXSLCarrier implements XSLCarrier {
 
     //START BUILDING WEBPATH TO THE XSL.
     StringBuffer webPathToXSL = new StringBuffer();
-    webPathToXSL.append(ITRResources.HTTP_PROTOCOL_STRING + ITRResources.getDefaultWebITRRootDir());
+    webPathToXSL.append(ITRResources.HTTP_PROTOCOL_STRING).append(ITRResources.getDefaultWebITRRootDir());
 
     //END BUILDING PATH TO XSL
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".handleClientXSL(): Returning xslFile = " + webPathToXSL + sbXSLFile.toString());
-    }
+    IntiroLog.detail(getClass(), getClass().getName() + ".handleClientXSL(): Returning xslFile = " + webPathToXSL + sbXSLFile.toString());
 
     return webPathToXSL + sbXSLFile.toString();
   }
@@ -65,7 +50,7 @@ public class DefaultXSLCarrier implements XSLCarrier {
   /**
    * Return a correct path to the xsl when parsing on server.
    *
-   * @param userProfile        a UserProfile with settings.
+   * @param userProfile a UserProfile with settings.
    * @return a String, specifying the correct realpath to the xsl file.
    */
   public String handleServerXSL(UserProfile userProfile) {
@@ -83,16 +68,15 @@ public class DefaultXSLCarrier implements XSLCarrier {
     realPathToXSL.append(ITRResources.getDefaultRealITRRootDir());
 
     //END BUILDING PATH TO XSL
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".handleServerXSL(): Returning xslFile = " + realPathToXSL + sbXSLFile.toString());
-    }
+    IntiroLog.detail(getClass(), getClass().getName() + ".handleServerXSL(): Returning xslFile = " + realPathToXSL + sbXSLFile.toString());
 
     return realPathToXSL + sbXSLFile.toString();
   }
 
   /**
    * Used to set the correct language prefix on the xsl file and uses the correct skin.
-   * @param userProfile        a UserProfile with settings for the user.
+   *
+   * @param userProfile a UserProfile with settings for the user.
    */
   protected void setLanguageCodePrefixAndSkin(UserProfile userProfile) {
 
@@ -100,9 +84,7 @@ public class DefaultXSLCarrier implements XSLCarrier {
     String languagePrefix = null;
 
     if (userProfile.getClientInfo() != null) {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".getClientInfo() != null ");
-      }
+      IntiroLog.detail(getClass(), getClass().getName() + ".getClientInfo() != null ");
 
       languagePrefix = userProfile.getClientInfo().getLanguageCode();
 
@@ -110,7 +92,7 @@ public class DefaultXSLCarrier implements XSLCarrier {
         languagePrefix = ITRResources.getDefaultLanguageCode();
       }
       //if .xsl is missing add it.
-      if (xslFile.indexOf(".xsl") == -1) {
+      if (!xslFile.contains(".xsl")) {
         sbXSLFile.append(".xsl");
       }
 
@@ -118,20 +100,16 @@ public class DefaultXSLCarrier implements XSLCarrier {
       insertSkin(userProfile.getClientInfo());
 
       //Build the path for the xsl file.
-      StringBuffer checkFile = new StringBuffer();
+      StringBuilder checkFile = new StringBuilder();
       checkFile.append(ITRResources.getDefaultRealITRRootDir());
 
       //add the language specific xslfile
       checkFile.append(sbXSLFile.toString());
 
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".setLanguageCodePrefixAndSkin(): Checking if file = " + sbXSLFile.toString() + " exists");
-      }
+      IntiroLog.detail(getClass(), getClass().getName() + ".setLanguageCodePrefixAndSkin(): Checking if file = " + sbXSLFile.toString() + " exists");
       //Check if the language xsl exists. If not switch back to default language xsl.
       if (!(new File(checkFile.toString()).exists())) {
-        if (IntiroLog.w()) {
-          IntiroLog.warning(getClass(), getClass().getName() + ".setLanguageCodePrefixAndSkin(): Specified language xsl does not exist, using default xsl instead. failed path = " + checkFile.toString());
-        }
+        IntiroLog.warning(getClass(), getClass().getName() + ".setLanguageCodePrefixAndSkin(): Specified language xsl does not exist, using default xsl instead. failed path = " + checkFile.toString());
 
         //add default language code
         languagePrefix = ITRResources.getDefaultLanguageCode();
@@ -148,8 +126,7 @@ public class DefaultXSLCarrier implements XSLCarrier {
         sbXSLFile.insert(xslFile.lastIndexOf("/") + 1, languagePrefix + "_");
         insertSkin(userProfile.getClientInfo());
       }
-    }
-    else { //if(userProfile.getClientInfo() != null)
+    } else { //if(userProfile.getClientInfo() != null)
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".setLanguageCodePrefixAndSkin(): userProfile.getClientInfo() = " + userProfile.getClientInfo());
       }
@@ -160,18 +137,17 @@ public class DefaultXSLCarrier implements XSLCarrier {
 
   /**
    * Used to set the correct skin-xsl file.
-   * @param clientInfo        a ClientInfo created with settings from the users browser.
+   *
+   * @param clientInfo a ClientInfo created with settings from the users browser.
    */
   protected void insertSkin(ClientInfo clientInfo) {
     String frames = "/frames/";
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".insertSkin(): xslFile.indexOf(frames) = " + xslFile.indexOf(frames) + " + " + frames + " = " + xslFile.indexOf(frames) + frames);
-    }
+    IntiroLog.detail(getClass(), getClass().getName() + ".insertSkin(): xslFile.indexOf(frames) = " + xslFile.indexOf(frames) + " + " + frames + " = " + xslFile.indexOf(frames) + frames);
+
     if (xslFile.indexOf(frames) != -1) {
       sbXSLFile.insert(xslFile.lastIndexOf(frames) + frames.length(), clientInfo.getSkin() + "/");
-    }
-    else if (IntiroLog.w()) {
+    } else {
       IntiroLog.warning(getClass(), getClass().getName() + ".insertSkin(): was called but " + frames + " was not contained in xslFile = " + xslFile);
     }
   }

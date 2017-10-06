@@ -1,28 +1,19 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.util.xml;
 
 import java.util.ArrayList;
 
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.List;
 
 /**
- * This class represents a table.
- * It is abstract so it need to be subclasses to be used by a specific innertable.
+ * This class represents a table. It is abstract so it need to be subclasses to be used by a specific innertable.
  *
  */
 public abstract class XMLInnerTable extends DynamicXMLCarrier {
 
   //~ Instance/static variables ........................................................................................
-
   static final String XML_TD_DISPLAY_END = "</display>";
   static final String XML_TD_DISPLAY_START = "<display>";
   static final String XML_TD_END = "</td>";
@@ -37,35 +28,29 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
 
   /*XML tags*/
   static final String XML_TR_START = "<tr>";
-  protected ArrayList columnProperties = null;
+  protected List<ColumnProperties> columnProperties = null;
   protected String nameEnd = null;
   protected String nameStart = null;
   protected StringRecordset rs = null;
 
   //~ Constructors .....................................................................................................
-
   /**
-   * Constructor I.
-   * Construct a XMLInnerTable.
-   * You must set the column properties with the method setColumnProperties().
-   * Load it with a StringRecordset with the load() method.
+   * Constructor I. Construct a XMLInnerTable. You must set the column properties with the method setColumnProperties(). Load it with a
+   * StringRecordset with the load() method.
    *
-   * @param    profile                a UserProfile.
-   * @param    columnProperties    a ArrayList with ColumnProperties.
-   * @exception    XMLBuilderException    thrown if something goes wrong.
+   * @param profile a UserProfile.
+   * @exception XMLBuilderException thrown if something goes wrong.
    */
   public XMLInnerTable(UserProfile profile) throws XMLBuilderException {
     super(profile);
   }
 
   /**
-   * Constructor II.
-   * Construct a XMLInnertable.
-   * Load it with a StringRecordset with the load() method.
+   * Constructor II. Construct a XMLInnertable. Load it with a StringRecordset with the load() method.
    *
-   * @param    profile                a UserProfile.
-   * @param    columnProperties    a ArrayList with ColumnProperties.
-   * @exception    XMLBuilderException    thrown if something goes wrong.
+   * @param profile a UserProfile.
+   * @param columnProperties a ArrayList with ColumnProperties.
+   * @exception XMLBuilderException thrown if something goes wrong.
    */
   public XMLInnerTable(UserProfile profile, ArrayList columnProperties) throws XMLBuilderException {
     super(profile);
@@ -73,21 +58,26 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
   }
 
   //~ Methods ..........................................................................................................
-
   /**
    * Set columnProperties.
+   *
+   * @param columnProperties
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-  public void setColumnProperties(ArrayList columnProperties) throws XMLBuilderException {
+  public void setColumnProperties(List<ColumnProperties> columnProperties) throws XMLBuilderException {
     this.columnProperties = columnProperties;
   }
 
   /**
-   * Get columnProperties.
-   * This method is called when fetching information from the database.
-   * This method should return an ArrayList with ColumnProperties.
+   * Get columnProperties. This method is called when fetching information from the database. This method should return an ArrayList with
+   * ColumnProperties.
+   *
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-  public ArrayList getColumnProperties() throws XMLBuilderException {
-    if (columnProperties == null || columnProperties.size() == 0) { throw new XMLBuilderException(getClass().getName() + ".getColumnProperties(): columnProperties was not set. Override this method or use method setColumnProperties() to set the columnProperties."); }
+  public List<ColumnProperties> getColumnProperties() throws XMLBuilderException {
+    if (columnProperties == null || columnProperties.isEmpty()) {
+      throw new XMLBuilderException(getClass().getName() + ".getColumnProperties(): columnProperties was not set. Override this method or use method setColumnProperties() to set the columnProperties.");
+    }
 
     return columnProperties;
   }
@@ -95,9 +85,8 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
   /**
    * Set start and end tag on document.
    *
-   * @param    nameStart, a String with the start tag of this innertable.
-   * @param    nameEnd, a String with the end tag of this innertable.
-   *
+   * @param nameStart, a String with the start tag of this innertable.
+   * @param nameEnd, a String with the end tag of this innertable.
    */
   public void setStartEndTags(String nameStart, String nameEnd) throws XMLBuilderException {
     this.nameStart = nameStart;
@@ -107,7 +96,7 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
   /**
    * Load the inner table.
    *
-   * @exception    throws XMLBuilderException if something goes wrong.
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public void load() throws XMLBuilderException {
     rs = getResultset();
@@ -115,12 +104,17 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
 
   /**
    * Make xml of the combobox.
+   *
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
+  @Override
   public void toXML(StringBuffer xmlDoc) throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
     }
-    if (rs == null) { throw new XMLBuilderException(getClass().getName() + ".toXML(): Resultset has not been loaded, DEVELOPER ERROR!!!! call the method load(). "); }
+    if (rs == null) {
+      throw new XMLBuilderException(getClass().getName() + ".toXML(): Resultset has not been loaded, DEVELOPER ERROR!!!! call the method load(). ");
+    }
 
     /*Make the columnProperties correctly set before using it.*/
     columnProperties = getColumnProperties();
@@ -143,7 +137,7 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
         for (int tdIndex = 0; tdIndex < columnProperties.size(); tdIndex++) {
 
           /*Retrive the ColumnProperties for this row*/
-          ColumnProperties tdProp = (ColumnProperties) columnProperties.get(tdIndex);
+          ColumnProperties tdProp = columnProperties.get(tdIndex);
 
           /*td start*/
           xmlDoc.append(XML_TD_START);
@@ -185,8 +179,8 @@ public abstract class XMLInnerTable extends DynamicXMLCarrier {
   /**
    * Return the resultset for this InnerTable.
    *
-   *
-   * @exception    throws XMLBuilderException if something goes wrong.
+   * @return
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   protected abstract StringRecordset getResultset() throws XMLBuilderException;
 }

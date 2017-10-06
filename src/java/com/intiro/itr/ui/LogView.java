@@ -1,11 +1,3 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui;
 
 import java.io.PrintWriter;
@@ -22,12 +14,11 @@ import com.intiro.itr.ui.xsl.XSLFormatedArea;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.ClientInfo;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class LogView extends ITRServlet implements URLs {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
     /*Change the loggingLevel*/
@@ -94,10 +85,7 @@ public class LogView extends ITRServlet implements URLs {
         out.flush();
       }
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): Entering catch Exception");
-      }
-
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): Entering catch Exception");
       /*Create errorHandler*/
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;
@@ -113,7 +101,6 @@ public class LogView extends ITRServlet implements URLs {
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
 
-      return;
     } finally {
       IntiroLog.getInstance().setLoggingLevel(originalLogLevel);
     }

@@ -1,63 +1,42 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.util.xml;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.Enumeration;
-
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-
-import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class DynamicXMLCarrier extends XMLElement implements Serializable {
 
-  //~ Instance/static variables ........................................................................................
-
-  protected DBExecute dbExecute = null;
-  protected DBQueries dbQuery = null;
-
-  //~ Constructors .....................................................................................................
-
   /**
-   * Constructor I.
-   * Use this one if you want to use the database
+   * Constructor I. Use this one if you want to use the database
+   *
+   * @param profile
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public DynamicXMLCarrier(UserProfile profile) throws XMLBuilderException {
     super(profile);
-    dbQuery = new DBQueries(profile);
-    dbExecute = new DBExecute(profile);
   }
 
   /**
-   * Constructor II.
-   * Use this one if you want to use the database
+   * Constructor II. Use this one if you want to use the database
+   *
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public DynamicXMLCarrier() throws XMLBuilderException {
     super();
-    dbQuery = new DBQueries();
-    dbExecute = new DBExecute();
   }
 
   //~ Methods ..........................................................................................................
-
   /**
-   * This method return the Document held by this class.
-   * It uses toXML(xmlDoc) to make a Document.
+   * This method return the Document held by this class. It uses toXML(xmlDoc) to make a Document.
    *
-   * @exception    Exception, if something goes wrong.
+   * @return
+   * @exception Exception, if something goes wrong.
    */
+  @Override
   public synchronized Document getDocument() throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getDocument(): getDocument entered");
@@ -89,39 +68,39 @@ public class DynamicXMLCarrier extends XMLElement implements Serializable {
   }
 
   /**
-   * Override the Object.toString() method.
-   * Good for debugging.
+   * Override the Object.toString() method. Good for debugging.
+   *
    * @return a debugging String, xmlformatted.
    */
+  @Override
   public String toString() {
     StringBuffer retval = new StringBuffer();
 
     try {
       toXML(retval);
     } catch (Exception e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".toString(): " + e.getMessage());
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".toString(): " + e.getMessage());
     }
 
     return retval.toString();
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
+   * @throws java.lang.Exception
    */
+  @Override
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(StringBuffer): entered");
     }
-    if (contents.size() == 0) { throw new XMLBuilderException(getClass().getName() + ".toXML(StringBuffer): No contents have been set."); }
+    if (contents.isEmpty()) {
+      throw new XMLBuilderException(getClass().getName() + ".toXML(StringBuffer): No contents have been set.");
+    }
 
-    XMLElement oneElement = null;
-
-    for (Enumeration e = contents.elements(); e.hasMoreElements();) {
-      oneElement = (XMLElement) e.nextElement();
+    for (XMLElement oneElement : contents) {
       oneElement.toXML(xmlDoc);
     }
     if (IntiroLog.d()) {

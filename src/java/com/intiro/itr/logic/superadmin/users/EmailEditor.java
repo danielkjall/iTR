@@ -1,26 +1,15 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.superadmin.users;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
 import com.intiro.itr.logic.contacts.Contacts;
 import com.intiro.itr.logic.email.Email;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class EmailEditor extends DynamicXMLCarrier {
-
-  //~ Instance/static variables ........................................................................................
 
   static final String XML_FIRSTNAME_END = "</firstname>";
   static final String XML_FIRSTNAME_START = "<firstname>";
@@ -36,7 +25,7 @@ public class EmailEditor extends DynamicXMLCarrier {
   static final String XML_USERID_START = "<userid>";
   static final String XML_USER_END = "</user>";
   static final String XML_USER_START = "<user>";
-  protected Vector <Email> emails = new Vector <Email> ();
+  protected ArrayList<Email> emails = new ArrayList<Email>();
   Email newEmail = new Email();
   int userId = -1;
   private boolean editingRow = false;
@@ -46,7 +35,6 @@ public class EmailEditor extends DynamicXMLCarrier {
   private String modeDesc = "";
 
   //~ Constructors .....................................................................................................
-
   public EmailEditor(UserProfile profile, int userId, String mode) throws XMLBuilderException {
     super(profile);
 
@@ -56,8 +44,7 @@ public class EmailEditor extends DynamicXMLCarrier {
       firstName = tmpContact.getFirstName();
       lastName = tmpContact.getLastName();
       modeDesc = "contacts";
-    }
-    else {
+    } else {
       UserProfile tmpProfile = new UserProfile();
       tmpProfile.load(userId);
       firstName = tmpProfile.getFirstName();
@@ -70,14 +57,12 @@ public class EmailEditor extends DynamicXMLCarrier {
 
     if (mode.equals("contacts")) {
       this.emails = Email.load(-1, userId, -1);
-    }
-    else {
+    } else {
       this.emails = Email.load(userId, -1, -1);
     }
   }
 
   //~ Methods ..........................................................................................................
-
   /**
    * Set editingRow.
    */
@@ -102,7 +87,7 @@ public class EmailEditor extends DynamicXMLCarrier {
   /**
    * Get Emails.
    */
-  public Vector getEmails() {
+  public ArrayList getEmails() {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getEmails(): Entering");
     }
@@ -133,8 +118,7 @@ public class EmailEditor extends DynamicXMLCarrier {
     }
     if (mode.equals("contacts")) {
       newEmail.setContactId(userId);
-    }
-    else {
+    } else {
       newEmail.setUserId(userId);
     }
 
@@ -148,8 +132,7 @@ public class EmailEditor extends DynamicXMLCarrier {
           oneEmail.setNotRemoved();
         }
       }
-    }
-    else {
+    } else {
       emails.add(newEmail.cloneEmail());
     }
 
@@ -178,18 +161,15 @@ public class EmailEditor extends DynamicXMLCarrier {
         }
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".save(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".save(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
@@ -250,8 +230,7 @@ public class EmailEditor extends DynamicXMLCarrier {
 
       if (oneEmail != null && !oneEmail.isRemoved()) {
         oneEmail.toXML(xmlDoc, i, j++);
-      }
-      else if (oneEmail != null) {
+      } else if (oneEmail != null) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): oneEmail.isRemoved() = " + oneEmail.isRemoved());
         }
@@ -269,37 +248,42 @@ public class EmailEditor extends DynamicXMLCarrier {
   /**
    * Set Emails.
    */
-  void setEmails(Vector <Email> emails) {
+  void setEmails(ArrayList<Email> emails) {
     if (IntiroLog.d()) {
-      IntiroLog.detail(getClass(), getClass().getName() + ".setEmails(Vector emails): Entering");
+      IntiroLog.detail(getClass(), getClass().getName() + ".setEmails(ArrayList emails): Entering");
     }
 
     this.emails = emails;
   }
+
   /**
    * @return Returns the firstName.
    */
   public String getFirstName() {
     return firstName;
   }
+
   /**
    * @return Returns the lastName.
    */
   public String getLastName() {
     return lastName;
   }
+
   /**
    * @return Returns the mode.
    */
   public String getMode() {
     return mode;
   }
+
   /**
    * @return Returns the modeDesc.
    */
   public String getModeDesc() {
     return modeDesc;
   }
+
   /**
    * @return Returns the userId.
    */

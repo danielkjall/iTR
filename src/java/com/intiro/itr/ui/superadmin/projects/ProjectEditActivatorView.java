@@ -1,18 +1,9 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.superadmin.projects;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.logic.superadmin.projects.ProjectEditor;
 import com.intiro.itr.ui.ITRServlet;
@@ -21,19 +12,17 @@ import com.intiro.itr.ui.constants.URLs;
 import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * Servlet that handles saving or adding of a user.
  *
- * This servlet does not display anything, it collects the information from the incoming form
- * and calls the save method on the user, followed by a redirecting of the logged in superadministator
- * to ProjectQueryView.
+ * This servlet does not display anything, it collects the information from the incoming form and calls the save method on the user,
+ * followed by a redirecting of the logged in superadministator to ProjectQueryView.
  */
 public class ProjectEditActivatorView extends ITRServlet implements URLs, Commands {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -57,12 +46,10 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
 
     //Find out what button was pressed
     //String mode = "error";
-
     if (save != null && save.length() > 0) {
       //mode = save.trim();
       bSave = true;
-    }
-    else if (delete != null && delete.length() > 0) {
+    } else if (delete != null && delete.length() > 0) {
       //mode = delete.trim();
       bDelete = true;
     }
@@ -71,8 +58,8 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
       /*Create an output page*/
       //Page page = new Page(request);
       //page = null;
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Page created");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Page created");
       }
 
       HttpSession session = request.getSession(false);
@@ -80,12 +67,11 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
       /*Get user profile*/
       //UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
       //userProfile = null;
-
       ProjectEditor projectEditor = (ProjectEditor) session.getAttribute(ITRResources.ITR_MODIFIED_PROJECT);
 
       if (bDelete) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Deleting project");
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Deleting project");
         }
 
         boolean retVal = projectEditor.getModifiedProject().delete();
@@ -93,10 +79,9 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
         if (retVal == false) {
           new Exception("Can not delete Project with id = " + projectEditor.getModifiedProject().getProjectId() + ". ");
         }
-      }
-      else if (bSave) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Saving project");
+      } else if (bSave) {
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Saving project");
         }
         if (request.getParameter("code") != null && request.getParameter("code").length() > 0) {
           code = request.getParameter("code");
@@ -128,8 +113,8 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
         if (request.getParameter("tech") != null && request.getParameter("tech").length() > 0) {
           tech = request.getParameter("tech");
         }
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE PROJECTPROFILE: <br x=\"x\"/> code = " + code + ", name = " + name + ", companyId = " + companyId + ", activated = " + activated + ", adminProj = " + adminProj + ", fromDate = " + fromDate + ", toDate = " + toDate + ", desc = " + desc + ", tech = " + tech);
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE PROJECTPROFILE: <br x=\"x\"/> code = " + code + ", name = " + name + ", companyId = " + companyId + ", activated = " + activated + ", adminProj = " + adminProj + ", fromDate = " + fromDate + ", toDate = " + toDate + ", desc = " + desc + ", tech = " + tech);
         }
 
         projectEditor.getModifiedProject().setProjectCode(code);
@@ -167,8 +152,8 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
         //Save the modified project to database.
         projectEditor.getModifiedProject().save();
 
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): project = " + projectEditor.getModifiedProject());
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): project = " + projectEditor.getModifiedProject());
         }
       }
 
@@ -184,9 +169,7 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
 
       return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;
@@ -202,10 +185,10 @@ public class ProjectEditActivatorView extends ITRServlet implements URLs, Comman
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
 
-      return;
     }
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): Entering doPost");

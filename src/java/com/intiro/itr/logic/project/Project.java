@@ -1,14 +1,6 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.project;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
@@ -18,121 +10,65 @@ import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.List;
 
 public class Project extends DynamicXMLCarrier {
-  // ~ Instance/static variables ........................................................................................
 
   protected static final String XML_ACTIVITY_END = "</activity>";
-
   protected static final String XML_ACTIVITY_START = "<activity>";
-
   protected static final String XML_ASSIGNED_ACTIVITIES_END = "</assigned>";
-
   protected static final String XML_ASSIGNED_ACTIVITIES_START = "<assigned>";
-
   protected static final String XML_ROW_ACTIVATED_END = "</activated>";
-
   protected static final String XML_ROW_ACTIVATED_START = "<activated>";
-
   protected static final String XML_ROW_ADMINPROJ_END = "</adminproj>";
-
   protected static final String XML_ROW_ADMINPROJ_START = "<adminproj>";
-
   protected static final String XML_ROW_COMPANY_END = "</companyid>";
-
   protected static final String XML_ROW_COMPANY_START = "<companyid>";
-
   protected static final String XML_ROW_CONTRACT_END = "</contract>";
-
   protected static final String XML_ROW_CONTRACT_START = "<contract>";
-
   protected static final String XML_ROW_FROMDATE_END = "</fromdate>";
-
   protected static final String XML_ROW_FROMDATE_START = "<fromdate>";
-
   protected static final String XML_ROW_PROJACT_END = "</projectactivity>";
-
-  /*
-   * protected String projSubId = ""; protected String projSubCode = ""; protected String projSubDesc = "";
-   */
-
   // Project Activity
   protected static final String XML_ROW_PROJACT_START = "<projectactivity>";
-
   protected static final String XML_ROW_PROJCODE_END = "</projcode>";
-
   protected static final String XML_ROW_PROJCODE_START = "<projcode>";
-
   protected static final String XML_ROW_PROJDESC_END = "</projdesc>";
-
   protected static final String XML_ROW_PROJDESC_START = "<projdesc>";
-
   protected static final String XML_ROW_PROJID_END = "</projid>";
-
   protected static final String XML_ROW_PROJID_START = "<projid>";
-
   protected static final String XML_ROW_PROJNAME_END = "</projname>";
-
   protected static final String XML_ROW_PROJNAME_START = "<projname>";
-
   protected static final String XML_ROW_PROJSUBCODE_END = "</subcode>";
-
   protected static final String XML_ROW_PROJSUBCODE_START = "<subcode>";
-
   protected static final String XML_ROW_PROJSUBID_END = "</subid>";
-
   // Row
   protected static final String XML_ROW_PROJSUBID_START = "<subid>";
-
   protected static final String XML_ROW_PROJTECH_END = "</projtech>";
-
   protected static final String XML_ROW_PROJTECH_START = "<projtech>";
-
   protected static final String XML_ROW_TODATE_END = "</todate>";
-
   protected static final String XML_ROW_TODATE_START = "<todate>";
-
   protected boolean activated = true;
-
   protected boolean adminProject = false;
-
-  protected Vector assignedActivities = null;
-
+  protected List<ProjectActivity> assignedActivities = null;
   protected String companyId = "";
-
   protected boolean contract = false;
-
   protected ITRCalendar fromDate = null;
-
   protected ProjectActivity projAct = new ProjectActivity();
-
   protected String projCode = "";
-
   protected String projDesc = "";
-
   protected String projId = "-1";
-
   protected String projName = "";
-
   protected String technique = "";
-  
   //Not connected to database yet: TODO connect to database
   protected int fixedPrice = 0;
-
   protected ITRCalendar toDate = null;
-
-  // ~ Constructors .....................................................................................................
 
   public Project(UserProfile userProfile) throws XMLBuilderException {
     super(userProfile);
   }
 
-  // ~ Methods ..........................................................................................................
-
-  /**
-   * Set activated or deactivated status on the project.
-   */
   public void setActivated(String status) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".setActivated(): Entering");
@@ -144,9 +80,6 @@ public class Project extends DynamicXMLCarrier {
     }
   }
 
-  /**
-   * Check if the project is activated or has been deactivated.
-   */
   public boolean getActivated() {
     return activated;
   }
@@ -174,9 +107,6 @@ public class Project extends DynamicXMLCarrier {
     return companyId;
   }
 
-  /**
-   * Set contract or not contract status on the project.
-   */
   public void setContract(String status) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".setContract(): Entering");
@@ -188,25 +118,16 @@ public class Project extends DynamicXMLCarrier {
     }
   }
 
-  /**
-   * Check if the project is contracted or on a running bill.
-   */
   public boolean getContract() {
     return contract;
   }
 
-  /**
-   * Set from date for project.
-   */
   public void setFromDate(ITRCalendar fromDate) {
 
     // if(IntiroLog.d()) if(IntiroLog.d()) IntiroLog.detail(getClass(), getClass(), getClass().getName()+".setFromDate(): fromDate = "+fromDate);
     this.fromDate = fromDate;
   }
 
-  /**
-   * Set from date for project.
-   */
   public void setFromDate(String fromDateString) {
 
     // if(IntiroLog.d()) if(IntiroLog.d()) IntiroLog.detail(getClass(), getClass(), getClass().getName()+".setFromDate(String): fromDateString = "+fromDateString);
@@ -214,21 +135,11 @@ public class Project extends DynamicXMLCarrier {
     this.fromDate = fromDate;
   }
 
-  /**
-   * get from date for project.
-   */
   public ITRCalendar getFromDate() {
     return fromDate;
   }
 
-  /*
-   * public void setProjectSubDesc(String desc) { if(IntiroLog.d()) IntiroLog.detail(getClass(), getClass().getName()+".setProjectSubDesc(): desc = " + desc); this.projSubDesc =
-   * desc; } public String getProjectSubDesc() { if(IntiroLog.d()) IntiroLog.detail(getClass(), getClass().getName()+".getProjectSubDesc(): desc = " + this.projSubDesc); return
-   * this.projSubDesc; } public void setProjectSubCode(String code) { if(IntiroLog.d()) IntiroLog.detail(getClass(), getClass().getName()+".setProjectSubCode(): Code = " + code);
-   * projSubCode = code; } public String getProjectSubCode() { return projSubCode; } public void setProjectSubId(String id) { if(IntiroLog.d()) IntiroLog.detail(getClass(),
-   * getClass().getName()+".setProjectSubId(): Id = " + id); projSubId = id; } public String getProjectSubId() { return projSubId; }
-   */
-  public void setProjectActivities(Vector assignedActivities) {
+  public void setProjectActivities(ArrayList assignedActivities) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".setProjectActivities(): assignedActivities = " + assignedActivities.toString());
     }
@@ -236,7 +147,7 @@ public class Project extends DynamicXMLCarrier {
     this.assignedActivities = assignedActivities;
   }
 
-  public Vector getProjectActivities() {
+  public List<ProjectActivity> getProjectActivities() {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getProjectActivities(): assignedActivities = " + assignedActivities.toString());
     }
@@ -336,9 +247,6 @@ public class Project extends DynamicXMLCarrier {
     return technique;
   }
 
-  /**
-   * Set to date for project.
-   */
   public void setToDate(ITRCalendar toDate) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".setToDate(): toDate = " + toDate);
@@ -347,9 +255,6 @@ public class Project extends DynamicXMLCarrier {
     this.toDate = toDate;
   }
 
-  /**
-   * Set from date for project.
-   */
   public void setToDate(String toDateString) {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".setToDate(String): toDateString = " + toDateString);
@@ -359,9 +264,6 @@ public class Project extends DynamicXMLCarrier {
     this.toDate = toDate;
   }
 
-  /**
-   * Get to date for project.
-   */
   public ITRCalendar getToDate() {
     return toDate;
   }
@@ -397,19 +299,12 @@ public class Project extends DynamicXMLCarrier {
       retval.setAdminProject(String.valueOf(getAdminProject()));
       retval.setContract(String.valueOf(getContract()));
     } catch (XMLBuilderException e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".cloneProject(): " + e.getMessage());
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".cloneProject(): " + e.getMessage());
     }
 
     return retval;
   }
 
-  /**
-   * Delete the Project.
-   * 
-   * @return boolean. false if nothing was deleted from db
-   */
   public boolean delete() throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".delete(): Entering");
@@ -418,7 +313,7 @@ public class Project extends DynamicXMLCarrier {
     boolean retVal = false;
 
     try {
-      retVal = new DBExecute().deleteProject(Integer.parseInt(getProjectId()));
+      retVal = DBExecute.getProxy().deleteProject(Integer.parseInt(getProjectId()));
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -433,7 +328,7 @@ public class Project extends DynamicXMLCarrier {
 
   public void load(String projId) throws XMLBuilderException {
     try {
-      StringRecordset rs = dbQuery.getProjectProperties(projId);
+      StringRecordset rs = DBQueries.getProxy().getProjectProperties(projId);
 
       if (!rs.getEOF()) {
         setProjectId(projId);
@@ -456,26 +351,17 @@ public class Project extends DynamicXMLCarrier {
 
       rs.close();
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".load(String): ERROR FROM DATABASE, Collecting Project data. exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".load(String): ERROR FROM DATABASE, Collecting Project data. exception = " + e.getMessage());
       throw new XMLBuilderException(getClass().getName() + ".load(String): " + e.getMessage());
     }
     try {
       this.assignedActivities = ProjectActivity.loadProjectActivities(Integer.parseInt(projId));
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".load(String): ERROR FROM DATABASE, Collecting Project Activity data. exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".load(String): ERROR FROM DATABASE, Collecting Project Activity data. exception = " + e.getMessage());
       throw new XMLBuilderException(getClass().getName() + ".load(String): " + e.getMessage());
     }
   }
 
-  /**
-   * Save project.
-   */
   public void save() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
@@ -485,13 +371,9 @@ public class Project extends DynamicXMLCarrier {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute dbExecute = new DBExecute();
-        dbExecute.updateProject(this);
+        DBExecute.getProxy().updateProject(this);
       } catch (Exception e) {
-        if (IntiroLog.ce()) {
-          IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-        }
-
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
     } else { // Make a new project
@@ -499,22 +381,19 @@ public class Project extends DynamicXMLCarrier {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        DBQueries dbQuery = new DBQueries();
-        StringRecordset rs = dbQuery.makeProjectAndFetchId(this);
+        StringRecordset rs = DBQueries.getProxy().makeProjectAndFetchId(this);
 
         if (!rs.getEOF()) {
           setProjectId(rs.getField("maxId"));
         }
       } catch (Exception e) {
-        if (IntiroLog.ce()) {
-          IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM	DATABASE, exception	= " + e.getMessage());
-        }
-
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM	DATABASE, exception	= " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
     }
   }
 
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     toString(sb);
@@ -539,7 +418,6 @@ public class Project extends DynamicXMLCarrier {
     /*
      * // project sub Id sb.append(", projSubId = "); sb.append(projSubId); // project sub code sb.append(", projSubCode = "); sb.append(projSubCode);
      */
-
     // project description
     sb.append(", projDesc = ");
     sb.append(projDesc);
@@ -584,6 +462,7 @@ public class Project extends DynamicXMLCarrier {
     sb.append("]");
   }
 
+  @Override
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -638,7 +517,7 @@ public class Project extends DynamicXMLCarrier {
 
     if (assignedActivities != null) {
       try {
-        ProjectActivity onePA = null;
+        ProjectActivity onePA;
 
         for (int i = 0; i < assignedActivities.size(); i++) {
           onePA = (ProjectActivity) assignedActivities.get(i);
@@ -650,10 +529,7 @@ public class Project extends DynamicXMLCarrier {
           }
         }
       } catch (Exception e) {
-        if (IntiroLog.e()) {
-          IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Available part. ERROR FROM DATABASE, exception = " + e.getMessage());
-        }
-
+        IntiroLog.error(getClass(), getClass().getName() + ".toXML(StringBuffer xmlDoc): The Available part. ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
     }
@@ -663,15 +539,11 @@ public class Project extends DynamicXMLCarrier {
     this.projAct.toXML(xmlDoc);
     xmlDoc.append(XML_ROW_PROJACT_END);
   }
-  /**
-   * @return Returns the fixedPrice.
-   */
+
   public int getFixedPrice() {
     return fixedPrice;
   }
-  /**
-   * @param fixedPrice The fixedPrice to set.
-   */
+
   public void setFixedPrice(int fixedPrice) {
     this.fixedPrice = fixedPrice;
   }

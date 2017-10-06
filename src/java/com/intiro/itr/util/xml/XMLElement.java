@@ -8,7 +8,7 @@
  */
 package com.intiro.itr.util.xml;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 
@@ -21,7 +21,7 @@ public abstract class XMLElement implements XMLCarrier {
 
   //~ Instance/static variables ........................................................................................
 
-  protected Vector <XMLElement> contents = new Vector <XMLElement> (5);
+  protected ArrayList <XMLElement> contents = new ArrayList <XMLElement> (5);
   protected UserProfile userProfile = null;
   private boolean hasBeenDisplayed = false;
   private String myObjName = new String("No Name");
@@ -103,7 +103,7 @@ public abstract class XMLElement implements XMLCarrier {
     if (newXMLElement == null) { throw new XMLBuilderException(myName + ":Cannot add null XMLElement to '" + getName() + "'"); }
 
     newXMLElement.setParent(this);
-    contents.addElement(newXMLElement);
+    contents.add(newXMLElement);
   }
 
   /**

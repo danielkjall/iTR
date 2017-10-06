@@ -1,31 +1,19 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.util.xml;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class StaticXMLCarrier extends XMLElement {
 
   //~ Instance/static variables ........................................................................................
-
   private StringBuffer xmlFile = new StringBuffer();
 
   //~ Constructors .....................................................................................................
-
   /**
    * Constructor I.
    */
@@ -35,12 +23,10 @@ public class StaticXMLCarrier extends XMLElement {
   }
 
   //~ Methods ..........................................................................................................
-
   /**
-   * This method return the Document held by this class.
-   * It uses toXML(xmlDoc) to make a Document.
+   * This method return the Document held by this class. It uses toXML(xmlDoc) to make a Document.
    *
-   * @exception    Exception, if something goes wrong.
+   * @exception Exception, if something goes wrong.
    */
   public synchronized Document getDocument() throws Exception {
     if (IntiroLog.d()) {
@@ -76,8 +62,8 @@ public class StaticXMLCarrier extends XMLElement {
   }
 
   /**
-   * Override the Object.toString() method.
-   * Good for debugging.
+   * Override the Object.toString() method. Good for debugging.
+   *
    * @return a debugging String, xmlformatted.
    */
   public String toString() {
@@ -86,18 +72,16 @@ public class StaticXMLCarrier extends XMLElement {
     try {
       toXML(retval);
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".toString(): " + e.getMessage());
-      }
+      IntiroLog.error(getClass(), getClass().getName() + ".toString(): " + e.getMessage());
     }
 
     return retval.toString();
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
@@ -127,9 +111,7 @@ public class StaticXMLCarrier extends XMLElement {
           }
         }
       } catch (Exception e) {
-        if (IntiroLog.e()) {
-          IntiroLog.error(getClass(), getClass().getName() + ".toXML(): " + e.getMessage());
-        }
+        IntiroLog.error(getClass(), getClass().getName() + ".toXML(): " + e.getMessage());
       }
     }
   }

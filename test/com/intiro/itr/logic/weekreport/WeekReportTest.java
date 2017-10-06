@@ -6,7 +6,7 @@
 package com.intiro.itr.logic.weekreport;
 
 import com.intiro.itr.util.ITRCalendar;
-import java.util.Vector;
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -116,8 +116,8 @@ public class WeekReportTest {
   public void testGetRows() {
     System.out.println("getRows");
     WeekReport instance = null;
-    Vector expResult = null;
-    Vector result = instance.getRows();
+    ArrayList expResult = null;
+    ArrayList result = instance.getRows();
     assertEquals(expResult, result);
     // TODO review the generated test code and remove the default call to fail.
     fail("The test case is a prototype.");
@@ -566,7 +566,7 @@ public class WeekReportTest {
   @Test
   public void testSetRows() {
     System.out.println("setRows");
-    Vector<Row> rows = null;
+    ArrayList<Row> rows = null;
     WeekReport instance = null;
     instance.setRows(rows);
     // TODO review the generated test code and remove the default call to fail.

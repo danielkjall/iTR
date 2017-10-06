@@ -1,64 +1,43 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.weekreport;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.NumberFormatter;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class SumRows {
-  // ~ Instance/static variables ........................................................................................
 
   protected static final String XML_DIFFROW_END = "</diffrow>";
-
   protected static final String XML_DIFFROW_START = "<diffrow>";
-
   protected static final String XML_DIFFSUM_END = "</diffsum>";
-
   protected static final String XML_DIFFSUM_START = "<diffsum>";
-
   protected static final String XML_EXPECTEDROW_END = "</expectedrow>";
-
   protected static final String XML_EXPECTEDROW_START = "<expectedrow>";
-
   protected static final String XML_EXPECTEDSUM_END = "</expectedsum>";
-
   protected static final String XML_EXPECTEDSUM_START = "<expectedsum>";
-
   protected static final String XML_SUMMARYROWS_END = "</sumrows>";
-
   protected static final String XML_SUMMARYROWS_START = "<sumrows>";
-
   protected static final String XML_TOTALROW_END = "</totalrow>";
-
   protected static final String XML_TOTALROW_START = "<totalrow>";
-
   protected static final String XML_TOTALSUM_END = "</totalsum>";
-
   protected static final String XML_TOTALSUM_START = "<totalsum>";
-
   protected DifferenceRow differenceRow = null;
-
   protected ExpectedRow expectedRow = null;
-
   protected TotalRow totalRow = null;
-
-  // ~ Constructors .....................................................................................................
 
   /**
    * Constructor for SumRows.
+   *
+   * @param userProfile
+   * @param fromDate
+   * @param toDate
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public SumRows(UserProfile userProfile, ITRCalendar fromDate, ITRCalendar toDate) throws XMLBuilderException {
     super();
@@ -67,8 +46,6 @@ public class SumRows {
     differenceRow = new DifferenceRow(userProfile, fromDate, toDate);
     expectedRow.load();
   }
-
-  // ~ Methods ..........................................................................................................
 
   public DifferenceRow getDifferenceRow() {
     return differenceRow;
@@ -82,11 +59,12 @@ public class SumRows {
     return totalRow;
   }
 
-  public void calcSum(Vector rows) {
+  public void calcSum(ArrayList rows) {
     totalRow.calcSum(rows);
     differenceRow.calcSum(totalRow, expectedRow);
   }
 
+  @Override
   public String toString() {
     String retval = null;
 
@@ -121,17 +99,16 @@ public class SumRows {
     xmlDoc.append(XML_SUMMARYROWS_END);
   }
 
-  // ~ Inner classes ....................................................................................................
-
-  // --------------------------------------------- Inner classes ExpectedRow, DifferenceRow and TotalRow -------------------------
   /**
    * Inner class that represents the expected hours row.
    */
   public class ExpectedRow extends Row {
+
     ExpectedRow(UserProfile profile, ITRCalendar fromDate, ITRCalendar toDate) throws XMLBuilderException {
       super(profile, fromDate, toDate);
     }
 
+    @Override
     public void toXML(StringBuffer xmlDoc) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -203,7 +180,7 @@ public class SumRows {
 
     void load() throws XMLBuilderException {
       try {
-        StringRecordset rs = dbQuery.getCalendarWeek(getFromDate().getCalendarInStoreFormat());
+        StringRecordset rs = DBQueries.getProxy().getCalendarWeek(getFromDate().getCalendarInStoreFormat());
 
         while (!rs.getEOF()) {
           double mo = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSMO));
@@ -226,10 +203,7 @@ public class SumRows {
 
         rs.close();
       } catch (Exception e) {
-        if (IntiroLog.e()) {
-          IntiroLog.error(getClass(), getClass().getName() + ".load(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
-        }
-
+        IntiroLog.error(getClass(), getClass().getName() + ".load(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
       }
     }
@@ -239,6 +213,7 @@ public class SumRows {
    * Inner class that represents the diff hours row.
    */
   public class DifferenceRow extends Row {
+
     DifferenceRow(UserProfile profile, ITRCalendar fromDate, ITRCalendar toDate) throws XMLBuilderException {
       super(profile, fromDate, toDate);
     }
@@ -254,6 +229,7 @@ public class SumRows {
       setRowSum();
     }
 
+    @Override
     public void toXML(StringBuffer xmlDoc) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -325,6 +301,7 @@ public class SumRows {
   }
 
   public class TotalRow extends Row {
+
     protected double komp1Hours = 0;
 
     protected double komp2Hours = 0;
@@ -361,6 +338,8 @@ public class SumRows {
 
     /**
      * Get overtime hours for week, that is taken out in money.
+     *
+     * @return
      */
     public double getOvertimeMoneyHoursForWeek() {
       double retval = 0;
@@ -376,6 +355,8 @@ public class SumRows {
 
     /**
      * Get overtime hours for week, that is taken out in vacation.
+     *
+     * @return
      */
     public double getOvertimeVacationHoursForWeek() {
       double retval = 0;
@@ -429,13 +410,13 @@ public class SumRows {
       // IntiroLog.detail(getClass().getName()+".addToOvertime2Hours(): after overtime2Hours = "+overtime2Hours);
     }
 
-    public void calcSum(Vector rows) {
+    public void calcSum(ArrayList rows) {
 
       /* Clear the hours before adding */
       this.clearHours();
 
       /* Rows in week */
-      Row oneRow = null;
+      Row oneRow;
 
       /* Loop through all rows */
       for (int i = 0; i < rows.size(); i++) {
@@ -471,6 +452,7 @@ public class SumRows {
     /**
      * Clears the hours in the row. Overrides the Row.clearHours().
      */
+    @Override
     public void clearHours() {
       super.clearHours();
       normalHours = 0;
@@ -480,6 +462,7 @@ public class SumRows {
       komp2Hours = 0;
     }
 
+    @Override
     public void toXML(StringBuffer xmlDoc) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -582,5 +565,4 @@ public class SumRows {
       xmlDoc.append(XML_TOTALROW_END);
     }
   }
-
 }

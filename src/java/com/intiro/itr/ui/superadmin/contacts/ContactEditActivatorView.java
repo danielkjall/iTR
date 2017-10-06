@@ -1,18 +1,9 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.superadmin.contacts;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.logic.superadmin.contacts.ContactEdit;
 import com.intiro.itr.ui.ITRServlet;
@@ -22,19 +13,17 @@ import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * Servlet that handles saving or adding of a user.
  *
- * This servlet does not display anything, it collects the information from the incoming form
- * and calls the save method on the user, followed by a redirecting of the logged in superadministator
- * to UserQueryView.
+ * This servlet does not display anything, it collects the information from the incoming form and calls the save method on the user,
+ * followed by a redirecting of the logged in superadministator to UserQueryView.
  */
 public class ContactEditActivatorView extends ITRServlet implements URLs, Commands {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -56,12 +45,10 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
 
     //Find out what button was pressed
     //String mode = "error";
-
     if (save != null && save.length() > 0) {
       //mode = save.trim();
       bSave = true;
-    }
-    else if (delete != null && delete.length() > 0) {
+    } else if (delete != null && delete.length() > 0) {
       //mode = delete.trim();
       bDelete = true;
     }
@@ -69,8 +56,8 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
       //Page page = new Page(request);
       //page = null;
 
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Page created");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Page created");
       }
 
       HttpSession session = request.getSession(false);
@@ -80,8 +67,8 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
       ContactEdit contactEditor = (ContactEdit) session.getAttribute(ITRResources.ITR_MODIFIED_CONTACT);
 
       if (bDelete) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Deleting Contact");
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Deleting Contact");
         }
 
         boolean retVal = contactEditor.getModifiedContact().delete();
@@ -89,10 +76,9 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
         if (retVal == false) {
           new Exception("Can not delete Contact with id = " + contactEditor.getModifiedContact().getId() + ". ");
         }
-      }
-      else if (bSave) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Saving contact");
+      } else if (bSave) {
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Saving contact");
         }
         if (request.getParameter("contactid") != null && request.getParameter("contactid").length() > 0) {
           contactId = request.getParameter("contactid");
@@ -121,8 +107,8 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
         if (request.getParameter("knownbyuser") != null && request.getParameter("knownbyuser").length() > 0) {
           knownById = request.getParameter("knownbyuser");
         }
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE CONTACT: <br x=\"x\"/> contactId = " + contactId + ", companyId = " + companyId + ", position = " + position + ", friendLevel = " + friendLevel + ", description = " + description + ", firstContact = " + firstContact + ", firstName = " + firstName + ", lastName = " + lastName + ", knownById = " + knownById);
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE CONTACT: <br x=\"x\"/> contactId = " + contactId + ", companyId = " + companyId + ", position = " + position + ", friendLevel = " + friendLevel + ", description = " + description + ", firstContact = " + firstContact + ", firstName = " + firstName + ", lastName = " + lastName + ", knownById = " + knownById);
         }
 
         contactEditor.getModifiedContact().setITR_CompanyId(Integer.parseInt(companyId));
@@ -133,8 +119,8 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
         try {
           contactEditor.getModifiedContact().setFirstContact(new ITRCalendar(firstContact));
         } catch (Exception e) {
-          if (IntiroLog.t()) {
-            IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): The date First Contact was given in a faulty way. firstContact=" + firstContact);
+          if (IntiroLog.d()) {
+            IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): The date First Contact was given in a faulty way. firstContact=" + firstContact);
           }
         }
 
@@ -158,9 +144,7 @@ public class ContactEditActivatorView extends ITRServlet implements URLs, Comman
 
       return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;

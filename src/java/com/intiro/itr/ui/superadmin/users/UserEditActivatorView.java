@@ -1,18 +1,9 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.superadmin.users;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.logic.superadmin.users.UserEdit;
 import com.intiro.itr.ui.ITRServlet;
@@ -22,19 +13,17 @@ import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * Servlet that handles saving or adding of a user.
  *
- * This servlet does not display anything, it collects the information from the incoming form
- * and calls the save method on the user, followed by a redirecting of the logged in superadministator
- * to UserQueryView.
+ * This servlet does not display anything, it collects the information from the incoming form and calls the save method on the user,
+ * followed by a redirecting of the logged in superadministator to UserQueryView.
  */
 public class UserEditActivatorView extends ITRServlet implements URLs, Commands {
 
-  //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -65,12 +54,10 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
 
     //Find out what button was pressed
     //String mode = "error";
-
     if (save != null && save.length() > 0) {
       //mode = save.trim();
       bSave = true;
-    }
-    else if (delete != null && delete.length() > 0) {
+    } else if (delete != null && delete.length() > 0) {
       //mode = delete.trim();
       bDelete = true;
     }
@@ -81,8 +68,8 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
       /*Create an output page*/
       //Page page = new Page(request);
       //page = null;
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Page created");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Page created");
       }
 
       HttpSession session = request.getSession(false);
@@ -90,12 +77,11 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
       /*Get user profile*/
       //UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
       //userProfile = null;
-
       UserEdit userEditor = (UserEdit) session.getAttribute(ITRResources.ITR_MODIFIED_USER);
 
       if (bDelete) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Deleting user");
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Deleting user");
         }
 
         boolean retVal = userEditor.getModifiedUser().delete();
@@ -103,10 +89,9 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
         if (retVal == false) {
           new Exception("Can not delete User with id = " + userEditor.getModifiedUser().getUserId() + ". ");
         }
-      }
-      else if (bSave) {
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): Saving user");
+      } else if (bSave) {
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Saving user");
         }
         if (request.getParameter("userid") != null && request.getParameter("userid").length() > 0) {
           //userId = request.getParameter("userid");
@@ -159,8 +144,8 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
         if (request.getParameter("role") != null && request.getParameter("role").length() > 0) {
           roleId = request.getParameter("role");
         }
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE USERPROFILE: <br x=\"x\"/> firstName = " + firstName + ", lastName = " + lastName + ", languageId = " + languageId + ", skinId = " + skinId + ", companyId = " + companyId + ", adminUserId = " + adminUserId + ", loginId = " + loginId + ", newPassword = " + newPassword + ", activated = " + activated + ", savedVacation = " + savedVacation + ", usedVacation = " + usedVacation + ", savedVacation = " + savedVacation + ", moneyovertime = " + moneyovertime + ", vacationovertime = " + vacationovertime + ", roleId = " + roleId);
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): VALUES BEFORE TRYING TO SET THEM IN THE USERPROFILE: <br x=\"x\"/> firstName = " + firstName + ", lastName = " + lastName + ", languageId = " + languageId + ", skinId = " + skinId + ", companyId = " + companyId + ", adminUserId = " + adminUserId + ", loginId = " + loginId + ", newPassword = " + newPassword + ", activated = " + activated + ", savedVacation = " + savedVacation + ", usedVacation = " + usedVacation + ", savedVacation = " + savedVacation + ", moneyovertime = " + moneyovertime + ", vacationovertime = " + vacationovertime + ", roleId = " + roleId);
         }
 
         userEditor.getModifiedUser().setFirstName(firstName);
@@ -177,8 +162,8 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
         if (newPassword != null && newPassword.length() > 0) {
           userEditor.getModifiedUser().setPassword(newPassword);
         }
-        if (IntiroLog.t()) {
-          IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): activated = " + activated + ", (activated != null) = " + (activated != null));
+        if (IntiroLog.d()) {
+          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): activated = " + activated + ", (activated != null) = " + (activated != null));
         }
 
         //ACTIVATED
@@ -193,15 +178,14 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
 
           //Has user been activated
           if (activateUser == true) {
-            if (IntiroLog.t()) {
-              IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): DATE TO SET FOR ACTIVATEDDATE, now = " + now);
+            if (IntiroLog.d()) {
+              IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): DATE TO SET FOR ACTIVATEDDATE, now = " + now);
             }
 
             userEditor.getModifiedUser().setActivatedDate(now);
-          }
-          else { //User has been deactivated
-            if (IntiroLog.t()) {
-              IntiroLog.trace(getClass(), getClass().getName() + ".doGet(): DATE TO SET FOR DEACTIVATEDDATE, now = " + now);
+          } else { //User has been deactivated
+            if (IntiroLog.d()) {
+              IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): DATE TO SET FOR DEACTIVATEDDATE, now = " + now);
             }
 
             userEditor.getModifiedUser().setDeActivatedDate(now);
@@ -232,9 +216,7 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
 
       return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;

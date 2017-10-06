@@ -1,50 +1,36 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.phone;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DbExecuteInterface;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Title:        ITR
- * Description:
- * Copyright:    Copyright (c) 2001
- * Company:      Intiro Development AB
- * @author Olof Altenstedt, Daniel Kjall
- * @version 1.1
- */
 public class PhoneNumber {
 
-  //~ Instance/static variables ........................................................................................
-
-  static final String XML_COLORINDEX_END = "</colorindex>";
-  static final String XML_COLORINDEX_START = "<colorindex>";
-  static final String XML_INDEX_END = "</i>";
-  static final String XML_INDEX_START = "<i>";
-  static final String XML_PHONECONTACTID_END = "</phonecontactid>";
-  static final String XML_PHONECONTACTID_START = "<phonecontactid>";
-  static final String XML_PHONEDESCRIPTION_END = "</phonedesc>";
-  static final String XML_PHONEDESCRIPTION_START = "<phonedesc>";
-  static final String XML_PHONEID_END = "</phoneid>";
-  static final String XML_PHONEID_START = "<phoneid>";
-  static final String XML_PHONENUMBER_END = "</phoneno>";
-  static final String XML_PHONENUMBER_START = "<phoneno>";
-  static final String XML_PHONEUSERID_END = "</phoneuserid>";
-  static final String XML_PHONEUSERID_START = "<phoneuserid>";
-  static final String XML_PHONE_END = "</phone>";
-
+  public static final String CACHE_ALL_PHONENUMBER = "CACHE_ALL_PHONENUMBER";
+  private static final String XML_COLORINDEX_END = "</colorindex>";
+  private static final String XML_COLORINDEX_START = "<colorindex>";
+  private static final String XML_INDEX_END = "</i>";
+  private static final String XML_INDEX_START = "<i>";
+  private static final String XML_PHONECONTACTID_END = "</phonecontactid>";
+  private static final String XML_PHONECONTACTID_START = "<phonecontactid>";
+  private static final String XML_PHONEDESCRIPTION_END = "</phonedesc>";
+  private static final String XML_PHONEDESCRIPTION_START = "<phonedesc>";
+  private static final String XML_PHONEID_END = "</phoneid>";
+  private static final String XML_PHONEID_START = "<phoneid>";
+  private static final String XML_PHONENUMBER_END = "</phoneno>";
+  private static final String XML_PHONENUMBER_START = "<phoneno>";
+  private static final String XML_PHONEUSERID_END = "</phoneuserid>";
+  private static final String XML_PHONEUSERID_START = "<phoneuserid>";
+  private static final String XML_PHONE_END = "</phone>";
   //Phone
   static final String XML_PHONE_START = "<phone>";
   int phoneContactId = -1;
@@ -56,27 +42,82 @@ public class PhoneNumber {
   int regionId = -1;
   boolean remove = false;
 
-  //~ Constructors .....................................................................................................
-
   /**
    * Constructor I for PhoneNumber.
    */
   public PhoneNumber() {
-    //empty
   }
 
-  //~ Methods ..........................................................................................................
+  public static Map<Integer, ArrayList<PhoneNumber>> loadAllPhoneNumbers() throws XMLBuilderException {
+    Map<Integer, ArrayList<PhoneNumber>> retval = new HashMap<Integer, ArrayList<PhoneNumber>>();
+    try {
+      Map<Integer, ArrayList<PhoneNumber>> cached = ItrCache.get(CACHE_ALL_PHONENUMBER);
+      if (cached != null) {
+        return cached;
+      }
+
+      Map<Integer, PhoneRegion> mapPhoneRegions = PhoneRegion.loadAllPhoneRegions();
+
+      StringRecordset rs = DBQueries.getProxy().getAllPhoneNumbers();
+      String tmpContact;
+      String tmpUser;
+
+      while (!rs.getEOF()) {
+        PhoneNumber pn = new PhoneNumber();
+        pn.setPhoneId(Integer.parseInt(rs.getField(DBConstants.PHONE_ID_PK)));
+        pn.setPhoneNumber(rs.getField(DBConstants.PHONE_PHONENUMBER));
+        pn.setPhoneDescription(rs.getField(DBConstants.PHONE_DESCRIPTION));
+        tmpUser = rs.getField(DBConstants.PHONE_USERID_FK);
+
+        if (tmpUser.length() > 0) {
+          pn.setPhoneUserId(Integer.parseInt(tmpUser));
+        }
+
+        tmpContact = rs.getField(DBConstants.PHONE_CONTACTID_FK);
+
+        if (tmpContact.length() > 0) {
+          pn.setPhoneContactId(Integer.parseInt(tmpContact));
+        }
+        pn.setPhoneRegionId(Integer.parseInt(rs.getField(DBConstants.PHONE_REGIONID_FK)));
+        pn.setRegion(mapPhoneRegions.get(pn.getPhoneRegionId()));
+        if (tmpUser.length() > 0) {
+          Integer key = Integer.parseInt(tmpUser);
+          if (retval.containsKey(key) == false) {
+            retval.put(key, new ArrayList<>());
+          }
+          retval.get(key).add(pn);
+        }
+        rs.moveNext();
+      }
+    } catch (Exception e) {
+      IntiroLog.info(PhoneNumber.class, ".loadAllPhoneNumbers(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      throw new XMLBuilderException(e.getMessage());
+    }
+
+    final int TenHours = 1 * 60 * 60 * 10;
+    ItrCache.put(CACHE_ALL_PHONENUMBER, retval, TenHours);
+
+    return retval;
+  }
 
   /**
    * Load the Phone numbers for the specified userId, contactId or phoneId.
+   *
+   * @param userId
+   * @param phoneId
+   * @param contactId
+   * @return
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-  public static Vector <PhoneNumber> load(int userId, int contactId, int phoneId) throws XMLBuilderException {
-    Vector <PhoneNumber> retval = new Vector <PhoneNumber> ();
+  public static ArrayList<PhoneNumber> load(int userId, int contactId, int phoneId) throws XMLBuilderException {
+    ArrayList<PhoneNumber> retval = new ArrayList<>();
 
     try {
-      if (userId == -1 && contactId == -1 && phoneId == -1) { throw new Exception("PhoneNumber.load(String userId, String contactId, String phoneId): At least one input has to be not null."); }
+      if (userId == -1 && contactId == -1 && phoneId == -1) {
+        throw new Exception("PhoneNumber.load(String userId, String contactId, String phoneId): At least one input has to be not null.");
+      }
 
-      StringRecordset rs = new DBQueries().getPhoneNumbers(userId, contactId, phoneId);
+      StringRecordset rs = DBQueries.getProxy().getPhoneNumbers(userId, contactId, phoneId);
       String tmpContact;
       String tmpUser;
 
@@ -117,128 +158,58 @@ public class PhoneNumber {
     this.remove = false;
   }
 
-  /**
-   * Sets the phoneContactId of the logged on user.
-   *
-   * @param        phoneContactId, an int specifying the phoneContactId.
-   */
   public void setPhoneContactId(int phoneContactId) {
     this.phoneContactId = phoneContactId;
   }
 
-  /**
-   * Gets the phoneContactId of the logged on user.
-   *
-   * @return        an int, specifying the phoneContactId.
-   */
   public int getPhoneContactId() {
     return phoneContactId;
   }
 
-  /**
-   * Sets the phoneDescription of the logged on user.
-   *
-   * @param        phoneDescription, an String specifying the phoneDescription.
-   */
   public void setPhoneDescription(String phoneDescription) {
     this.phoneDescription = phoneDescription;
   }
 
-  /**
-   * Gets the phoneDescription of the logged on user.
-   *
-   * @return        a String, specifying the phoneDescription.
-   */
   public String getPhoneDescription() {
-    return (phoneDescription==null)?"":phoneDescription;
+    return (phoneDescription == null) ? "" : phoneDescription;
   }
 
-  /**
-   * Sets the phoneId of the logged on user.
-   *
-   * @param      phoneId, an int specifying the phoneId.
-   */
   public void setPhoneId(int phoneId) {
     this.phoneId = phoneId;
   }
 
-  /**
-   * Gets the PhoneId of the logged on user.
-   *
-   * @return      an int, specifying the PhoneId.
-   */
   public int getPhoneId() {
     return phoneId;
   }
 
-  /**
-   * Sets the phoneNumber of the logged on user.
-   *
-   * @param        phoneNumber, an String specifying the phoneNumber.
-   */
   public void setPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
 
-  /**
-   * Gets the phoneNumber of the logged on user.
-   *
-   * @return        a String, specifying the phoneNumber.
-   */
   public String getPhoneNumber() {
-    return (phoneNumber==null)?"":phoneNumber;
+    return (phoneNumber == null) ? "" : phoneNumber;
   }
 
-  /**
-   * Sets the regionId of the  on phone number.
-   *
-   * @param      regionId, an int specifying the regionId.
-   */
   public void setPhoneRegionId(int regionId) {
     this.regionId = regionId;
   }
 
-  /**
-   * Gets the regionId of the phone number.
-   *
-   * @return      an int, specifying the regionId.
-   */
   public int getPhoneRegionId() {
     return regionId;
   }
 
-  /**
-   * Sets the phoneUserId of the logged on user.
-   *
-   * @param        phoneUserId, an int specifying the phoneUserId.
-   */
   public void setPhoneUserId(int phoneUserId) {
     this.phoneUserId = phoneUserId;
   }
 
-  /**
-   * Gets the phoneUserId of the logged on user.
-   *
-   * @return        an int, specifying the phoneUserId.
-   */
   public int getPhoneUserId() {
     return phoneUserId;
   }
 
-  /**
-   * Sets the region of the logged on user.
-   *
-   * @param      PhoneRegion, a PhoneRegion specifying the region.
-   */
   public void setRegion(PhoneRegion region) {
     this.region = region;
   }
 
-  /**
-   * Gets the PhoneRegion.
-   *
-   * @return      a PhoneRegion, specifying the region.
-   */
   public PhoneRegion getRegion() {
     return region;
   }
@@ -262,9 +233,7 @@ public class PhoneNumber {
     try {
       retval.getRegion().load(retval.getRegion().getRegionId());
     } catch (Exception e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".clonePhoneNumber(): Could not load region: ", e);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".clonePhoneNumber(): Could not load region: ", e);
     }
 
     retval.setPhoneRegionId(getPhoneRegionId());
@@ -274,17 +243,17 @@ public class PhoneNumber {
 
   /**
    * Save the phone numbers for either the contact or the user.
+   *
+   * @throws java.lang.Exception
    */
   public void save() throws Exception {
     if (getPhoneId() == -1) {
       try {
-        DBQueries dbQueries = new DBQueries();
-        StringRecordset rs = dbQueries.addPhoneNumberAndGetId(this);
+        StringRecordset rs = DBQueries.getProxy().addPhoneNumberAndGetId(this);
 
         if (!rs.getEOF()) {
           setPhoneId(Integer.parseInt(rs.getField("maxId")));
-        }
-        else {
+        } else {
           throw new XMLBuilderException(getClass().getName() + ".save(): Could not make and find a new phone.");
         }
       } catch (Exception e) {
@@ -294,11 +263,9 @@ public class PhoneNumber {
 
         throw new Exception(e.getMessage());
       }
-    }
-    else if (isRemoved() && getPhoneId() != -1) {
+    } else if (isRemoved() && getPhoneId() != -1) {
       try {
-        DBExecute dbExecute = new DBExecute();
-        dbExecute.deletePhoneNumber(this);
+        DBExecute.getProxy().deletePhoneNumber(this);
       } catch (Exception e) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -306,16 +273,11 @@ public class PhoneNumber {
 
         throw new Exception(e.getMessage());
       }
-    }
-    else {
+    } else {
       try {
-        DBExecute dbExecute = new DBExecute();
-        dbExecute.updatePhoneNumber(this);
+        DBExecute.getProxy().updatePhoneNumber(this);
       } catch (Exception e) {
-        if (IntiroLog.e()) {
-          IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-        }
-
+        IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new Exception(e.getMessage());
       }
     }
@@ -324,6 +286,7 @@ public class PhoneNumber {
     //getRegion().save();
   }
 
+  @Override
   public String toString() {
     StringBuffer retval = new StringBuffer();
     this.toXML(retval, -1, -1);

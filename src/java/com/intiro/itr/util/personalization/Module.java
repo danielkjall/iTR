@@ -3,91 +3,96 @@
  * Description:
  * Copyright:     Copyright (c) 2001
  * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
+ *
+ * @author Daniel Kjall
+ * @version 1.0
  */
 package com.intiro.itr.util.personalization;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Module {
 
-  //~ Instance/static variables ........................................................................................
+  public static final String CACHE_ALL_MODULES = "CACHE_ALL_MODULES";
+  private int moduleId = -1;
+  private String name = "";
+  private int rolesId = -1;
 
-  int moduleId = -1;
-  String name = "";
-  int rolesId = -1;
-
-  //~ Methods ..........................................................................................................
-
-  /**
-   * Sets the moduleId of the module.
-   *
-   * @param   an int containing the moduleId of the module.
-   */
   public void setModuleId(int moduleId) {
     this.moduleId = moduleId;
   }
 
-  /**
-   * Get the moduleId of the module.
-   *
-   * @return   an int containing the moduleId of the module.
-   */
   public int getModuleId() {
     return moduleId;
   }
 
-  /**
-   * Sets the name of the module.
-   *
-   * @param   a String containing the name of the module.
-   */
   public void setName(String name) {
     this.name = name;
   }
 
-  /**
-   * Get the name of the module.
-   *
-   * @return   a String containing the name of the module.
-   */
   public String getName() {
     return name;
   }
 
-  /**
-   * Sets the roleId of the role.
-   *
-   * @param   an int containing the roleId of the role.
-   */
   public void setRoleId(int roleId) {
     this.rolesId = roleId;
   }
 
-  /**
-   * Get the roleId of the role.
-   *
-   * @return   an int containing the roleId of the role.
-   */
   public int getRoleId() {
     return rolesId;
   }
 
-  /**
-   * Load the modules for the roleId.
-   */
-  public static Vector <Module> load(int roleId) throws XMLBuilderException {
-    Vector <Module> retval = new Vector <Module> ();
+  public static Map<Integer, ArrayList<Module>> loadAllModules() throws XMLBuilderException {
+    Map<Integer, ArrayList<Module>> retval = new HashMap<>();
+    try {
+      Map<Integer, ArrayList<Module>> cached = ItrCache.get(CACHE_ALL_MODULES);
+      if (cached != null) {
+        return cached;
+      }
+      
+      StringRecordset rs = DBQueries.getProxy().getModulesForRole(-1);
+      while (!rs.getEOF()) {
+        Module oneModule = new Module();
+        oneModule.setModuleId(Integer.parseInt(rs.getField(DBConstants.MODULE_ID_PK)));
+        oneModule.setRoleId(Integer.parseInt(rs.getField(DBConstants.MODULE_ROLESID_FK)));
+        oneModule.setName(rs.getField(DBConstants.MODULE_MODULE));
+
+        Integer key = oneModule.getRoleId();
+        if (retval.containsKey(key) == false) {
+          retval.put(key, new ArrayList<>());
+        }
+        retval.get(key).add(oneModule);
+
+        rs.moveNext();
+      }
+    } catch (Exception e) {
+      if (IntiroLog.d()) {
+        IntiroLog.detail(Module.class, ".loadAllModules(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      }
+
+      throw new XMLBuilderException(e.getMessage());
+    }
+
+    final int TenHours = 1 * 60 * 60 * 10;
+    ItrCache.put(CACHE_ALL_MODULES, retval, TenHours);
+    
+    return retval;
+  }
+
+  public static ArrayList<Module> load(int roleId) throws XMLBuilderException {
+    ArrayList<Module> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = new DBQueries().getModulesForRole(roleId);
+      StringRecordset rs = DBQueries.getProxy().getModulesForRole(roleId);
 
       while (!rs.getEOF()) {
         Module oneModule = new Module();
@@ -99,7 +104,7 @@ public class Module {
       }
     } catch (Exception e) {
       if (IntiroLog.d()) {
-        IntiroLog.detail(Module.class, ".load(String roleId): ERROR FROM DATABASE, exception = " + e.getMessage());
+        IntiroLog.detail(Module.class, ".load(int roleId): ERROR FROM DATABASE, exception = " + e.getMessage());
       }
 
       throw new XMLBuilderException(e.getMessage());

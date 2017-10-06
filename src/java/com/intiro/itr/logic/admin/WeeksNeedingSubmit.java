@@ -1,16 +1,9 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.admin;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.logic.weekreport.WeekReport;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StringRecordset;
@@ -18,58 +11,47 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
-import javax.mail.event.MailEvent;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class WeeksNeedingSubmit extends DynamicXMLCarrier {
-  // ~ Instance/static variables ........................................................................................
 
   static final String XML_MODE_END = "</mode>";
-
   static final String XML_MODE_START = "<mode>";
-
   String mode = "";
-
-  // week reports
-  Vector<WeekReport> weekReports = new Vector<WeekReport>();
-
-  // ~ Constructors .....................................................................................................
+  ArrayList<WeekReport> weekReports = new ArrayList<>();
 
   /**
    * Constructor I for Weeks.
-   * 
-   * @param profile
-   *          the UserProfile for the current user.
-   * @exception XMLBuilderException
-   *              if something goes wrong.
+   *
+   * @param profile the UserProfile for the current user.
+   * @param mode
+   * @exception XMLBuilderException if something goes wrong.
    */
   public WeeksNeedingSubmit(UserProfile profile, String mode) throws XMLBuilderException {
     super(profile);
-    weekReports = new Vector<WeekReport>();
+    weekReports = new ArrayList<>();
     this.mode = mode;
   }
 
-  // ~ Methods ..........................................................................................................
-
   /**
    * Load the weekreports for users.
+   *
+   * @param year
+   * @param periodType
+   * @return
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-  public Vector load(String year, int periodType) throws XMLBuilderException {
-    Vector<String> allUsers = new Vector<String>();
+  public ArrayList load(String year, int periodType) throws XMLBuilderException {
+    ArrayList<String> allUsers = new ArrayList<>();
     String sDate;
-    
-    
     sDate = getEndPeriod(year, periodType);
-    
-    
-    
     try {
-      StringRecordset rs = dbQuery.getUsers(true);
+      StringRecordset rs = DBQueries.getProxy().getUsers(true);
       String userId = null;
 
       while (!rs.getEOF()) {
         userId = rs.getField("Id");
-        allUsers.add(userId); 
+        allUsers.add(userId);
         rs.moveNext();
       }
 
@@ -81,8 +63,8 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
 
       throw new XMLBuilderException(e.getMessage());
     }
-    
-    UserProfile profile = new UserProfile();
+
+    UserProfile profile;
 
     for (int i = 0; i < allUsers.size(); i++) {
       String userId = allUsers.get(i);
@@ -91,7 +73,7 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
       profile.setClientInfo(getUserProfile().getClientInfo());
 
       try {
-        StringRecordset rs = dbQuery.getWeeksNeedingSubmit(userId, profile.getActivatedDate(), year, sDate);
+        StringRecordset rs = DBQueries.getProxy().getWeeksNeedingSubmit(userId, profile.getActivatedDate(), year, sDate);
         int lastCalendarWeekId = -1;
 
         while (!rs.getEOF()) {
@@ -108,15 +90,13 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
 
             // Add weekreport to week reports
             weekReports.add(oneWeekReport);
-            
-            
+
           }
 
           rs.moveNext();
         }
-        
-        //Snurra igenom veckor som inte paborjats, och lagg in har.
 
+        //Snurra igenom veckor som inte paborjats, och lagg in har.
         rs.close();
       } catch (Exception e) {
         if (IntiroLog.d()) {
@@ -132,7 +112,10 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
 
   /**
    * Make xml of weeks.
+   *
+   * @throws java.lang.Exception
    */
+  @Override
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
@@ -149,7 +132,7 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
     xmlDoc.append(XML_MODE_END);
 
     // week reports
-    WeekReport oneWeekReport = null;
+    WeekReport oneWeekReport;
 
     // Loop through all weekReports in combobox
     for (int i = 0; i < weekReports.size(); i++) {
@@ -167,69 +150,56 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
       IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): xmlDoc = " + xmlDoc.toString());
     }
   }
-  /**
-   * @return Returns the mode.
-   */
+
   public String getMode() {
     return mode;
   }
-  /**
-   * @return Returns the weekReports.
-   */
-  public Vector<WeekReport> getWeekReports() {
+
+  public ArrayList<WeekReport> getWeekReports() {
     return weekReports;
   }
-  private String getEndPeriod(String year, int periodType)
-  {
+
+  private String getEndPeriod(String year, int periodType) {
     java.util.Calendar cDate = java.util.Calendar.getInstance();
     String sDate;
     String sMonth;
     String sYear;
     String sDay;
-    
-  if(Integer.parseInt(year) == cDate.get(java.util.Calendar.YEAR))
-    {      
-      if(periodType == 2)
-      {
-        int dd = cDate.get(java.util.Calendar.DAY_OF_WEEK)-2;
-        
-        if (dd == -1)   //Sondag
+
+    if (Integer.parseInt(year) == cDate.get(java.util.Calendar.YEAR)) {
+      if (periodType == 2) {
+        int dd = cDate.get(java.util.Calendar.DAY_OF_WEEK) - 2;
+
+        if (dd == -1) //Sondag
         {
-            dd = 6;
+          dd = 6;
         }
-        
-        if(dd > 0) 
-        {
-            cDate.add(java.util.Calendar.DATE, -dd);
+
+        if (dd > 0) {
+          cDate.add(java.util.Calendar.DATE, -dd);
         }
         sDay = twoDigits(cDate.get(java.util.Calendar.DATE));
+      } else {
+        sDay = "01";
       }
-      else
-      {
-          sDay ="01";
-      }
-      
+
       sMonth = twoDigits(cDate.get(java.util.Calendar.MONTH) + 1);
       sYear = Integer.toString(cDate.get(java.util.Calendar.YEAR));
-      
+
       sDate = sYear + "-" + sMonth + "-" + sDay;
-    
+
+    } else {
+      //Lagg till ett ar, och ta 1/1. Vill man se ar 2007, skall man ha det som ar fram till 2008-01-01
+      sDate = Integer.parseInt(year) + 1 + "-01-01";
     }
-    else
-    {
-        //Lagg till ett ar, och ta 1/1. Vill man se ar 2007, skall man ha det som ar fram till 2008-01-01
-        sDate = Integer.parseInt(year) + 1 + "-01-01";
-    }
-       
-       return sDate;
+
+    return sDate;
   }
-  
-  private String twoDigits(int num)
-  {
+
+  private String twoDigits(int num) {
     String sTemp = "0" + Integer.toString(num);
     sTemp = sTemp.substring(sTemp.length() - 2, sTemp.length());
     return sTemp;
   }
-  
-  
+
 }

@@ -1,15 +1,6 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.superadmin.users;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
 import com.intiro.itr.logic.contacts.Contacts;
 import com.intiro.itr.logic.phone.PhoneNumber;
 import com.intiro.itr.util.combos.PhoneCountryCombo;
@@ -18,7 +9,7 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class PhoneEditor extends DynamicXMLCarrier {
 
@@ -28,42 +19,49 @@ public class PhoneEditor extends DynamicXMLCarrier {
   public PhoneCountryCombo getCountryCombo() {
     return countryCombo;
   }
+
   /**
    * @return Returns the firstName.
    */
   public String getFirstName() {
     return firstName;
   }
+
   /**
    * @return Returns the lastName.
    */
   public String getLastName() {
     return lastName;
   }
+
   /**
    * @return Returns the mode.
    */
   public String getMode() {
     return mode;
   }
+
   /**
    * @return Returns the modeDesc.
    */
   public String getModeDesc() {
     return modeDesc;
   }
+
   /**
    * @return Returns the phones.
    */
-  public Vector<PhoneNumber> getPhones() {
+  public ArrayList<PhoneNumber> getPhones() {
     return phones;
   }
+
   /**
    * @return Returns the regionCombo.
    */
   public PhoneRegionCombo getRegionCombo() {
     return regionCombo;
   }
+
   /**
    * @return Returns the userId.
    */
@@ -91,7 +89,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
   static final String XML_USER_END = "</user>";
   static final String XML_USER_START = "<user>";
   protected PhoneCountryCombo countryCombo = null;
-  protected Vector <PhoneNumber> phones = new Vector <PhoneNumber> ();
+  protected ArrayList<PhoneNumber> phones = new ArrayList<PhoneNumber>();
 
   //Combo
   protected PhoneRegionCombo regionCombo = null;
@@ -104,7 +102,6 @@ public class PhoneEditor extends DynamicXMLCarrier {
   private String modeDesc = "";
 
   //~ Constructors .....................................................................................................
-
   public PhoneEditor(UserProfile profile, int userId, String mode) throws XMLBuilderException {
     super(profile);
 
@@ -114,8 +111,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
       firstName = tmpContact.getFirstName();
       lastName = tmpContact.getLastName();
       modeDesc = "contact";
-    }
-    else {
+    } else {
       UserProfile tmpProfile = new UserProfile();
       tmpProfile.load(userId);
       firstName = tmpProfile.getFirstName();
@@ -128,8 +124,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
 
     if (mode.equals("contacts")) {
       this.phones = PhoneNumber.load(-1, userId, -1);
-    }
-    else {
+    } else {
       this.phones = PhoneNumber.load(userId, -1, -1);
     }
     try {
@@ -148,16 +143,12 @@ public class PhoneEditor extends DynamicXMLCarrier {
 
       //countryCombo.setSelectedValue(String.valueOf(getPhoneCountryId()));
     } catch (XMLBuilderException e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".Constructor(): Could not create combos. ", e);
-      }
-
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".Constructor(): Could not create combos. ", e);
       e.printStackTrace();
     }
   }
 
   //~ Methods ..........................................................................................................
-
   /**
    * Set editingRow.
    */
@@ -197,7 +188,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
   /**
    * Get Phone numbers.
    */
-  public Vector getPhoneNumbers() {
+  public ArrayList getPhoneNumbers() {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getPhoneNumbers(): Entering");
     }
@@ -211,8 +202,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
   public void addPhoneNumber() {
     if (mode.equals("contacts")) {
       newPhoneNumber.setPhoneContactId(userId);
-    }
-    else {
+    } else {
       newPhoneNumber.setPhoneUserId(userId);
     }
 
@@ -226,8 +216,7 @@ public class PhoneEditor extends DynamicXMLCarrier {
           onePhoneNumber.setNotRemoved();
         }
       }
-    }
-    else {
+    } else {
       phones.add(newPhoneNumber.clonePhoneNumber());
     }
 
@@ -266,9 +255,9 @@ public class PhoneEditor extends DynamicXMLCarrier {
   }
 
   /**
-   * This is the method that will produce the XML.
-   * It will fill the xmlDoc with XML.
-   * @param    xmlDoc a StringBuffer to be filled with xml.
+   * This is the method that will produce the XML. It will fill the xmlDoc with XML.
+   *
+   * @param xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
     if (IntiroLog.d()) {
@@ -346,9 +335,9 @@ public class PhoneEditor extends DynamicXMLCarrier {
   /**
    * Set Phone numbers.
    */
-  void setPhoneNumbers(Vector <PhoneNumber> phones) {
+  void setPhoneNumbers(ArrayList<PhoneNumber> phones) {
     if (IntiroLog.d()) {
-      IntiroLog.detail(getClass(), getClass().getName() + ".setPhoneNumbers(Vector phones): Entering");
+      IntiroLog.detail(getClass(), getClass().getName() + ".setPhoneNumbers(ArrayList phones): Entering");
     }
 
     this.phones = phones;

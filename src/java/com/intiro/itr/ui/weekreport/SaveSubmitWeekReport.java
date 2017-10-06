@@ -1,11 +1,3 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.ui.weekreport;
 
 import java.io.PrintWriter;
@@ -26,7 +18,7 @@ import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.ui.xsl.XSLFormatedArea;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 /**
  * This servlet handles saving, submitting, rejecting and approving of a WeekReport.
@@ -34,7 +26,7 @@ import com.intiro.toolbox.log.IntiroLog;
 public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
 
   //~ Methods ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): entered doGet");
@@ -103,16 +95,13 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
         handleSave(request, response, getServletContext());
 
         return;
-      }
-
-      //SUBMIT THE WEEKREPORT
+      } //SUBMIT THE WEEKREPORT
       else if (submit != null) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): FORCE SUBMITTING WEEKREPORT");
         }
 
         //mode = "submit";
-
         if (xmlCarrier.checkIfOkToSubmit()) {
 
           /*Submit the week report*/
@@ -123,16 +112,13 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
 
           return;
         }
-      }
-
-      //FORCE SUBMIT OF THE WEEKREPORT
+      } //FORCE SUBMIT OF THE WEEKREPORT
       else if (action != null && action.equalsIgnoreCase("forceSubmit")) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): SUBMITTING WEEKREPORT");
         }
 
         //mode = "submit";
-
         //Submit the week report
         xmlCarrier.submit();
 
@@ -140,9 +126,7 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
         handleSubmit(request, response, getServletContext());
 
         return;
-      }
-
-      // Reject a WeekReport
+      } // Reject a WeekReport
       else if (reject != null && reject.trim().equalsIgnoreCase("Reject")) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Rejecting a WeekReport");
@@ -155,9 +139,7 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
         handleReject(request, response, getServletContext());
 
         return;
-      }
-
-      //Approve a WeekReport
+      } //Approve a WeekReport
       else if (approve != null && approve.trim().equalsIgnoreCase("Approve")) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): Approving a WeekReport");
@@ -170,11 +152,8 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
         handleApprove(request, response, getServletContext());
 
         return;
-      }
-      else {
-        if (IntiroLog.ce()) {
-          IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): ACTION NOT FOUND");
-        }
+      } else {
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): ACTION NOT FOUND");
 
         int log = IntiroLog.getInstance().getLoggingLevel();
         IntiroLog.getInstance().setLoggingLevel(6);
@@ -197,8 +176,7 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
 
       /*END ACTION*/
 
-      /*Create an XSLFormatedArea and add it to the page*/
-
+ /*Create an XSLFormatedArea and add it to the page*/
       // If this code is reached we must show a warning page
       XSLFormatedArea xslAnswer = new XSLFormatedArea(xmlCarrier, RESULT_SAVE_SUBMIT_WEEK_XSL);
       page.add(xslAnswer);
@@ -221,9 +199,7 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
 
       return;
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): An Error occured when trying to display " + getClass().getName(), exception);
 
       UserProfile userProfile = (UserProfile) request.getSession(false).getAttribute(ITRResources.ITR_USER_PROFILE);
       ErrorHandler errorHandler = null;
@@ -238,11 +214,10 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
       errorHandler.setErrorMessage("A problem occured when trying to display the " + getClass().getName() + " page.");
       errorHandler.setException(exception);
       handleError(request, response, getServletContext(), errorHandler);
-
-      return;
     }
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): Entering doPost");

@@ -4,24 +4,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.ui.ITRServlet;
 import com.intiro.itr.ui.constants.Commands;
 import com.intiro.itr.ui.constants.URLs;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.personalization.UserProfile;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class LoginVerifier extends ITRServlet implements URLs, Commands {
 
-  // ~ Methods
-  // ..........................................................................................................
-
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     doPost(request, response);
   }
 
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): entered");
@@ -65,21 +63,18 @@ public class LoginVerifier extends ITRServlet implements URLs, Commands {
         response.sendRedirect(redirectURLPath.toString());
 
         return;
-      } else { /* Login attempt failed */
+      } else {
+        /* Login attempt failed */
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".doPost(): Login failed");
         }
 
         /* redirect to LOGIN_PAGE */
         reAuthenticate(request, response, getServletContext(), "Wrong userid or password!");
-
-        return;
       }
     } catch (Exception exception) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".doPost(): Something went wrong during Login Verification exception = " + exception.getClass().getName(),
-                exception);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".doPost(): Something went wrong during Login Verification exception = " + exception.getClass().getName(),
+              exception);
 
       /* Create errorHandler */
       UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);

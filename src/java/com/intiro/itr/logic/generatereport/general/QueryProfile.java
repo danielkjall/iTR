@@ -15,7 +15,7 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class QueryProfile extends DynamicXMLCarrier {
 
@@ -66,8 +66,8 @@ public class QueryProfile extends DynamicXMLCarrier {
    * @param    xmlDoc a StringBuffer to be filled with xml.
    */
   public void toXML(StringBuffer xmlDoc) throws Exception {
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".toXML(StringBuffer): entered");
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".toXML(StringBuffer): entered");
     }
 
     XMLBuilder builder = new XMLBuilder();
@@ -104,8 +104,8 @@ public class QueryProfile extends DynamicXMLCarrier {
     /*Get end of document*/
     builder.getEndOfDocument(xmlDoc);
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".toXML(StringBuffer): xmlDoc = " + xmlDoc.toString());
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".toXML(StringBuffer): xmlDoc = " + xmlDoc.toString());
     }
   }
 }

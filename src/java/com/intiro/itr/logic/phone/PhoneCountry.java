@@ -1,115 +1,66 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.phone;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 public class PhoneCountry {
 
-  //~ Instance/static variables ........................................................................................
-
-  static final String XML_PHONECOUNTRYCODE_END = "</countrycode>";
-  static final String XML_PHONECOUNTRYCODE_START = "<countrycode>";
-  static final String XML_PHONECOUNTRYID_END = "</countryid>";
-  static final String XML_PHONECOUNTRYID_START = "<countryid>";
-  static final String XML_PHONECOUNTRYNAME_END = "</countryname>";
-  static final String XML_PHONECOUNTRYNAME_START = "<countryname>";
-  static final String XML_PHONECOUNTRY_END = "</phonecountry>";
-  static final String XML_PHONECOUNTRY_START = "<phonecountry>";
-  static final String XML_PHONEREGION_END = "</phoneregion>";
-  static final String XML_PHONEREGION_START = "<phoneregion>";
-  String countryCode = null;
-  int countryId = -1;
-  String countryName = null;
-  int phoneContactId = -1;
-  String phoneDescription = null;
-  int phoneId = -1;
-  String phoneNumber = null;
-  int phoneUserId = -1;
-  String regionCode = null;
-  int regionId = -1;
-  String regionName = null;
-  boolean remove = false;
-
-  //~ Constructors .....................................................................................................
+  public static final String CACHE_ALL_PHONECOUNTRY = "CACHE_ALL_PHONECOUNTRY";
+  private static final String XML_PHONECOUNTRYCODE_END = "</countrycode>";
+  private static final String XML_PHONECOUNTRYCODE_START = "<countrycode>";
+  private static final String XML_PHONECOUNTRYID_END = "</countryid>";
+  private static final String XML_PHONECOUNTRYID_START = "<countryid>";
+  private static final String XML_PHONECOUNTRYNAME_END = "</countryname>";
+  private static final String XML_PHONECOUNTRYNAME_START = "<countryname>";
+  private static final String XML_PHONECOUNTRY_END = "</phonecountry>";
+  private static final String XML_PHONECOUNTRY_START = "<phonecountry>";
+  private static final String XML_PHONEREGION_END = "</phoneregion>";
+  private static final String XML_PHONEREGION_START = "<phoneregion>";
+  private String countryCode = null;
+  private int countryId = -1;
+  private String countryName = null;
+  private int phoneContactId = -1;
+  private String phoneDescription = null;
+  private int phoneId = -1;
+  private String phoneNumber = null;
+  private int phoneUserId = -1;
+  private String regionCode = null;
+  private int regionId = -1;
+  private String regionName = null;
+  private boolean remove = false;
 
   /**
    * Constructor I for PhoneNumber.
    */
   public PhoneCountry() {
-    //empty
   }
 
-  //~ Methods ..........................................................................................................
-
-  /**
-   * Sets the countryCode of the logged on user.
-   *
-   * @param      countryCode, an String specifying the countryCode.
-   */
   public void setCountryCode(String countryCode) {
     this.countryCode = countryCode;
   }
 
-  /**
-   * Gets the countryCode of the logged on user.
-   *
-   * @return      a String, specifying the countryCode.
-   */
   public String getCountryCode() {
     return countryCode;
   }
 
-  /**
-   * Sets the countryId of the  on phone number.
-   *
-   * @param      countryId, an int specifying the countryId.
-   */
   public void setCountryId(int countryId) {
     this.countryId = countryId;
   }
 
-  /**
-   * Gets the countryId of the phone number.
-   *
-   * @return      an int, specifying the countryId.
-   */
   public int getCountryId() {
     return countryId;
   }
 
-  /**
-   * Sets the countryName of the logged on user.
-   *
-   * @param      countryName, an String specifying the countryName.
-   */
   public void setCountryName(String countryName) {
     this.countryName = countryName;
   }
 
-  /**
-   * Gets the countryName of the logged on user.
-   *
-   * @return      a String, specifying the countryName.
-   */
   public String getCountryName() {
     return countryName;
   }
@@ -133,12 +84,17 @@ public class PhoneCountry {
 
   /**
    * Load the Phone numbers for the specified userId, contactId or phoneId.
+   *
+   * @param countryId
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public void load(int countryId) throws XMLBuilderException {
     try {
-      if (countryId == -1) { throw new Exception(getClass().getName() + ".load(int countryId): At least one input has to be not null."); }
+      if (countryId == -1) {
+        throw new Exception(getClass().getName() + ".load(int countryId): At least one input has to be not null.");
+      }
 
-      StringRecordset rs = new DBQueries().getPhoneCountry(countryId);
+      StringRecordset rs = DBQueries.getProxy().getPhoneCountry(countryId);
 
       if (!rs.getEOF()) {
         setCountryCode(rs.getField(DBConstants.PHONECOUNTRYCODE_COUNTRYCODE));
@@ -151,26 +107,51 @@ public class PhoneCountry {
         }
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".load(int countryId): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".load(int countryId): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
-  /**
-   * Save the phone country.
-   */
-  public void save() throws Exception {
+  public static Map<Integer, PhoneCountry> loadAllPhoneCountries() throws XMLBuilderException {
+    Map<Integer, PhoneCountry> retval = new HashMap<>();
+    try {
 
-    //not implemented yet
+      Map<Integer, PhoneCountry> cached = ItrCache.get(CACHE_ALL_PHONECOUNTRY);
+      if (cached != null) {
+        return cached;
+      }
+
+      StringRecordset rs = DBQueries.getProxy().getPhoneCountry(-1);
+
+      if (!rs.getEOF()) {
+        PhoneCountry pc = new PhoneCountry();
+        pc.setCountryCode(rs.getField(DBConstants.PHONECOUNTRYCODE_COUNTRYCODE));
+        pc.setCountryName(rs.getField(DBConstants.PHONECOUNTRYCODE_COUNTRYNAME));
+        pc.setCountryId(Integer.parseInt(rs.getField(DBConstants.PHONECOUNTRYCODE_ID_PK)));
+        retval.put(pc.getCountryId(), pc);
+        rs.moveNext();
+
+        if (IntiroLog.d()) {
+          IntiroLog.detail(PhoneCountry.class, PhoneCountry.class.getName() + ".loadAllPhoneCountries()");
+        }
+      }
+    } catch (Exception e) {
+      IntiroLog.error(PhoneCountry.class, PhoneCountry.class.getName() + ".loadAllPhoneCountries(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      throw new XMLBuilderException(e.getMessage());
+    }
+
+    final int TenHours = 1 * 60 * 60 * 10;
+    ItrCache.put(CACHE_ALL_PHONECOUNTRY, retval, TenHours);
+    return retval;
   }
 
+  public void save() throws Exception {
+  }
+
+  @Override
   public String toString() {
     StringBuffer retval = new StringBuffer();
     this.toXML(retval);
-
     return retval.toString();
   }
 

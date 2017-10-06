@@ -13,7 +13,7 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class ActivityEditor extends DynamicXMLCarrier {
 
@@ -72,16 +72,16 @@ public class ActivityEditor extends DynamicXMLCarrier {
     this.mode = mode;
     this.activityId = activityId;
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): activityId = " + activityId);
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): activityId = " + activityId);
     }
 
     //Load the activity to edit, view
     Activity oneActivity = new Activity();
 
     if (inEditMode || inViewMode || inDeleteMode) {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + activityId + ", inAddMode =  " + inAddMode);
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + activityId + ", inAddMode =  " + inAddMode);
       }
 
       oneActivity.load(activityId);

@@ -1,11 +1,3 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.db;
 
 import com.intiro.itr.logic.activity.Activity;
@@ -20,27 +12,22 @@ import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.Role;
 import com.intiro.itr.util.personalization.UserProfile;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DBQueries implements DBConstants {
-  // ~ Instance/static variables ........................................................................................
+public class DBQueries implements DBQueriesInterface, DBConstants {
 
-  private UserProfile profile;
-
-  // ~ Constructors .....................................................................................................
-  public DBQueries() {
-    // empty
+  private DBQueries() {
   }
 
-  public DBQueries(UserProfile profile) {
-    this.profile = profile;
+  public static DBQueriesInterface getProxy() {
+    DBQueries db = new DBQueries();
+    return (DBQueriesInterface) Proxy.newProxyInstance(db.getClass().getClassLoader(), new Class<?>[]{DBQueriesInterface.class}, new ItrInvocationHandler(db));
   }
 
-  // ~ Methods ..........................................................................................................
-  /**
-   * Return project for a specific user.
-   */
+  @Override
   public StringRecordset getActivitiesForProject(int projId, int activityId) throws Exception {
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_PROJECTCODES_DOT + "*" + COMMA + TABLE_PROJECTCODE_DOT + PROJECTCODE_DESCRIPTION + COMMA + TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE);
@@ -51,31 +38,22 @@ public class DBQueries implements DBConstants {
 
     if (projId != -1) {
       sb.append(" AND ");
-      sb.append(TABLE_PROJECTCODES_DOT + PROJECTCODES_PROJECTID_FK + " = " + projId);
+      sb.append(TABLE_PROJECTCODES_DOT + PROJECTCODES_PROJECTID_FK + " = ").append(projId);
     }
     if (activityId != -1) {
       sb.append(" AND ");
-      sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK + " = " + activityId);
+      sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK + " = ").append(activityId);
     }
 
     sb.append(" ORDER BY ITR_ProjectCode.Code, ITR_ProjectCode.Description ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all companies.
-   */
+  @Override
   public StringRecordset getAllCompanies() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -83,22 +61,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_COMPANY);
     sb.append(" ORDER BY Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all phone countries.
-   */
+  @Override
   public StringRecordset getAllPhoneCountries() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append(" SELECT ");
     sb.append("*");
@@ -106,22 +75,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_PHONECOUNTRYCODE);
     sb.append(" ORDER BY CountryName ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all phone regions.
-   */
+  @Override
   public StringRecordset getAllPhoneRegions() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append(" SELECT ");
     sb.append("*");
@@ -129,22 +89,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_PHONEREGIONCODE);
     sb.append(" ORDER BY RegionName ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all projectcodes.
-   */
+  @Override
   public StringRecordset getAllProjectCodes() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -152,22 +103,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_PROJECTCODE);
     sb.append(" ORDER BY Code, Description ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all projects.
-   */
+  @Override
   public StringRecordset getAllProjects() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -175,22 +117,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_PROJECT);
     sb.append(" ORDER BY Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return all users.
-   */
+  @Override
   public StringRecordset getAllUsers() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -198,22 +131,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_USER);
     sb.append(" ORDER BY Firstname, LastName, LoginId ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return calendar week.
-   */
+  @Override
   public StringRecordset getCalendarWeek(String fromDate) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -222,24 +146,15 @@ public class DBQueries implements DBConstants {
     sb.append(" WHERE ");
 
     /* the week must have a from date that is >= supplied startFromDate */
-    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '" + fromDate + "'");
+    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '").append(fromDate).append("'");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return contacts.
-   */
+  @Override
   public StringRecordset getContacts() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("   * ");
@@ -247,22 +162,13 @@ public class DBQueries implements DBConstants {
     sb.append("   contact ");
     sb.append("ORDER BY FirstName, LastName ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the emails for the specified id
-   */
+  @Override
   public StringRecordset getEmails(int userId, int contactId, int emailId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append(" SELECT ");
     sb.append("*");
@@ -271,31 +177,34 @@ public class DBQueries implements DBConstants {
     sb.append(" WHERE ");
 
     if (!(emailId == -1)) {
-      sb.append(EMAIL_ID_PK + " = " + emailId);
+      sb.append(EMAIL_ID_PK + " = ").append(emailId);
     }
     if (!(userId == -1)) {
-      sb.append(EMAIL_USERID_FK + " = " + userId);
+      sb.append(EMAIL_USERID_FK + " = ").append(userId);
     }
     if (!(contactId == -1)) {
-      sb.append(EMAIL_CONTACTID + " = " + contactId);
+      sb.append(EMAIL_CONTACTID + " = ").append(contactId);
     }
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Get general report.
-   */
-  public synchronized StringRecordset getGeneralReport(String userId, String projectId, String projectCodeId, String fromDate, String toDate) throws Exception {
+  @Override
+  public StringRecordset getAllEmails() throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append(" SELECT ");
+    sb.append("*");
+    sb.append(" FROM ");
+    sb.append(TABLE_EMAIL);
+    DBConnect access = new DBConnect();
+    StringRecordset rs = access.executeQuery(sb);
+    return rs;
+  }
 
-    /* Create sql query */
+  @Override
+  public synchronized StringRecordset getGeneralReport(String userId, String projectId, String projectCodeId, String fromDate, String toDate) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("cw.FromDate, ");
@@ -327,19 +236,19 @@ public class DBQueries implements DBConstants {
     sb.append("AND pm.ITR_UserId          = us.Id ");
 
     if (userId != null) {
-      sb.append(" AND er.ITR_UserId          = " + userId);
+      sb.append(" AND er.ITR_UserId          = ").append(userId);
     }
     if (projectId != null) {
-      sb.append(" AND er.ITR_ProjectId       = " + projectId);
+      sb.append(" AND er.ITR_ProjectId       = ").append(projectId);
     }
     if (projectCodeId != null) {
-      sb.append(" AND er.ITR_ProjectCodeId   = " + projectCodeId);
+      sb.append(" AND er.ITR_ProjectCodeId   = ").append(projectCodeId);
     }
     if (fromDate != null && fromDate.length() > 0) {
-      sb.append(" AND cw.FromDate           >= '" + fromDate + "'");
+      sb.append(" AND cw.FromDate           >= '").append(fromDate).append("'");
     }
     if (toDate != null && toDate.length() > 0) {
-      sb.append(" AND cw.ToDate             <= '" + toDate + "'");
+      sb.append(" AND cw.ToDate             <= '").append(toDate).append("'");
     }
 
     sb.append(" AND uw.Submitted = True ");
@@ -356,22 +265,13 @@ public class DBQueries implements DBConstants {
     sb.append("pm.Rate, ");
     sb.append("cw.ExpectedHoursSum ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the languages for the ITR.
-   */
+  @Override
   public StringRecordset getLanguages() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("*");
@@ -379,46 +279,31 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_LANGUAGE);
     sb.append(" ORDER BY Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return modules for a role.
-   */
+  @Override
   public StringRecordset getModulesForRole(int roleId) throws Exception {
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
     sb.append(" FROM ");
     sb.append(TABLE_MODULE);
-    sb.append(" WHERE ");
-    sb.append(TABLE_MODULE_DOT + MODULE_ROLESID_FK + " = " + roleId);
+    if (roleId > -1) {
+      sb.append(" WHERE ");
+      sb.append(TABLE_MODULE_DOT + MODULE_ROLESID_FK + " = ").append(roleId);
+    }
     sb.append(" ORDER BY Module ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Get Report - Monthly
-   */
+  @Override
   public StringRecordset getMonthlyReport(String userId, String projectId, String projectCodeId, String fromDate, String toDate) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT \n");
     sb.append("    ITR_Project.Id AS ProjectId, \n");
@@ -448,18 +333,18 @@ public class DBQueries implements DBConstants {
     sb.append("        ) ON ITR_User.Id = ITR_EntryRow.ITR_UserId \n");
     sb.append("    ) ON ITR_UserWeek.Id = ITR_EntryRow.ITR_UserWeekId \n");
     sb.append("WHERE \n");
-    sb.append("    ITR_CalendarWeek.FromDate>='" + fromDate + "' \n");
-    sb.append("    AND ITR_CalendarWeek.ToDate<='" + toDate + "' \n");
+    sb.append("    ITR_CalendarWeek.FromDate>='").append(fromDate).append("' \n");
+    sb.append("    AND ITR_CalendarWeek.ToDate<='").append(toDate).append("' \n");
     sb.append("    AND ITR_UserWeek.Approved=True \n");
 
     if (!projectId.equals("")) {
-      sb.append("    AND ITR_EntryRow.ITR_ProjectId=" + projectId + " \n");
+      sb.append("    AND ITR_EntryRow.ITR_ProjectId=").append(projectId).append(" \n");
     }
     if (!projectCodeId.equals("")) {
-      sb.append("    AND ITR_EntryRow.ITR_ProjectCodeId=" + projectCodeId + " \n");
+      sb.append("    AND ITR_EntryRow.ITR_ProjectCodeId=").append(projectCodeId).append(" \n");
     }
     if (!userId.equals("")) {
-      sb.append("    AND ITR_EntryRow.ITR_userId=" + userId + " \n");
+      sb.append("    AND ITR_EntryRow.ITR_userId=").append(userId).append(" \n");
     }
 
     sb.append("GROUP BY \n");
@@ -482,8 +367,8 @@ public class DBQueries implements DBConstants {
     return rs;
   }
 
+  @Override
   public StringRecordset getWeeksAlreadySubmittedAsStartDate(String userId) throws Exception {
-
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT distinct ");
     sb.append("cw.FromDate ");
@@ -492,46 +377,34 @@ public class DBQueries implements DBConstants {
     sb.append("INNER JOIN ITR_UserWeek as uw on (cw.id = uw.ITR_CalendarWeekId) ");
     sb.append("INNER JOIN ITR_EntryRow as er on (uw.id = er.ITR_UserWeekId) ");
     sb.append("WHERE   ");
-    sb.append("er.ITR_UserId = " + userId + " ");
+    sb.append("er.ITR_UserId = ").append(userId).append(" ");
     sb.append("AND uw.Submitted = true ");
     sb.append("order by fromdate asc ");
 
     DBConnect access = new DBConnect();
     StringRecordset rs = access.executeQuery(sb);
-
     return rs;
   }
 
-  /**
-   * Return the phone country for the specified id.
-   */
+  @Override
   public StringRecordset getPhoneCountry(int countryId) throws Exception {
-
-    // Create sql query
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
     sb.append(" FROM ");
     sb.append(TABLE_PHONECOUNTRYCODE);
-    sb.append(" WHERE ");
-    sb.append(PHONECOUNTRYCODE_ID_PK + " = " + countryId);
+    if (countryId > -1) {
+      sb.append(" WHERE ");
+      sb.append(PHONECOUNTRYCODE_ID_PK + " = ").append(countryId);
+    }
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the phonenumbers for the specified id.
-   */
+  @Override
   public StringRecordset getPhoneNumbers(int userId, int contactId, int phoneId) throws Exception {
-
-    // Create sql query
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_PHONE_DOT + "*" + COMMA);
@@ -548,105 +421,97 @@ public class DBQueries implements DBConstants {
     sb.append(" AND ");
 
     if (!(phoneId == -1)) {
-      sb.append(TABLE_PHONE_DOT + PHONE_ID_PK + " = " + phoneId);
+      sb.append(TABLE_PHONE_DOT + PHONE_ID_PK + " = ").append(phoneId);
     }
     if (!(userId == -1)) {
-      sb.append(TABLE_PHONE_DOT + PHONE_USERID_FK + " = " + userId);
+      sb.append(TABLE_PHONE_DOT + PHONE_USERID_FK + " = ").append(userId);
     }
     if (!(contactId == -1)) {
-      sb.append(TABLE_PHONE_DOT + PHONE_CONTACTID_FK + " = " + contactId);
+      sb.append(TABLE_PHONE_DOT + PHONE_CONTACTID_FK + " = ").append(contactId);
     }
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the phone region for the specified id.
-   */
-  public StringRecordset getPhoneRegion(int regionId) throws Exception {
+  @Override
+  public StringRecordset getAllPhoneNumbers() throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append("SELECT ");
+    sb.append(TABLE_PHONE_DOT + "*" + COMMA);
+    sb.append(TABLE_PHONEREGIONCODE_DOT + PHONEREGIONCODE_REGIONCODE + COMMA);
+    sb.append(TABLE_PHONEREGIONCODE_DOT + PHONEREGIONCODE_REGIONNAME + COMMA);
+    sb.append(TABLE_PHONECOUNTRYCODE_DOT + PHONECOUNTRYCODE_COUNTRYCODE + COMMA);
+    sb.append(TABLE_PHONECOUNTRYCODE_DOT + PHONECOUNTRYCODE_COUNTRYNAME);
+    sb.append(" FROM ");
+    sb.append(TABLE_PHONE + COMMA + TABLE_PHONEREGIONCODE + COMMA + TABLE_PHONECOUNTRYCODE);
+    sb.append(" WHERE ");
+    sb.append(TABLE_PHONE_DOT + PHONE_REGIONID_FK + " = " + TABLE_PHONEREGIONCODE_DOT + PHONEREGIONCODE_ID_PK);
+    sb.append(" AND ");
+    sb.append(TABLE_PHONEREGIONCODE_DOT + PHONEREGIONCODE_PHONECOUNTRYCODEID_FK + " = " + TABLE_PHONECOUNTRYCODE_DOT + PHONECOUNTRYCODE_ID_PK);
 
-    // Create sql query
+    DBConnect access = new DBConnect();
+
+    StringRecordset rs = access.executeQuery(sb);
+
+    return rs;
+  }
+
+  @Override
+  public StringRecordset getPhoneRegion(int regionId) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
     sb.append(" FROM ");
     sb.append(TABLE_PHONEREGIONCODE);
-    sb.append(" WHERE ");
-    sb.append(PHONEREGIONCODE_ID_PK + " = " + regionId);
-
-    /* Create connection to database */
+    if (regionId > -1) {
+      sb.append(" WHERE ");
+      sb.append(PHONEREGIONCODE_ID_PK + " = ").append(regionId);
+    }
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return project for a specific user.
-   */
+  @Override
   public StringRecordset getProjectCodesForProject(int projId) throws Exception {
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE + COMMA + TABLE_PROJECTCODE_DOT + PROJECTCODE_DESCRIPTION + COMMA + TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK);
     sb.append(" FROM ");
     sb.append(TABLE_PROJECTCODE + COMMA + TABLE_PROJECTCODES);
     sb.append(" WHERE ");
-    sb.append(TABLE_PROJECTCODES_DOT + PROJECTCODES_PROJECTID_FK + " = " + projId);
+    sb.append(TABLE_PROJECTCODES_DOT + PROJECTCODES_PROJECTID_FK + " = ").append(projId);
     sb.append(" AND ");
     sb.append(TABLE_PROJECTCODES_DOT + PROJECTCODES_PROJECTCODEID_FK + " = " + TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK);
     sb.append(" ORDER BY ITR_ProjectCode.Code, ITR_ProjectCode.Description ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
 
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
 
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return project for a specific user.
-   */
+  @Override
   public StringRecordset getProjectProperties(String projId) throws Exception {
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
     sb.append(" FROM ");
     sb.append(TABLE_PROJECT);
     sb.append(" WHERE ");
-    sb.append(TABLE_PROJECT_DOT + PROJECT_ID_PK + " = " + projId);
+    sb.append(TABLE_PROJECT_DOT + PROJECT_ID_PK + " = ").append(projId);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return project for a specific user.
-   */
+  @Override
   public StringRecordset getProjectsForUser(int userId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_PROJECT_DOT + PROJECT_ID_PK + COMMA);
@@ -657,26 +522,18 @@ public class DBQueries implements DBConstants {
     sb.append(" FROM ");
     sb.append(TABLE_PROJECT + COMMA + TABLE_PROJECTMEMBERS);
     sb.append(" WHERE ");
-    sb.append(TABLE_PROJECTMEMBERS_DOT + PROJECTMEMBERS_USERID_FK + " = " + userId);
+    sb.append(TABLE_PROJECTMEMBERS_DOT + PROJECTMEMBERS_USERID_FK + " = ").append(userId);
     sb.append(" AND ");
     sb.append(TABLE_PROJECT_DOT + PROJECT_ID_PK + " = " + TABLE_PROJECTMEMBERS_DOT + PROJECTMEMBERS_PROJECTID_FK);
     sb.append(" ORDER BY ITR_Project.Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Get the years that the iTR database has time data about.
-   */
+  @Override
   public StringRecordset getReportYears() throws Exception {
-
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT \n");
     sb.append("    DISTINCT Year(ITR_CalendarWeek.FromDate) AS year \n");
@@ -686,16 +543,11 @@ public class DBQueries implements DBConstants {
 
     DBConnect access = new DBConnect();
     StringRecordset rs = access.executeQuery(sb);
-
     return rs;
   }
 
-  /**
-   * Return role for a user.
-   */
+  @Override
   public StringRecordset getRoleForUser(String userId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_USERROLES_DOT + "*" + COMMA);
@@ -704,26 +556,21 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_ROLES + COMMA);
     sb.append(TABLE_USERROLES);
     sb.append(" WHERE ");
-    sb.append(TABLE_USERROLES_DOT + USERROLES_USERID_FK + " = " + userId);
-    sb.append(" AND ");
+    if (userId != null && userId.length() > 0) {
+      sb.append(TABLE_USERROLES_DOT + USERROLES_USERID_FK + " = ").append(userId);
+      sb.append(" AND ");
+    }
     sb.append(TABLE_USERROLES_DOT + USERROLES_ROLESID_FK + " = " + TABLE_ROLES_DOT + ROLES_ID_PK);
+    sb.append(" ORDER BY ");
+    sb.append(TABLE_USERROLES_DOT + USERROLES_USERID_FK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return roles.
-   */
+  @Override
   public StringRecordset getRoles() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
@@ -731,48 +578,30 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_ROLES);
     sb.append(" ORDER BY Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return a week for a user.
-   */
-  public StringRecordset getRowEntryForUser(String rowEntryId) throws Exception {
-
-    /* Create sql query */
+  @Override
+  public StringRecordset getRowEntryForUser(String userId, String rowEntryId) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("*");
     sb.append(" FROM ");
     sb.append(TABLE_ENTRYROW);
     sb.append(" WHERE ");
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_ID_PK + " = " + rowEntryId);
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_ID_PK + " = ").append(rowEntryId);
     sb.append(" AND ");
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + profile.getUserId());
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return a week for a user.
-   */
-  public StringRecordset getRowsInUserWeek(String fromDate) throws Exception {
-
-    /* Create sql query */
+  @Override
+  public StringRecordset getRowsInUserWeek(String userId, String fromDate) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_MO_HOURS + COMMA);
@@ -812,12 +641,14 @@ public class DBQueries implements DBConstants {
     sb.append(" AND ");
 
     /* It must be this user that made them */
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + profile.getUserId());
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
     sb.append(" AND ");
 
-    /* the week must have a from date that is = supplied fromDate */
-    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '" + fromDate + "'");
-    sb.append(" AND ");
+    if (fromDate != null) {
+      /* the week must have a from date that is = supplied fromDate */
+      sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '").append(fromDate).append("'");
+      sb.append(" AND ");
+    }
 
     /* the week must have a from date that is = supplied fromDate */
     sb.append(TABLE_COMMENT_DOT + COMMENT_ID_PK + " = " + TABLE_USERWEEK_DOT + USERWEEK_COMMENTID_FK);
@@ -831,19 +662,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_PROJECTCODEID_FK + " = " + TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK);
     sb.append(")");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  public StringRecordset getRowsInUserWeekAllWeeks() throws Exception {
-
-    /* Create sql query */
+  @Override
+  public StringRecordset getAllRowsInUserWeek() throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_MO_HOURS + COMMA);
@@ -863,7 +688,8 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_TYPE + COMMA);
     sb.append(TABLE_USERWEEK_DOT + "*" + COMMA);
     sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE + COMMA);
-    sb.append(TABLE_COMMENT_DOT + COMMENT_COMMENT);
+    sb.append(TABLE_COMMENT_DOT + COMMENT_COMMENT + COMMA);
+    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE);
     sb.append(" FROM ");
     sb.append(TABLE_USERWEEK + COMMA);
     sb.append(TABLE_CALENDARWEEK + COMMA);
@@ -882,10 +708,6 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
     sb.append(" AND ");
 
-    /* It must be this user that made them */
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + profile.getUserId());
-    sb.append(" AND ");
-
     sb.append(TABLE_COMMENT_DOT + COMMENT_ID_PK + " = " + TABLE_USERWEEK_DOT + USERWEEK_COMMENTID_FK);
     sb.append(" AND ");
 
@@ -896,23 +718,17 @@ public class DBQueries implements DBConstants {
     /* the timetypeid is the same */
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_PROJECTCODEID_FK + " = " + TABLE_PROJECTCODE_DOT + PROJECTCODE_ID_PK);
     sb.append(")");
+    sb.append(" ORDER BY ");
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + COMMA);
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
-  
-  /**
-   * Return the settings for the ITR.
-   */
+
+  @Override
   public StringRecordset getSettings() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_LANGUAGE_DOT + "*" + COMMA + TABLE_SETTINGS_DOT + "*" + COMMA + TABLE_SKIN_DOT + "*");
@@ -923,22 +739,13 @@ public class DBQueries implements DBConstants {
     sb.append(" AND ");
     sb.append(TABLE_SETTINGS_DOT + SETTINGS_SKINID_FK + " = " + TABLE_SKIN_DOT + SKIN_ID_PK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the skins for the ITR.
-   */
+  @Override
   public StringRecordset getSkins() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("*");
@@ -946,18 +753,13 @@ public class DBQueries implements DBConstants {
     sb.append(TABLE_SKIN);
     sb.append(" ORDER BY Name ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
-  /* Get a list of Years where the user have submitted weeks */
+
+  @Override
   public StringRecordset getSubmittedYears(String userId) throws Exception {
-      /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT distinct ");
     sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") as theYear, count(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") as quantity ");
@@ -973,44 +775,33 @@ public class DBQueries implements DBConstants {
 
     /* Connect userweek and entryrow */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
-    
-    if(userId.length() > 0)
-    {
-        sb.append(" AND ");
-        /* It must be this user that made them */
-        sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + userId);
+
+    if (userId.length() > 0) {
+      sb.append(" AND ");
+      /* It must be this user that made them */
+      sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
     }
     sb.append(")");
     /* Order by weekno and weekpart */
     sb.append(" GROUP BY ");
     sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ")");
-    
+
     sb.append(" ORDER BY ");
     sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ")");
     sb.append(" DESC");
 
-
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return submitted week.
-   */
+  @Override
   public StringRecordset getSubmittedWeeks(String userId, boolean descendingSortOrder, boolean checkIfTheyAreNotApproved) throws Exception {
-     return getSubmittedWeeks(userId, "", descendingSortOrder, checkIfTheyAreNotApproved);
+    return getSubmittedWeeks(userId, "", descendingSortOrder, checkIfTheyAreNotApproved);
   }
-  
-  
-  public StringRecordset getSubmittedWeeks(String userId, String year, boolean descendingSortOrder, boolean checkIfTheyAreNotApproved) throws Exception {
 
-    /* Create sql query */
+  @Override
+  public StringRecordset getSubmittedWeeks(String userId, String year, boolean descendingSortOrder, boolean checkIfTheyAreNotApproved) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_CALENDARWEEK_DOT + "* ");
@@ -1037,18 +828,17 @@ public class DBQueries implements DBConstants {
       /* they must not have been approved */
       sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + FALSE_ACCESS);
     }
-    
-    if(year.length() > 0) {
-        /* select specified year */
-        sb.append(" AND ");
-        sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '" + year +"'");
-        
+
+    if (year.length() > 0) {
+      /* select specified year */
+      sb.append(" AND ");
+      sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
     }
 
     sb.append(" AND ");
 
     /* It must be this user that made them */
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + userId);
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
 
     /* Order by weekno and weekpart */
     sb.append(") ORDER BY ");
@@ -1058,19 +848,13 @@ public class DBQueries implements DBConstants {
       sb.append(" DESC ");
     }
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
+  @Override
   public StringRecordset getSubmittedWeeksThick(String userId, String year, boolean descendingSortOrder, boolean checkIfTheyAreNotApproved) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("  ITR_EntryRow.Id as Eid  ");
@@ -1108,13 +892,12 @@ public class DBQueries implements DBConstants {
       sb.append(" AND ");
       sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + FALSE_ACCESS);
     }
-     if(year.length() > 0) {
-        /* select specified year */
-        sb.append(" AND ");
-        sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '" + year +"'");
-
+    if (year.length() > 0) {
+      /* select specified year */
+      sb.append(" AND ");
+      sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
     }
-    sb.append(" AND ITR_EntryRow.ITR_UserId = " + userId);
+    sb.append(" AND ITR_EntryRow.ITR_UserId = ").append(userId);
     sb.append(" AND ITR_Comment.Id = ITR_UserWeek.ITR_CommentId  ");
     sb.append("AND ITR_TimeType.Id = ITR_EntryRow.ITR_TimeTypeId  ");
     sb.append("AND ITR_EntryRow.ITR_ProjectCodeId = ITR_ProjectCode.Id ");
@@ -1128,26 +911,17 @@ public class DBQueries implements DBConstants {
       sb.append(" DESC ");
     }
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return approved week.
-   */
   public StringRecordset getApprovedWeeks(String userId) throws Exception {
-   return getApprovedWeeks(userId, "");
+    return getApprovedWeeks(userId, "");
   }
-  
-  public StringRecordset getApprovedWeeks(String userId, String year) throws Exception {
 
-    /* Create sql query */
+  @Override
+  public StringRecordset getApprovedWeeks(String userId, String year) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_CALENDARWEEK_DOT + "* ");
@@ -1168,47 +942,37 @@ public class DBQueries implements DBConstants {
     /* they must have been approved */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + TRUE_ACCESS);
 
-    if(year.length() > 0) {
-        /* select specified year */
-        sb.append(" AND ");
-        sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '" + year +"'");  
+    if (year.length() > 0) {
+      /* select specified year */
+      sb.append(" AND ");
+      sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
     }
     sb.append(" AND ");
 
     /* It must be this user that made them */
-    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + userId);
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
 
     /* Order by weekno and weekpart */
     sb.append(") ORDER BY ");
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + ", " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return approved week.
-   */
-  public StringRecordset getWeeksNeedingSubmit(String userId, ITRCalendar cal, String year, String stopDate) throws Exception {
-
-    /* Create sql query */
+  @Override
+  public StringRecordset getAllApprovedWeeks(String year) throws Exception {
     StringBuffer sb = new StringBuffer();
-    
-sb.append("SELECT DISTINCT ");
-    sb.append(TABLE_CALENDARWEEK_DOT + "* ");
+    sb.append("SELECT ");
+    sb.append(TABLE_CALENDARWEEK_DOT + "*, " + TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK);
     sb.append(" FROM ");
     sb.append(TABLE_USERWEEK + COMMA);
     sb.append(TABLE_CALENDARWEEK + COMMA);
     sb.append(TABLE_ENTRYROW);
     sb.append(" WHERE (");
 
-/* Connect userweek and calendarweek */
+    /* Connect userweek and calendarweek */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_CALENDARWEEK_ID_FK + " = " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
     sb.append(" AND ");
 
@@ -1216,26 +980,62 @@ sb.append("SELECT DISTINCT ");
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
     sb.append(" AND ");
 
-/* they are not approved */
+    /* they must have been approved */
+    sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + TRUE_ACCESS);
+
+    if (year.length() > 0) {
+      /* select specified year */
+      sb.append(" AND ");
+      sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
+    }
+
+    /* Order by weekno and weekpart */
+    sb.append(") ORDER BY ");
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + ", " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE);
+
+    DBConnect access = new DBConnect();
+    StringRecordset rs = access.executeQuery(sb);
+    return rs;
+  }
+
+  @Override
+  public StringRecordset getWeeksNeedingSubmit(String userId, ITRCalendar cal, String year, String stopDate) throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append("SELECT DISTINCT ");
+    sb.append(TABLE_CALENDARWEEK_DOT + "* ");
+    sb.append(" FROM ");
+    sb.append(TABLE_USERWEEK + COMMA);
+    sb.append(TABLE_CALENDARWEEK + COMMA);
+    sb.append(TABLE_ENTRYROW);
+    sb.append(" WHERE (");
+
+    /* Connect userweek and calendarweek */
+    sb.append(TABLE_USERWEEK_DOT + USERWEEK_CALENDARWEEK_ID_FK + " = " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
+    sb.append(" AND ");
+
+    /* Connect userweek and entryrow */
+    sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
+    sb.append(" AND ");
+
+    /* they are not approved */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + FALSE_ACCESS);
     sb.append(" AND ");
-/* they are not submitted */
+    /* they are not submitted */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_SUBMITTED + " = " + FALSE_ACCESS);
 
-sb.append(" AND ");
-sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " <= date('" + stopDate + "') ");
+    sb.append(" AND ");
+    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " <= date('").append(stopDate).append("') ");
 
-sb.append(" AND ");
-        sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '" + year +"'");  
-        sb.append(" AND ");
-sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + userId);
+    sb.append(" AND ");
+    sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
+    sb.append(" AND ");
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
 
-sb.append(" ) ");
+    sb.append(" ) ");
 
-sb.append(" UNION ");
+    sb.append(" UNION ");
 
-
-sb.append("SELECT DISTINCT ");
+    sb.append("SELECT DISTINCT ");
     sb.append(TABLE_CALENDARWEEK_DOT + "* ");
     sb.append(" FROM ");
     sb.append(TABLE_CALENDARWEEK);
@@ -1243,69 +1043,51 @@ sb.append("SELECT DISTINCT ");
     sb.append(" WHERE (");
     sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
     sb.append(" NOT IN ( ");
-    	sb.append("SELECT " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
-    	sb.append(" FROM ");
-    	sb.append(TABLE_USERWEEK + COMMA);
-    	sb.append(TABLE_CALENDARWEEK + COMMA);
-    	sb.append(TABLE_ENTRYROW);
-    	sb.append(" WHERE (");
-	sb.append(TABLE_USERWEEK_DOT + USERWEEK_CALENDARWEEK_ID_FK + " = " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
-    	sb.append(" AND ");
-	sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
-    	sb.append(" AND ");
-	sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = " + userId);
-	sb.append(" ) ");
-      sb.append(" ) ");
+    sb.append("SELECT " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
+    sb.append(" FROM ");
+    sb.append(TABLE_USERWEEK + COMMA);
+    sb.append(TABLE_CALENDARWEEK + COMMA);
+    sb.append(TABLE_ENTRYROW);
+    sb.append(" WHERE (");
+    sb.append(TABLE_USERWEEK_DOT + USERWEEK_CALENDARWEEK_ID_FK + " = " + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_ID_PK);
     sb.append(" AND ");
-    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " > DATE('" + cal.getCalendarInStoreFormat() + "')  ");
+    sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
     sb.append(" AND ");
-    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " < DATE('" + stopDate + "')  ");
+    sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERID_FK + " = ").append(userId);
+    sb.append(" ) ");
+    sb.append(" ) ");
     sb.append(" AND ");
-    sb.append(" YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = " + year);
+    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " > DATE('").append(cal.getCalendarInStoreFormat()).append("')  ");
+    sb.append(" AND ");
+    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " < DATE('").append(stopDate).append("')  ");
+    sb.append(" AND ");
+    sb.append(" YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = ").append(year);
 
-sb.append(" ) ");
-sb.append(" ORDER BY ID ");
-    
-    /* Create connection to database */
+    sb.append(" ) ");
+    sb.append(" ORDER BY ID ");
+
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the time types for the ITR.
-   */
+  @Override
   public StringRecordset getTimeType(String id) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("*");
     sb.append(" FROM ");
     sb.append(TABLE_TIMETYPE);
     sb.append(" WHERE ");
-    sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_ID_PK + " = " + id);
+    sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_ID_PK + " = ").append(id);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the time types for the ITR.
-   */
+  @Override
   public StringRecordset getTimeTypes() throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("*");
@@ -1313,25 +1095,13 @@ sb.append(" ORDER BY ID ");
     sb.append(TABLE_TIMETYPE);
     sb.append(" ORDER BY Type ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return users.
-   * 
-   * @param activated
-   *          a boolean specifying if activated user should be returned or deactivated users.
-   */
+  @Override
   public StringRecordset getUsers(boolean activated) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" Id, ITR_SkinId, ITR_LanguageId, ITR_CompanyId, FirstName, LastName, LoginId, Password, Activated, DeactivatedDate, ActivatedDate, CreatedDate, DefaultVacationDays, UsedVacationDays, VacationOvertimeHours, MoneyOvertimeHours, ReportApproverId, SavedVacationDays");
@@ -1347,22 +1117,12 @@ sb.append(" ORDER BY ID ");
 
     sb.append(" ORDER BY Firstname, LastName, LoginId ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return users that need approvel.
-   */
-  public StringRecordset getUsersThatNeedApprovel() throws Exception {
-
-    /* Create sql query */
+  public StringRecordset getUsersThatNeedApprovel(String userId) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_USER + USER_ID_PK);
@@ -1394,25 +1154,19 @@ sb.append(" ORDER BY ID ");
     sb.append(" AND ");
 
     /* It must be this user that is the approver for the user */
-    sb.append(TABLE_USER_DOT + USER_REPORT_APPROVERID_FK + " = " + profile.getUserId());
+    sb.append(TABLE_USER_DOT + USER_REPORT_APPROVERID_FK + " = ").append(userId);
 
     // Order by weekno and weekpart
     sb.append(") ORDER BY ");
     sb.append(TABLE_USER_DOT + USER_ID_PK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
-  
-   public StringRecordset getUsersReportedYear(String year) throws Exception {
 
-    /* Create sql query */
+  @Override
+  public StringRecordset getUsersReportedYear(String year) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT DISTINCT ");
     sb.append(TABLE_USER_DOT + USER_ID_PK);
@@ -1441,28 +1195,18 @@ sb.append(" ORDER BY ID ");
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_SUBMITTED + " = " + TRUE_ACCESS);
     sb.append(" AND ");
 
-    sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '" + year +"'");
+    sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
 
     // Order by weekno and weekpart
     sb.append(") ORDER BY FullName");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-
-  /**
-   * Get vacation report.
-   */
+  @Override
   public synchronized StringRecordset getVacationReport(String userId, String projectId, String companyId, String year) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    us.Id, ");
@@ -1500,17 +1244,17 @@ sb.append(" ORDER BY ID ");
     sb.append("    AND uw.Submitted            = True ");
 
     if (userId != null) {
-      sb.append("    AND us.Id                   = " + userId);
+      sb.append("    AND us.Id = ").append(userId);
     }
     if (projectId != null) {
-      sb.append("    AND pr.Id                   = " + projectId);
+      sb.append("    AND pr.Id = ").append(projectId);
     }
     if (companyId != null) {
-      sb.append("    AND co.Id                   = " + companyId);
+      sb.append("    AND co.Id = ").append(companyId);
     }
     if (year != null && year.length() > 0) {
-      sb.append("    AND cw.FromDate            >= '" + year + "-01-01'");
-      sb.append("    AND cw.FromDate            <= '" + year + "-12-31'");
+      sb.append("    AND cw.FromDate >= '").append(year).append("-01-01'");
+      sb.append("    AND cw.FromDate <= '").append(year).append("-12-31'");
     }
 
     sb.append("GROUP BY  ");
@@ -1527,103 +1271,70 @@ sb.append(" ORDER BY ID ");
     sb.append("    er.ITR_TimetypeId, ");
     sb.append("    tt.type ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new company entry and retreive the id.
-   */
+  @Override
   public synchronized StringRecordset addCompanyAndGetId(Company company) throws Exception {
     try {
-      new DBExecute().addCompany(company);
+      DBExecute.getProxy().addCompany(company);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".addCompanyAndGetId(Company company): Could not make a new company");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + COMPANY_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_COMPANY);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new email entry and retreive the id.
-   */
+  @Override
   public synchronized StringRecordset addEmailAndGetId(Email email) throws Exception {
     try {
-      new DBExecute().addEmail(email);
+      DBExecute.getProxy().addEmail(email);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".addEmailAndGetId(Email email): Could not make a new email address");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + EMAIL_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_EMAIL);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new phone number entry and retreve the id.
-   */
+  @Override
   public synchronized StringRecordset addPhoneNumberAndGetId(PhoneNumber phone) throws Exception {
     try {
-      new DBExecute().addPhoneNumber(phone);
+      DBExecute.getProxy().addPhoneNumber(phone);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".addPhoneNumberAndGetId(PhoneNumber phone): Could not make a new phone number");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + PHONE_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_PHONE);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load Activities not in the specified project.
-   */
+  @Override
   public StringRecordset loadActivitiesNotInProject(int projectId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT DISTINCT ");
     sb.append("    ITR_ProjectCode.Id, ");
@@ -1635,50 +1346,32 @@ sb.append(" ORDER BY ID ");
     sb.append("    NOT EXISTS ( ");
     sb.append("        SELECT * FROM  ITR_ProjectCodes ");
     sb.append("        WHERE ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
-    sb.append("            AND ITR_ProjectCodes.ITR_ProjectId = " + projectId + " ");
+    sb.append("            AND ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
     sb.append("    ) ");
     sb.append("ORDER BY ITR_ProjectCode.Code ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load an Activity with the activityId.
-   */
+  @Override
   public StringRecordset loadActivity(int id) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("* ");
     sb.append("FROM ");
     sb.append("ITR_ProjectCode ");
     sb.append("WHERE ");
-    sb.append("Id = " + id);
+    sb.append("Id = ").append(id);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load Members in the specified project.
-   */
+  @Override
   public StringRecordset loadAssignedProjectMembers(int projectId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    ITR_ProjectMembers.*, ");
@@ -1689,28 +1382,19 @@ sb.append(" ORDER BY ID ");
     sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
     sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
     sb.append("WHERE ");
-    sb.append("    ITR_ProjectMembers.ITR_ProjectId = " + projectId + " ");
+    sb.append("    ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
     sb.append("ORDER BY ");
     sb.append("    ITR_User.LastName, ");
     sb.append("    ITR_User.FirstName, ");
     sb.append("    ITR_User.LoginId ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load ProjectMembers not in the specified project.
-   */
+  @Override
   public StringRecordset loadAvailableProjectMembers(int projectId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    ITR_User.* ");
@@ -1720,7 +1404,7 @@ sb.append(" ORDER BY ID ");
     sb.append("    NOT EXISTS ( ");
     sb.append("        SELECT * FROM ITR_ProjectMembers ");
     sb.append("        WHERE ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
-    sb.append("            AND ITR_ProjectMembers.ITR_ProjectId = " + projectId + " ");
+    sb.append("            AND ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
     sb.append("    ) ");
     sb.append("    AND ITR_User.Activated=True ");
     sb.append("ORDER BY ");
@@ -1728,70 +1412,43 @@ sb.append(" ORDER BY ID ");
     sb.append("    ITR_User.FirstName, ");
     sb.append("    ITR_User.LoginId ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load a company with the companyId.
-   */
+  @Override
   public StringRecordset loadCompany(String companyId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" * ");
     sb.append(" FROM ");
     sb.append(TABLE_COMPANY);
     sb.append(" WHERE ");
-    sb.append(COMPANY_ID_PK + " = " + companyId);
+    sb.append(COMPANY_ID_PK + " = ").append(companyId);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load a contact with the Id.
-   */
+  @Override
   public StringRecordset loadContact(int contactId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("   * ");
     sb.append("FROM ");
     sb.append("    contact ");
     sb.append("WHERE ");
-    sb.append("   Id = " + contactId);
+    sb.append("   Id = ").append(contactId);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load Activities in the specified project.
-   */
+  @Override
   public StringRecordset loadProjectActivities(int projectId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    ITR_ProjectCodes.*, ");
@@ -1801,26 +1458,17 @@ sb.append(" ORDER BY ID ");
     sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
     sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
     sb.append("WHERE ");
-    sb.append("    ITR_ProjectCodes.ITR_ProjectId = " + projectId + " ");
+    sb.append("    ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
     sb.append("ORDER BY ");
     sb.append("    ITR_ProjectCode.Code ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load an Project Activity with the activityId.
-   */
+  @Override
   public StringRecordset loadProjectActivity(int id) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    ITR_ProjectCode.*, ");
@@ -1830,24 +1478,15 @@ sb.append(" ORDER BY ID ");
     sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
     sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
     sb.append("WHERE ");
-    sb.append("    ITR_ProjectCode.Id = " + id + " ");
+    sb.append("    ITR_ProjectCode.Id = ").append(id).append(" ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load an Project Member with the given Id.
-   */
+  @Override
   public StringRecordset loadProjectMember(int id) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append("    ITR_ProjectMembers.*, ");
@@ -1858,24 +1497,15 @@ sb.append(" ORDER BY ID ");
     sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
     sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
     sb.append("WHERE ");
-    sb.append("    ITR_ProjectMembers.Id = " + id + " ");
+    sb.append("    ITR_ProjectMembers.Id = ").append(id).append(" ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Load a user with the userId.
-   */
+  @Override
   public StringRecordset loadUserProfile(String userId) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_USER_DOT + "*" + COMMA);
@@ -1890,30 +1520,25 @@ sb.append(" ORDER BY ID ");
     sb.append("FROM ");
     sb.append(TABLE_USER + COMMA + TABLE_LANGUAGE + COMMA + TABLE_SKIN + COMMA + TABLE_COMPANY);
     sb.append(" WHERE ");
-    sb.append(TABLE_USER_DOT + USER_ID_PK + " = " + userId);
-    sb.append(" AND ");
+    if (userId != null && userId.length() > 0) {
+      sb.append(TABLE_USER_DOT + USER_ID_PK + " = ").append(userId);
+      sb.append(" AND ");
+    }
     sb.append(TABLE_USER_DOT + USER_LANGUAGEID_FK + " = " + TABLE_LANGUAGE_DOT + LANGUAGE_ID_PK);
     sb.append(" AND ");
     sb.append(TABLE_SKIN_DOT + SKIN_ID_PK + " = " + TABLE_USER_DOT + USER_SKINID_FK);
     sb.append(" AND ");
     sb.append(TABLE_USER_DOT + USER_COMPANYID_FK + " = " + TABLE_COMPANY_DOT + COMPANY_ID_PK);
+    sb.append(" ORDER BY ");
+    sb.append(TABLE_USER_DOT + USER_ID_PK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Return the userprofile when trying to login the user.
-   */
+  @Override
   public StringRecordset login(String loginId, String password) throws Exception {
-
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(TABLE_USER_DOT + "*" + COMMA);
@@ -1928,9 +1553,9 @@ sb.append(" ORDER BY ID ");
     sb.append("FROM ");
     sb.append(TABLE_USER + COMMA + TABLE_LANGUAGE + COMMA + TABLE_SKIN + COMMA + TABLE_COMPANY);
     sb.append(" WHERE ");
-    sb.append(TABLE_USER_DOT + USER_LOGINID + " = " + SINGLE_QUOTE + loginId + SINGLE_QUOTE);
+    sb.append(TABLE_USER_DOT + USER_LOGINID + " = " + SINGLE_QUOTE).append(loginId).append(SINGLE_QUOTE);
     sb.append(" AND ");
-    sb.append(TABLE_USER_DOT + USER_PASSWORD + " = " + SINGLE_QUOTE + password + SINGLE_QUOTE);
+    sb.append(TABLE_USER_DOT + USER_PASSWORD + " = " + SINGLE_QUOTE).append(password).append(SINGLE_QUOTE);
     sb.append(" AND ");
     sb.append(TABLE_USER_DOT + USER_LANGUAGEID_FK + " = " + TABLE_LANGUAGE_DOT + LANGUAGE_ID_PK);
     sb.append(" AND ");
@@ -1938,250 +1563,200 @@ sb.append(" ORDER BY ID ");
     sb.append(" AND ");
     sb.append(TABLE_USER_DOT + USER_COMPANYID_FK + " = " + TABLE_COMPANY_DOT + COMPANY_ID_PK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new activity and retrieve the id.
-   */
+  @Override
   public synchronized StringRecordset makeActivityAndFetchId(Activity activity) throws Exception {
     try {
-      new DBExecute().addActivity(activity);
+      DBExecute.getProxy().addActivity(activity);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeActivityAndFetchId(Activity activity): Could not make a new activity");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + PROJECTCODE_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_PROJECTCODE);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make new comment and retreve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewCommmentAndRetriveTheId(String comment) throws Exception {
     try {
-      new DBExecute(profile).makeNewComment(comment);
+      DBExecute.getProxy().makeNewComment(comment);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewCommmentAndRetriveTheId(String comment): Could not make a new Comment: " + e.getMessage());
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" max(" + COMMENT_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_COMMENT);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new Contact and retrieve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewContactAndFetchId(Contacts contact) throws Exception {
     try {
-      new DBExecute().addContacts(contact);
+      DBExecute.getProxy().addContacts(contact);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewContactAndFetchId(Contacts contact): Could not make a new Contact.");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT MAX(Id) maxId FROM Contact");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new project activity and retrieve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewProjectActivityAndFetchId(ProjectActivity projectActivity) throws Exception {
     try {
-      new DBExecute().addProjectActivity(projectActivity);
+      DBExecute.getProxy().addProjectActivity(projectActivity);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewProjectActivityAndFetchId(ProjectActivity projectActivity): Could not make a new project activity");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + PROJECTCODES_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_PROJECTCODES);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new project member activity and retrieve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewProjectMemberAndFetchId(ProjectMember projectMember) throws Exception {
     try {
-      new DBExecute().addProjectMember(projectMember);
+      DBExecute.getProxy().addProjectMember(projectMember);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewProjectActivityAndFetchId(ProjectActivity projectActivity): Could not make a new project activity");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT MAX(Id) maxId FROM ITR_ProjectMembers ");
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make new userProfile and retreve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewUserAndFetchId(UserProfile user) throws Exception {
     try {
-      new DBExecute(profile).makeNewUserProfile(user);
+      DBExecute.getProxy().makeNewUserProfile(user);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewUserProfileAndFetchId(UserProfile user): Could not make a new UserProfile: " + e.getMessage());
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" max(" + USER_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_USER);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make a new user role connection and retreve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewUserRoleConnectionAndFetchId(Role role) throws Exception {
     try {
-      new DBExecute().addUserRoleConnection(role);
+      DBExecute.getProxy().addUserRoleConnection(role);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewUserRoleConnectionAndFetchId(Role role): Could not make a new user role connection");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" MAX(" + USERROLES_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_USERROLES);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make new userweek entry and retreve the id.
-   */
+  @Override
   public synchronized StringRecordset makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, int weekCommentId) throws Exception {
     try {
-      new DBExecute(profile).makeNewUserWeekId(calendarWeekId, weekCommentId);
+      DBExecute.getProxy().makeNewUserWeekId(calendarWeekId, weekCommentId);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, int weekCommentId): Could not make a new UserWeekId");
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" max(" + USERWEEK_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_USERWEEK);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
   }
 
-  /**
-   * Make new Project and retrive the id.
-   */
+  @Override
   public synchronized StringRecordset makeProjectAndFetchId(Project project) throws Exception {
     try {
-      new DBExecute().makeNewProject(project);
+      DBExecute.getProxy().makeNewProject(project);
     } catch (Exception e) {
       throw new Exception(getClass().getName() + ".makeProjectAndFetchId(Project project): Could not make a new Project: " + e.getMessage());
     }
 
-    /* Create sql query */
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
     sb.append(" max(" + PROJECT_ID_PK + ") maxId");
     sb.append(" FROM ");
     sb.append(TABLE_PROJECT);
 
-    /* Create connection to database */
     DBConnect access = new DBConnect();
-
-    /* Get StringRecordset */
     StringRecordset rs = access.executeQuery(sb);
-
-    /* Return StringRecordset */
     return rs;
+  }
+
+  @Override
+  public String getProperty(String key) throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append("SELECT `key`, value FROM ITR_PROPERTY WHERE UPPER(`key`) = UPPER('").append(key).append("')");
+    DBConnect access = new DBConnect();
+    StringRecordset rs = access.executeQuery(sb);
+    if(!rs.getEOF()) {      
+      return rs.getField("VALUE");
+    }
+    return null;
+  }
+
+  @Override
+  public Map<String, String> getProperties() throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append("SELECT `key`, value FROM ITR_PROPERTY");
+    DBConnect access = new DBConnect();
+    StringRecordset rs = access.executeQuery(sb);
+    Map<String, String> retval = new HashMap<>();
+    while (!rs.getEOF()) {      
+      retval.put(rs.getField("KEY"), rs.getField("VALUE"));
+      rs.moveNext();
+    }
+    
+    return retval;
   }
 }

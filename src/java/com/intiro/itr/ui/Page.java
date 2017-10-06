@@ -67,13 +67,10 @@ public class Page extends UIElement {
 
     if (contents.size() == 0) { throw new UIException("<p>" + myName + ":Page " + getName() + " has no contents"); }
 
-    UIElement oneElement = null;
-
-    for (Enumeration e = contents.elements(); e.hasMoreElements();) {
-      oneElement = (UIElement) e.nextElement();
+    for (UIElement oneElement : contents) {
       oneElement.display(out);
     }
-
+    
     setDisplayed();
     out.flush();
   }

@@ -10,7 +10,7 @@ package com.intiro.itr.ui;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Base class for all of the UIElements on a page or Deck.
@@ -21,7 +21,7 @@ public abstract class UIElement {
 
   protected String cSSClass = "Title5";
   protected String cSSID = null;
-  protected Vector <UIElement> contents = new Vector <UIElement> (5);
+  protected ArrayList <UIElement> contents = new ArrayList <UIElement> (5);
   private boolean hasBeenDisplayed = false;
   private String myObjName = new String("No Name");
   private UIElement myParent = null;
@@ -128,7 +128,7 @@ public abstract class UIElement {
     if (newUIElement == null) { throw new UIException(myName + ":Cannot add null UIElement to '" + getName() + "'"); }
 
     newUIElement.setParent(this);
-    contents.addElement(newUIElement);
+    contents.add(newUIElement);
   }
 
   /**

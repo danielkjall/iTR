@@ -1,144 +1,75 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.phone;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Title:        ITR
- * Description:
- * Copyright:    Copyright (c) 2001
- * Company:      Intiro Development AB
- * @author Daniel Kjall
- * @version 1.1
- */
 public class PhoneRegion {
 
-  //~ Instance/static variables ........................................................................................
-
-  static final String XML_PHONEREGIONCODE_END = "</regioncode>";
-  static final String XML_PHONEREGIONCODE_START = "<regioncode>";
-  static final String XML_PHONEREGIONID_END = "</regionid>";
-  static final String XML_PHONEREGIONID_START = "<regionid>";
-  static final String XML_PHONEREGIONNAME_END = "</regionname>";
-  static final String XML_PHONEREGIONNAME_START = "<regionname>";
-  static final String XML_PHONEREGION_END = "</phoneregion>";
-  static final String XML_PHONEREGION_START = "<phoneregion>";
-  PhoneCountry country = new PhoneCountry();
-  int countryId = -1;
-  String regionCode = null;
-  int regionId = -1;
-  String regionName = null;
-  boolean remove = false;
-
-  //~ Constructors .....................................................................................................
+  public static final String CACHE_ALL_PHONEREGION = "CACHE_ALL_PHONEREGION";
+  private static final String XML_PHONEREGIONCODE_END = "</regioncode>";
+  private static final String XML_PHONEREGIONCODE_START = "<regioncode>";
+  private static final String XML_PHONEREGIONID_END = "</regionid>";
+  private static final String XML_PHONEREGIONID_START = "<regionid>";
+  private static final String XML_PHONEREGIONNAME_END = "</regionname>";
+  private static final String XML_PHONEREGIONNAME_START = "<regionname>";
+  private static final String XML_PHONEREGION_END = "</phoneregion>";
+  private static final String XML_PHONEREGION_START = "<phoneregion>";
+  private PhoneCountry country = new PhoneCountry();
+  private int countryId = -1;
+  private String regionCode = null;
+  private int regionId = -1;
+  private String regionName = null;
+  private boolean remove = false;
 
   /**
    * Constructor I for PhoneRegion.
    */
   public PhoneRegion() {
-    //empty
   }
 
-  //~ Methods ..........................................................................................................
-
-  /**
-   * Sets the country of the  on phone number.
-   *
-   * @param      country, a PhoneCountry specifying the country.
-   */
   public void setCountry(PhoneCountry country) {
     this.country = country;
   }
 
-  /**
-   * Gets the country of the phone number.
-   *
-   * @return      a PhoneCountry, specifying the country.
-   */
   public PhoneCountry getCountry() {
     return country;
   }
 
-  /**
-   * Sets the countryId of the  on phone number.
-   *
-   * @param      countryId, an int specifying the countryId.
-   */
   public void setCountryId(int countryId) {
     this.countryId = countryId;
   }
 
-  /**
-   * Gets the countryId of the phone number.
-   *
-   * @return      an int, specifying the countryId.
-   */
   public int getCountryId() {
     return countryId;
   }
 
-  /**
-   * Sets the regionCode of the logged on user.
-   *
-   * @param      regionCode, an String specifying the regionCode.
-   */
   public void setRegionCode(String regionCode) {
     this.regionCode = regionCode;
   }
 
-  /**
-   * Gets the regionCode of the logged on user.
-   *
-   * @return      a String, specifying the regionCode.
-   */
   public String getRegionCode() {
     return regionCode;
   }
 
-  /**
-   * Sets the regionId of the  on phone number.
-   *
-   * @param      regionId, an int specifying the regionId.
-   */
   public void setRegionId(int regionId) {
     this.regionId = regionId;
   }
 
-  /**
-   * Gets the regionId of the phone number.
-   *
-   * @return      an int, specifying the regionId.
-   */
   public int getRegionId() {
     return regionId;
   }
 
-  /**
-   * Sets the regionName of the logged on user.
-   *
-   * @param      regionName, an String specifying the regionName.
-   */
   public void setRegionName(String regionName) {
     this.regionName = regionName;
   }
 
-  /**
-   * Gets the regionName of the logged on user.
-   *
-   * @return      a String, specifying the regionName.
-   */
   public String getRegionName() {
     return regionName;
   }
@@ -162,9 +93,7 @@ public class PhoneRegion {
     try {
       retval.getCountry().load(retval.getCountry().getCountryId());
     } catch (Exception e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".cloneRegion(): Could not load country: ", e);
-      }
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".cloneRegion(): Could not load country: ", e);
     }
 
     return retval;
@@ -172,12 +101,17 @@ public class PhoneRegion {
 
   /**
    * Load the Phone region for the specified regionid or countryId.
+   *
+   * @param regionId
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public void load(int regionId) throws XMLBuilderException {
     try {
-      if (regionId == -1) { throw new Exception(getClass().getName() + ".load(int regionId): At least one input has to be not null."); }
+      if (regionId == -1) {
+        throw new Exception(getClass().getName() + ".load(int regionId): At least one input has to be not null.");
+      }
 
-      StringRecordset rs = new DBQueries().getPhoneRegion(regionId);
+      StringRecordset rs = DBQueries.getProxy().getPhoneRegion(regionId);
 
       if (!rs.getEOF()) {
         setRegionCode(rs.getField(DBConstants.PHONEREGIONCODE_REGIONCODE));
@@ -194,16 +128,52 @@ public class PhoneRegion {
         IntiroLog.detail(getClass(), getClass().getName() + ".load(int regionId): toString() = " + toString());
       }
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".load(int regionId): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".load(int regionId): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
+  public static Map<Integer, PhoneRegion> loadAllPhoneRegions() throws XMLBuilderException {
+    Map<Integer, PhoneRegion> retval = new HashMap<>();
+    try {
+
+      Map<Integer, PhoneRegion> cached = ItrCache.get(CACHE_ALL_PHONEREGION);
+      if (cached != null) {
+        return cached;
+      }
+
+      Map<Integer, PhoneCountry> mapPhoneCountries = PhoneCountry.loadAllPhoneCountries();
+      StringRecordset rs = DBQueries.getProxy().getAllPhoneRegions();
+
+      while (!rs.getEOF()) {
+        PhoneRegion pr = new PhoneRegion();
+        pr.setRegionCode(rs.getField(DBConstants.PHONEREGIONCODE_REGIONCODE));
+        pr.setRegionName(rs.getField(DBConstants.PHONEREGIONCODE_REGIONNAME));
+        pr.setRegionId(Integer.parseInt(rs.getField(DBConstants.PHONEREGIONCODE_ID_PK)));
+        pr.setCountryId(Integer.parseInt(rs.getField(DBConstants.PHONEREGIONCODE_PHONECOUNTRYCODEID_FK)));
+        pr.setCountry(mapPhoneCountries.get(pr.getCountryId()));
+        retval.put(pr.getRegionId(), pr);
+
+        rs.moveNext();
+      }
+      if (IntiroLog.d()) {
+        IntiroLog.detail(PhoneRegion.class, PhoneRegion.class.getName() + ".loadAllPhoneRegions()");
+      }
+    } catch (Exception e) {
+      IntiroLog.error(PhoneRegion.class, PhoneRegion.class.getName() + ".loadAllPhoneRegions(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      throw new XMLBuilderException(e.getMessage());
+    }
+
+    final int TenHours = 1 * 60 * 60 * 10;
+    ItrCache.put(CACHE_ALL_PHONEREGION, retval, TenHours);
+
+    return retval;
+  }
+
   /**
    * Save the phone numbers for either the contact or the user.
+   *
+   * @throws java.lang.Exception
    */
   public void save() throws Exception {
 
@@ -234,19 +204,16 @@ public class PhoneRegion {
      }
      else {*/
     try {
-      DBExecute dbExecute = new DBExecute();
-      dbExecute.updatePhoneRegion(this);
+      DBExecute.getProxy().updatePhoneRegion(this);
     } catch (Exception e) {
-      if (IntiroLog.e()) {
-        IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new Exception(e.getMessage());
     }
 
     //}
   }
 
+  @Override
   public String toString() {
     StringBuffer retval = new StringBuffer();
     this.toXML(retval);

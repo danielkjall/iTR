@@ -14,7 +14,7 @@ import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
 import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 
 public class CompanyEditor extends DynamicXMLCarrier {
 
@@ -74,16 +74,16 @@ public class CompanyEditor extends DynamicXMLCarrier {
     this.mode = mode;
     this.companyId = companyId;
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): projectId = " + companyId);
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): projectId = " + companyId);
     }
 
     //Load the company to edit, view
     Company oneCompany = new Company();
 
     if (inEditMode || inViewMode || inDeleteMode) {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + companyId + ", inAddMode =  " + inAddMode);
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".Constructor(): loading project with projid = " + companyId + ", inAddMode =  " + inAddMode);
       }
 
       oneCompany.load(Integer.parseInt(companyId));

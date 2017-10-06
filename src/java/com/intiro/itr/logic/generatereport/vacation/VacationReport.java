@@ -1,31 +1,15 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- * @author        Daniel Kjall
- * @version       1.0
- */
 package com.intiro.itr.logic.generatereport.vacation;
 
 import com.intiro.itr.db.*;
-
 import com.intiro.itr.util.*;
-
 import com.intiro.itr.util.personalization.*;
-
 import com.intiro.itr.util.xml.*;
-
-import com.intiro.toolbox.log.IntiroLog;
-
+import com.intiro.itr.util.log.IntiroLog;
 import java.util.*;
 
 public class VacationReport extends DynamicXMLCarrier {
 
-  //~ Instance/static variables ........................................................................................
-
   static final String XML_ROLE_END = "</role>";
-
   //GeneralReport
   static final String XML_ROLE_START = "<role>";
   static final String XML_ROW_END = "</row>";
@@ -33,7 +17,6 @@ public class VacationReport extends DynamicXMLCarrier {
   static final String XML_ROW_INDEX_START = "<i>";
   static final String XML_ROW_PROJECTNAME_END = "</projectname>";
   static final String XML_ROW_PROJECTNAME_START = "<projectname>";
-
   //ROW
   static final String XML_ROW_START = "<row>";
   static final String XML_ROW_TIMETYPE_END = "</timetype>";
@@ -59,7 +42,6 @@ public class VacationReport extends DynamicXMLCarrier {
   static final String XML_TABLE_REMAININGDAYS_START = "<remainingdays>";
   static final String XML_TABLE_SAVEDDAYS_END = "</saveddays>";
   static final String XML_TABLE_SAVEDDAYS_START = "<saveddays>";
-
   //TABLE
   static final String XML_TABLE_START = "<vacationtable>";
   static final String XML_TABLE_SUMWORKEDHOURS_END = "</sumworkedh>";
@@ -84,17 +66,19 @@ public class VacationReport extends DynamicXMLCarrier {
   double sumWorkedHours = 0;
 
   //week reports
-  Vector <ReportTable> tables = new Vector <ReportTable> ();
+  ArrayList<ReportTable> tables = new ArrayList<>();
   String userId = null;
   String year = null;
-
-  //~ Constructors .....................................................................................................
 
   /**
    * Constructor I for VacationReport.
    *
-   * @param       profile the UserProfile for the current user.
-   * @exception   XMLBuilderException if something goes wrong.
+   * @param profile the UserProfile for the current user.
+   * @param userId
+   * @param projectId
+   * @param companyId
+   * @param year
+   * @exception XMLBuilderException if something goes wrong.
    */
   public VacationReport(UserProfile profile, String userId, String projectId, String companyId, String year) throws XMLBuilderException {
     super(profile);
@@ -103,33 +87,31 @@ public class VacationReport extends DynamicXMLCarrier {
     this.companyId = companyId;
     this.year = year;
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".constructor(): userId = " + userId + ", projectId = " + projectId + ", companyId = " + companyId + ", year = " + year);
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".constructor(): userId = " + userId + ", projectId = " + projectId + ", companyId = " + companyId + ", year = " + year);
     }
   }
 
-  //~ Methods ..........................................................................................................
-
   public boolean getBooleanValue(String booleanFromDB) {
-
     //if booleanFromDB = "1" || booleanFromDB = "True",  then it is true.
     if ((booleanFromDB != null && booleanFromDB.trim().equals("1")) || (booleanFromDB != null && booleanFromDB.trim().equalsIgnoreCase("True"))) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
   /**
    * Loads the vacation report.
+   *
+   * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
   public void load() throws XMLBuilderException {
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".load() Entering");
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".load() Entering");
     }
     try {
-      StringRecordset rs = dbQuery.getVacationReport(userId, projectId, companyId, year);
+      StringRecordset rs = DBQueries.getProxy().getVacationReport(userId, projectId, companyId, year);
       int rowIndex = 0;
       int tableIndex = 0;
       int userId = -1;
@@ -151,7 +133,7 @@ public class VacationReport extends DynamicXMLCarrier {
         timetype = rs.getField(DBConstants.TIMETYPE_TYPE);
         workedHours = Double.parseDouble(rs.getField("WorkedHours"));
 
-        ReportRow oneRow = null;
+        ReportRow oneRow;
         userId = Integer.parseInt(rs.getField(DBConstants.USER_ID_PK));
 
         if (userId != userIdOld) {
@@ -182,20 +164,20 @@ public class VacationReport extends DynamicXMLCarrier {
       //Calculate summarys
       calculateTimeReportSummary();
     } catch (Exception e) {
-      if (IntiroLog.ce()) {
-        IntiroLog.criticalError(getClass(), getClass().getName() + ".ERROR FROM DATABASE, exception = " + e.getMessage());
-      }
-
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }
 
   /**
    * Make xml of GeneralReport.
+   *
+   * @throws java.lang.Exception
    */
+  @Override
   public void toXML(StringBuffer xmlDoc) throws Exception {
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".toXML(): Entering");
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
     }
 
     XMLBuilder builder = new XMLBuilder();
@@ -214,7 +196,7 @@ public class VacationReport extends DynamicXMLCarrier {
     xmlDoc.append(XML_YEAR_END);
 
     /*table*/
-    ReportTable oneTable = null;
+    ReportTable oneTable;
 
     /*Loop through all table in VacationReport*/
     for (int i = 0; i < tables.size(); i++) {
@@ -248,13 +230,13 @@ public class VacationReport extends DynamicXMLCarrier {
     /*Get end of document*/
     builder.getEndOfDocument(xmlDoc);
 
-    if (IntiroLog.t()) {
-      IntiroLog.trace(getClass(), getClass().getName() + ".toXML(): xmlDoc = " + xmlDoc.toString());
+    if (IntiroLog.d()) {
+      IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): xmlDoc = " + xmlDoc.toString());
     }
   }
 
   void calculateTimeReportSummary() {
-    ReportTable oneTable = null;
+    ReportTable oneTable;
 
     for (int i = 0; i < tables.size(); i++) {
       oneTable = tables.get(i);
@@ -270,8 +252,6 @@ public class VacationReport extends DynamicXMLCarrier {
     sumTotalOvertimeHours = sumMoneyOvertimeHours + sumVacationOvertimeHours;
   }
 
-  //~ Inner classes ....................................................................................................
-
   /**
    * Inner class used to represent a table in GeneralReport.
    */
@@ -284,17 +264,16 @@ public class VacationReport extends DynamicXMLCarrier {
     private double reportOvertimeVacationHours = 0;
     private int reportRemainingVacationDays = 0;
     private int reportRowIndex = 0;
-    private Vector <ReportRow> reportRows = new Vector <ReportRow> ();
+    private ArrayList<ReportRow> reportRows = new ArrayList<>();
     private int reportSavedVacationDays = 0;
     private double reportSumWorkedHours = 0;
     private int reportUsedVacationDays = 0;
     private String reportUserName = null;
 
     /**
-     * Constructor I for ReportTable.
-     * Creates a Table.
+     * Constructor I for ReportTable. Creates a Table.
      *
-     * @exception   throws XMLBuilderException if something goes wrong.
+     * @exception throws XMLBuilderException if something goes wrong.
      */
     public ReportTable(String userName, int defaultVacationDays, int usedVacationDays, int savedVacationDays, double overtimeVacationHours, double overtimeMoneyHours, String company, int rowIndex) throws XMLBuilderException {
       this.reportUserName = userName;
@@ -312,8 +291,8 @@ public class VacationReport extends DynamicXMLCarrier {
      * Make ReportTable to xml.
      */
     public void toXML(StringBuffer xmlDoc) throws Exception {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".toXML(): Entering");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
       }
 
       xmlDoc.append(XML_TABLE_START);
@@ -375,7 +354,7 @@ public class VacationReport extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_INDEX_END);
 
       /*rows*/
-      ReportRow oneRow = null;
+      ReportRow oneRow;
 
       /*Loop through all rows in VacationReport*/
       for (int i = 0; i < reportRows.size(); i++) {
@@ -426,7 +405,7 @@ public class VacationReport extends DynamicXMLCarrier {
     }
 
     void calculateSumWorkedHours() {
-      ReportRow oneRow = null;
+      ReportRow oneRow;
 
       for (int i = 0; i < reportRows.size(); i++) {
         oneRow = reportRows.get(i);
@@ -449,10 +428,9 @@ public class VacationReport extends DynamicXMLCarrier {
     double workedHours = 0;
 
     /**
-     * Constructor I for ReportRow.
-     * Creates a Row.
+     * Constructor I for ReportRow. Creates a Row.
      *
-     * @exception   throws XMLBuilderException if something goes wrong.
+     * @exception throws XMLBuilderException if something goes wrong.
      */
     public ReportRow(String projectName, String timetype, double workedHours, int rowIndex) throws XMLBuilderException {
       this.projectName = projectName;
@@ -465,8 +443,8 @@ public class VacationReport extends DynamicXMLCarrier {
      * Make ReportRow to xml.
      */
     public void toXML(StringBuffer xmlDoc) throws Exception {
-      if (IntiroLog.t()) {
-        IntiroLog.trace(getClass(), getClass().getName() + ".toXML(): Entering");
+      if (IntiroLog.d()) {
+        IntiroLog.detail(getClass(), getClass().getName() + ".toXML(): Entering");
       }
 
       xmlDoc.append(XML_ROW_START);
