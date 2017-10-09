@@ -17,6 +17,8 @@ public class StoreStatistics extends StartupThread {
   public void run() {
     ItrStatistics.getInstance().setUse(true);
 
+    sleep(SLEEP_IN_SECONDS_BEFORE_FIRST_TRY);
+    
     while (true) {
       sleep(SLEEP_IN_SECONDS_BETWEEN_TRIES);
 
@@ -41,10 +43,9 @@ public class StoreStatistics extends StartupThread {
 
       for (ItrStatistic stat : stats.keySet()) {
         StatisticVO vo = new StatisticVO();
-        vo.setKategori(stat.getCategory());
         vo.setAction(stat.getAction());
         vo.setStatus(stat.getStatus());
-        vo.setCount(stats.get(stat));
+        vo.setHits(stats.get(stat));
         vo.setTimestamp(now);
         list.add(vo);
       }

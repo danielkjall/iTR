@@ -14,6 +14,8 @@ public class StoreLogs extends StartupThread {
   public void run() {
     ItrLogger.getInstance().setUse(true);
 
+    sleep(SLEEP_IN_SECONDS_BEFORE_FIRST_TRY);
+    
     while (true) {
       sleep(SLEEP_IN_SECONDS_BETWEEN_TRIES);
 

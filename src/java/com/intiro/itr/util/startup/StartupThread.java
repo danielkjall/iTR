@@ -14,7 +14,8 @@ public abstract class StartupThread extends Thread {
 
   protected Date latestRun = new Date();
   protected static final int SLEEP_IN_SECONDS_BETWEEN_TRIES = 5;
-  private static final Object lock = new Object();
+  protected static final int SLEEP_IN_SECONDS_BEFORE_FIRST_TRY = 60;
+  private static final Object LOCK = new Object();
   private static final String STARTUPCLASS_EXECUTION_PAUS_FOR_DEFAULT = "com.intiro.itr.startup.execution.paus.default";
   private static final String STARTUPCLASS_EXECUTION_SLEEP_INTERVAL_FOR_DEFAULT = "com.intiro.itr.startup.sleep.interval.default";
   private static final String STARTUPCLASS_EXECUTION_PAUS_FOR_PREFIX = "com.intiro.itr.startup.execution.paus.prefix.";
@@ -68,7 +69,7 @@ public abstract class StartupThread extends Thread {
       map = ItrCache.get(cacheKey);
 
       if (map == null || map.isEmpty()) {
-        synchronized (lock) {
+        synchronized (LOCK) {
           // for the second, third... threads waiting, we try fetch again
           // from cache.
           map = ItrCache.get(cacheKey);

@@ -1,6 +1,6 @@
 package com.intiro.itr.util;
 
-import com.intiro.toolbox.log.IntiroLog;
+import com.intiro.itr.util.log.IntiroLog;
 import java.text.SimpleDateFormat;
 
 import java.util.*;

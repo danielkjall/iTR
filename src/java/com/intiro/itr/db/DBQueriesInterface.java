@@ -1,5 +1,7 @@
 package com.intiro.itr.db;
 
+import com.intiro.itr.db.vo.ProjectPropertyVO;
+import com.intiro.itr.db.vo.CalendarWeekVO;
 import com.intiro.itr.logic.activity.Activity;
 import com.intiro.itr.logic.company.Company;
 import com.intiro.itr.logic.contacts.Contacts;
@@ -30,7 +32,7 @@ public interface DBQueriesInterface extends InvocationHandled {
 
   StringRecordset getAllUsers() throws Exception;
 
-  StringRecordset getCalendarWeek(String fromDate) throws Exception;
+  CalendarWeekVO getCalendarWeek(String fromDate) throws Exception;
 
   StringRecordset getContacts() throws Exception;
 
@@ -58,7 +60,7 @@ public interface DBQueriesInterface extends InvocationHandled {
 
   StringRecordset getProjectCodesForProject(int projId) throws Exception;
 
-  StringRecordset getProjectProperties(String projId) throws Exception;
+  ProjectPropertyVO getProjectProperty(String projId) throws Exception;
 
   StringRecordset getProjectsForUser(int userId) throws Exception;
 
@@ -126,7 +128,7 @@ public interface DBQueriesInterface extends InvocationHandled {
 
   StringRecordset loadContact(int contactId) throws Exception;
 
-  StringRecordset loadProjectActivities(int projectId) throws Exception;
+  StringRecordset loadProjectActivitiesForProject(int projectId) throws Exception;
 
   StringRecordset loadProjectActivity(int id) throws Exception;
 

@@ -1,5 +1,6 @@
 package com.intiro.itr.logic.weekreport;
 
+import com.intiro.itr.db.vo.CalendarWeekVO;
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueries;
@@ -520,11 +521,11 @@ public class WeekReport extends DynamicXMLCarrier {
       try {
         DBQueriesInterface proxy = DBQueries.getProxy();
         // CALENDAR WEEK
-        StringRecordset rsCalendarWeek = proxy.getCalendarWeek(getFromDate().getCalendarInStoreFormat());
+        CalendarWeekVO rsCalendarWeek = proxy.getCalendarWeek(getFromDate().getCalendarInStoreFormat());
         String calendarWeekId = "-1";
 
-        if (!rsCalendarWeek.getEOF()) {
-          calendarWeekId = rsCalendarWeek.getField(DBConstants.CALENDARWEEK_ID_PK);
+        if (rsCalendarWeek != null) {
+          calendarWeekId = String.valueOf(rsCalendarWeek.getId());
         } else {
           throw new XMLBuilderException(WeekReport.class.getName() + ".save(): Could not find a CalendarWeekId");
         }

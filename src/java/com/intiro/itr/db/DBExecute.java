@@ -1,12 +1,3 @@
-/**
- * Title:         ITR
- * Description:
- * Copyright:     Copyright (c) 2001
- * Company:       Intiro Development AB
- *
- * @author Daniel Kjäll
- * @version 1.0
- */
 package com.intiro.itr.db;
 
 import com.intiro.itr.util.logger.LoggerVO;
@@ -994,8 +985,11 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
 
   @Override
   public void saveLog(List<LoggerVO> list) throws Exception {
+    if(list == null || list.isEmpty()){
+      return;
+    }
+    
     String sqlQuery = "INSERT INTO ITR_LOG (itr_userid, anropstidims, felmeddelande, inparameter, utparameter, metodnamn, sessionid, timestamp) values (?,?,?,?,?,?,?,?)";
-
     Connection conn = null;
     PreparedStatement pstmt = null;
 
@@ -1031,8 +1025,12 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
 
   @Override
   public void saveStatistics(StatisticsVO statistics) throws Exception {
-    String sqlQuery = "INSERT INTO itr_statistics(antal, kategori, status, timestamp) values (?,?,?,?,?)";
-
+    if(statistics == null || statistics.getStatistics() == null || statistics.getStatistics().isEmpty()){
+      return;
+    }
+    
+    String sqlQuery = "INSERT INTO itr_statistics(hits, action, status, timestamp) values (?,?,?,?)";
+    
     Connection conn = null;
     PreparedStatement pstmt = null;
 
@@ -1042,9 +1040,8 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
 
       for (StatisticVO log : statistics.getStatistics()) {
         int i = 1;
-        pstmt.setInt(i++, log.getCount());
+        pstmt.setInt(i++, log.getHits());
         pstmt.setString(i++, log.getAction());
-        pstmt.setString(i++, log.getKategori());
         pstmt.setString(i++, log.getStatus());
         java.sql.Timestamp t = new java.sql.Timestamp(log.getTimestamp().getTime());
         pstmt.setTimestamp(i++, t);

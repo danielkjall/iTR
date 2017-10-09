@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class ItrStatistics
 {
-
    private static final ItrStatistics instance = new ItrStatistics();
    private final static String DATA = "DATA";
    public final static String TEXTKEY = "TRACK_TEXT";
@@ -34,13 +33,13 @@ public class ItrStatistics
       this.use = use;
    }
 
-   public void addGeneric( String category, String action, String status )
+   public void addGeneric( String action, String status )
    {
       int listId = ( int ) Math.floor( Math.random() * listSize );
 
       List<ItrStatistic> list = getList( listId );
       
-      list.add( new ItrStatistic( category, action, status ) );
+      list.add( new ItrStatistic( action, status ) );
    }
 
    private List<ItrStatistic> getList( int id )

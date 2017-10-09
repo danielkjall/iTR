@@ -4,19 +4,10 @@ import java.util.Date;
 
 public class StatisticVO {
 
-  private String kategori;
   private String action;
   private String status;
-  private int count;
+  private int hits;
   private Date timestamp;
-
-  public String getKategori() {
-    return kategori;
-  }
-
-  public void setKategori(String kategori) {
-    this.kategori = kategori;
-  }
 
   public String getAction() {
     return action;
@@ -34,12 +25,12 @@ public class StatisticVO {
     this.status = status;
   }
 
-  public int getCount() {
-    return count;
+  public int getHits() {
+    return hits;
   }
 
-  public void setCount(int count) {
-    this.count = count;
+  public void setHits(int count) {
+    this.hits = count;
   }
 
   public Date getTimestamp() {
@@ -49,5 +40,4 @@ public class StatisticVO {
   public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
-
 }

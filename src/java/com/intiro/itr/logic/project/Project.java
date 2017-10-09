@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.vo.ProjectPropertyVO;
 import com.intiro.itr.util.ITRCalendar;
+import com.intiro.itr.util.ItrUtil;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.DynamicXMLCarrier;
@@ -328,28 +330,21 @@ public class Project extends DynamicXMLCarrier {
 
   public void load(String projId) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getProjectProperties(projId);
+      ProjectPropertyVO vo = DBQueries.getProxy().getProjectProperty(projId);
 
-      if (!rs.getEOF()) {
-        setProjectId(projId);
-        setProjectDesc(rs.getField(DBConstants.PROJECT_DESCRIPTION));
-
-        String projectCode = rs.getField(DBConstants.PROJECT_MAINCODE);
-
-        if (projectCode != null) {
-          setProjectCode(projectCode);
-        }
-        setProjectName(rs.getField(DBConstants.PROJECT_NAME));
-        setFromDate(rs.getField(DBConstants.PROJECT_FROMDATE));
-        setToDate(rs.getField(DBConstants.PROJECT_TODATE));
-        setCompanyId(rs.getField(DBConstants.PROJECT_COMPANYID_FK));
-        setActivated(rs.getField(DBConstants.PROJECT_ACTIVE));
-        setAdminProject(rs.getField(DBConstants.PROJECT_ADMINPROJECT));
-        setContract(rs.getField(DBConstants.PROJECT_CONTRACT));
-        setTechnique(rs.getField(DBConstants.PROJECT_TECHNIQUE));
+      if (vo != null && ItrUtil.isStrContainingValue(vo.getProjectId())) {
+        setProjectId(vo.getProjectId());
+        setProjectDesc(vo.getProjectDescription());
+        setProjectCode(vo.getProjectCode());
+        setProjectName(vo.getProjectName());
+        setFromDate(vo.getFromDate());
+        setToDate(vo.getToDate());
+        setCompanyId(vo.getCompanyId());
+        setActivated(vo.getActivated());
+        setAdminProject(vo.getAdminProject());
+        setContract(vo.getContract());
+        setTechnique(vo.getTechnique());
       }
-
-      rs.close();
     } catch (Exception e) {
       IntiroLog.error(getClass(), getClass().getName() + ".load(String): ERROR FROM DATABASE, Collecting Project data. exception = " + e.getMessage());
       throw new XMLBuilderException(getClass().getName() + ".load(String): " + e.getMessage());

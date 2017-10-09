@@ -7,12 +7,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Map;
 
 public class ItrInvocationHandler implements InvocationHandler {
 
   private static ItrInvocationHandler m_instance;
   private static final Object LOCK = new Object();
-  private InvocationHandled m_invocationHandled;
+  private final InvocationHandled m_invocationHandled;
 
   protected ItrInvocationHandler(InvocationHandled invocationHandled) {
     m_invocationHandled = invocationHandled;
@@ -38,8 +39,6 @@ public class ItrInvocationHandler implements InvocationHandler {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    String interfaceNameAndMethodName = getMethodName(method);
-
     // Special fall, vi anropar metoden och returnerar direkt.
     //if ("MsDAO.setCallSetup".equals(interfaceNameAndMethodName)) {
     //  return method.invoke(m_invocationHandled, args);
@@ -65,14 +64,13 @@ public class ItrInvocationHandler implements InvocationHandler {
         entry.setOut(result);
         ItrLogger.getInstance().log(entry);
       }
-      ItrStatistics.getInstance().addGeneric(interfaceName, interfaceName, "SUCCESS");
+      ItrStatistics.getInstance().addGeneric(interfaceNameAndMethodName, "SUCCESS");
     } catch (InvocationTargetException ex) {
-
       long afterCallInMs = System.currentTimeMillis();
       ItrLogEntry entry = getLogEntry(interfaceNameAndMethodName, args, beforeCallInMs, afterCallInMs, timestamp);
       entry.setError(ex.getCause());
       ItrLogger.getInstance().log(entry);
-      ItrStatistics.getInstance().addGeneric(interfaceName, interfaceName, "FAILED");
+      ItrStatistics.getInstance().addGeneric(interfaceNameAndMethodName, "FAILED");
       throw ex;
     }
 
@@ -119,14 +117,7 @@ public class ItrInvocationHandler implements InvocationHandler {
   }
 
   private String getServiceString() throws Exception {
-    /*
-    StringRecordset rs = m_queries.getSettings();
-    while (!rs.getEOF()) {
-      if(rs.getField(ix))
-    }
-
-    settings.getField("com.intiro.itr.logger");
-     */
-    return null;
+    Map<String, String> map = new DBQueries().getProperties();
+    return map.get("com.intiro.itr.logger.blacklist");
   }
 }

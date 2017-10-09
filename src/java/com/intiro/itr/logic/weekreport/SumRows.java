@@ -1,12 +1,11 @@
 package com.intiro.itr.logic.weekreport;
 
+import com.intiro.itr.db.vo.CalendarWeekVO;
 import java.util.ArrayList;
 
-import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBQueries;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.NumberFormatter;
-import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
@@ -180,28 +179,18 @@ public class SumRows {
 
     void load() throws XMLBuilderException {
       try {
-        StringRecordset rs = DBQueries.getProxy().getCalendarWeek(getFromDate().getCalendarInStoreFormat());
+        CalendarWeekVO rs = DBQueries.getProxy().getCalendarWeek(getFromDate().getCalendarInStoreFormat());
 
-        while (!rs.getEOF()) {
-          double mo = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSMO));
-          double tu = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSTU));
-          double we = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSWE));
-          double th = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSTH));
-          double fr = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSFR));
-          double sa = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSSA));
-          double su = Double.parseDouble(rs.getField(DBConstants.CALENDARWEEK_EXPECTEDHOURSSU));
-          setMonday(mo);
-          setTuesday(tu);
-          setWednesday(we);
-          setThursday(th);
-          setFriday(fr);
-          setSaturday(sa);
-          setSunday(su);
+        if (rs != null) {
+          setMonday(rs.getMo());
+          setTuesday(rs.getTu());
+          setWednesday(rs.getWe());
+          setThursday(rs.getTh());
+          setFriday(rs.getFr());
+          setSaturday(rs.getSa());
+          setSunday(rs.getSu());
           setRowSum();
-          rs.moveNext();
         }
-
-        rs.close();
       } catch (Exception e) {
         IntiroLog.error(getClass(), getClass().getName() + ".load(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());

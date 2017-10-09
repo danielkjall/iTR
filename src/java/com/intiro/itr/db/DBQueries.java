@@ -1,5 +1,7 @@
 package com.intiro.itr.db;
 
+import com.intiro.itr.db.vo.ProjectPropertyVO;
+import com.intiro.itr.db.vo.CalendarWeekVO;
 import com.intiro.itr.logic.activity.Activity;
 import com.intiro.itr.logic.company.Company;
 import com.intiro.itr.logic.contacts.Contacts;
@@ -9,7 +11,10 @@ import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.logic.project.ProjectActivity;
 import com.intiro.itr.logic.project.ProjectMember;
 import com.intiro.itr.util.ITRCalendar;
+import com.intiro.itr.util.ItrUtil;
 import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
+import com.intiro.itr.util.cache.LockHelper;
 import com.intiro.itr.util.personalization.Role;
 import com.intiro.itr.util.personalization.UserProfile;
 import java.lang.reflect.Proxy;
@@ -18,7 +23,7 @@ import java.util.Map;
 
 public class DBQueries implements DBQueriesInterface, DBConstants {
 
-  private DBQueries() {
+  protected DBQueries() {
   }
 
   public static DBQueriesInterface getProxy() {
@@ -137,20 +142,39 @@ public class DBQueries implements DBQueriesInterface, DBConstants {
   }
 
   @Override
-  public StringRecordset getCalendarWeek(String fromDate) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append(" * ");
-    sb.append(" FROM ");
-    sb.append(TABLE_CALENDARWEEK);
-    sb.append(" WHERE ");
+  public CalendarWeekVO getCalendarWeek(String fromDate) throws Exception {
 
-    /* the week must have a from date that is >= supplied startFromDate */
-    sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '").append(fromDate).append("'");
+    String cacheKeyPrefix = "getCalendarWeek_";
+    String cacheKey = cacheKeyPrefix + fromDate;
+    CalendarWeekVO cachedObject = ItrCache.get(cacheKey);
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append(" * ");
+        sb.append(" FROM ");
+        sb.append(TABLE_CALENDARWEEK);
+        //sb.append(" WHERE ");
+        //sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '").append(fromDate).append("'");
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+        int tenHours = 3600 * 10;
+        String weeklyCacheKey;
+        while (!rs.getEOF()) {
+          CalendarWeekVO vo = new CalendarWeekVO();
+          vo.loadFromRS(rs);
+          weeklyCacheKey = cacheKeyPrefix + vo.getFromDate();
+          ItrCache.put(weeklyCacheKey, vo, tenHours);
+          rs.moveNext();
+        }
+      }
+    }
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+    return cachedObject;
   }
 
   @Override
@@ -496,18 +520,35 @@ public class DBQueries implements DBQueriesInterface, DBConstants {
   }
 
   @Override
-  public StringRecordset getProjectProperties(String projId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append(" * ");
-    sb.append(" FROM ");
-    sb.append(TABLE_PROJECT);
-    sb.append(" WHERE ");
-    sb.append(TABLE_PROJECT_DOT + PROJECT_ID_PK + " = ").append(projId);
+  public ProjectPropertyVO getProjectProperty(String projId) throws Exception {
+    String cacheKey = "getProjectProperties";
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    Map<String, ProjectPropertyVO> cachedObject = ItrCache.get(cacheKey);
+    if (cachedObject == null) {
+      StringBuffer sb = new StringBuffer();
+      sb.append("SELECT ");
+      sb.append(" * ");
+      sb.append(" FROM ");
+      sb.append(TABLE_PROJECT);
+
+      DBConnect access = new DBConnect();
+      StringRecordset rs = access.executeQuery(sb);
+      Map<String, ProjectPropertyVO> map = new HashMap<>();
+      while (!rs.getEOF()) {
+        ProjectPropertyVO vo = new ProjectPropertyVO();
+        vo.loadFromRS(rs);
+        if (ItrUtil.isStrContainingValue(vo.getProjectId())) {
+          map.put(vo.getProjectId(), vo);
+        }
+        rs.moveNext();
+      }
+      int tenHours = 3600 * 10;
+      ItrCache.put(cacheKey, map, tenHours);
+    }
+
+    cachedObject = ItrCache.get(cacheKey);
+
+    return cachedObject.get(projId);
   }
 
   @Override
@@ -1073,55 +1114,102 @@ public class DBQueries implements DBQueriesInterface, DBConstants {
 
   @Override
   public StringRecordset getTimeType(String id) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("*");
-    sb.append(" FROM ");
-    sb.append(TABLE_TIMETYPE);
-    sb.append(" WHERE ");
-    sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_ID_PK + " = ").append(id);
+    String cacheKey = "getTimeType_" + id;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("*");
+        sb.append(" FROM ");
+        sb.append(TABLE_TIMETYPE);
+        sb.append(" WHERE ");
+        sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_ID_PK + " = ").append(id);
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset getTimeTypes() throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("*");
-    sb.append(" FROM ");
-    sb.append(TABLE_TIMETYPE);
-    sb.append(" ORDER BY Type ");
+    String cacheKey = "getTimeTypes";
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("*");
+        sb.append(" FROM ");
+        sb.append(TABLE_TIMETYPE);
+        sb.append(" ORDER BY Type ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset getUsers(boolean activated) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append(" Id, ITR_SkinId, ITR_LanguageId, ITR_CompanyId, FirstName, LastName, LoginId, Password, Activated, DeactivatedDate, ActivatedDate, CreatedDate, DefaultVacationDays, UsedVacationDays, VacationOvertimeHours, MoneyOvertimeHours, ReportApproverId, SavedVacationDays");
-    sb.append(" FROM ");
-    sb.append(TABLE_USER);
-    sb.append(" WHERE ");
+    String cacheKey = "getUsers_" + activated;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    if (activated) {
-      sb.append(USER_ACTIVATED + " = " + TRUE_ACCESS);
-    } else {
-      sb.append(USER_ACTIVATED + " = " + FALSE_ACCESS);
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append(" Id, ITR_SkinId, ITR_LanguageId, ITR_CompanyId, FirstName, LastName, LoginId, Password, Activated, DeactivatedDate, ActivatedDate, CreatedDate, DefaultVacationDays, UsedVacationDays, VacationOvertimeHours, MoneyOvertimeHours, ReportApproverId, SavedVacationDays");
+        sb.append(" FROM ");
+        sb.append(TABLE_USER);
+        sb.append(" WHERE ");
+
+        if (activated) {
+          sb.append(USER_ACTIVATED + " = " + TRUE_ACCESS);
+        } else {
+          sb.append(USER_ACTIVATED + " = " + FALSE_ACCESS);
+        }
+
+        sb.append(" ORDER BY Firstname, LastName, LoginId ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
     }
 
-    sb.append(" ORDER BY Firstname, LastName, LoginId ");
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    return cachedObject;
   }
 
+  @Override
   public StringRecordset getUsersThatNeedApprovel(String userId) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("SELECT ");
@@ -1335,173 +1423,312 @@ public class DBQueries implements DBQueriesInterface, DBConstants {
 
   @Override
   public StringRecordset loadActivitiesNotInProject(int projectId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT DISTINCT ");
-    sb.append("    ITR_ProjectCode.Id, ");
-    sb.append("    ITR_ProjectCode.Description, ");
-    sb.append("    ITR_ProjectCode.Code ");
-    sb.append("FROM ");
-    sb.append("    ITR_ProjectCode ");
-    sb.append("WHERE ");
-    sb.append("    NOT EXISTS ( ");
-    sb.append("        SELECT * FROM  ITR_ProjectCodes ");
-    sb.append("        WHERE ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
-    sb.append("            AND ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
-    sb.append("    ) ");
-    sb.append("ORDER BY ITR_ProjectCode.Code ");
+    String cacheKey = "loadActivitiesNotInProject_" + projectId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT DISTINCT ");
+        sb.append("    ITR_ProjectCode.Id, ");
+        sb.append("    ITR_ProjectCode.Description, ");
+        sb.append("    ITR_ProjectCode.Code ");
+        sb.append("FROM ");
+        sb.append("    ITR_ProjectCode ");
+        sb.append("WHERE ");
+        sb.append("    NOT EXISTS ( ");
+        sb.append("        SELECT * FROM  ITR_ProjectCodes ");
+        sb.append("        WHERE ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
+        sb.append("            AND ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
+        sb.append("    ) ");
+        sb.append("ORDER BY ITR_ProjectCode.Code ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadActivity(int id) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("* ");
-    sb.append("FROM ");
-    sb.append("ITR_ProjectCode ");
-    sb.append("WHERE ");
-    sb.append("Id = ").append(id);
+    String cacheKey = "loadActivity_" + id;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("* ");
+        sb.append("FROM ");
+        sb.append("ITR_ProjectCode ");
+        sb.append("WHERE ");
+        sb.append("Id = ").append(id);
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadAssignedProjectMembers(int projectId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("    ITR_ProjectMembers.*, ");
-    sb.append("    ITR_User.FirstName, ");
-    sb.append("    ITR_User.LastName, ");
-    sb.append("    ITR_User.LoginId ");
-    sb.append("FROM ");
-    sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
-    sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
-    sb.append("WHERE ");
-    sb.append("    ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
-    sb.append("ORDER BY ");
-    sb.append("    ITR_User.LastName, ");
-    sb.append("    ITR_User.FirstName, ");
-    sb.append("    ITR_User.LoginId ");
+    String cacheKey = "loadAssignedProjectMembers_" + projectId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("    ITR_ProjectMembers.*, ");
+        sb.append("    ITR_User.FirstName, ");
+        sb.append("    ITR_User.LastName, ");
+        sb.append("    ITR_User.LoginId ");
+        sb.append("FROM ");
+        sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
+        sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
+        sb.append("WHERE ");
+        sb.append("    ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
+        sb.append("ORDER BY ");
+        sb.append("    ITR_User.LastName, ");
+        sb.append("    ITR_User.FirstName, ");
+        sb.append("    ITR_User.LoginId ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadAvailableProjectMembers(int projectId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("    ITR_User.* ");
-    sb.append("FROM ");
-    sb.append("    ITR_User ");
-    sb.append("WHERE ");
-    sb.append("    NOT EXISTS ( ");
-    sb.append("        SELECT * FROM ITR_ProjectMembers ");
-    sb.append("        WHERE ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
-    sb.append("            AND ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
-    sb.append("    ) ");
-    sb.append("    AND ITR_User.Activated=True ");
-    sb.append("ORDER BY ");
-    sb.append("    ITR_User.LastName, ");
-    sb.append("    ITR_User.FirstName, ");
-    sb.append("    ITR_User.LoginId ");
+    String cacheKey = "loadAvailableProjectMembers_" + projectId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("    ITR_User.* ");
+        sb.append("FROM ");
+        sb.append("    ITR_User ");
+        sb.append("WHERE ");
+        sb.append("    NOT EXISTS ( ");
+        sb.append("        SELECT * FROM ITR_ProjectMembers ");
+        sb.append("        WHERE ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
+        sb.append("            AND ITR_ProjectMembers.ITR_ProjectId = ").append(projectId).append(" ");
+        sb.append("    ) ");
+        sb.append("    AND ITR_User.Activated=True ");
+        sb.append("ORDER BY ");
+        sb.append("    ITR_User.LastName, ");
+        sb.append("    ITR_User.FirstName, ");
+        sb.append("    ITR_User.LoginId ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadCompany(String companyId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append(" * ");
-    sb.append(" FROM ");
-    sb.append(TABLE_COMPANY);
-    sb.append(" WHERE ");
-    sb.append(COMPANY_ID_PK + " = ").append(companyId);
+    String cacheKey = "loadCompany_" + companyId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append(" * ");
+        sb.append(" FROM ");
+        sb.append(TABLE_COMPANY);
+        sb.append(" WHERE ");
+        sb.append(COMPANY_ID_PK + " = ").append(companyId);
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadContact(int contactId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("   * ");
-    sb.append("FROM ");
-    sb.append("    contact ");
-    sb.append("WHERE ");
-    sb.append("   Id = ").append(contactId);
+    String cacheKey = "loadContact_" + contactId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("   * ");
+        sb.append("FROM ");
+        sb.append("    contact ");
+        sb.append("WHERE ");
+        sb.append("   Id = ").append(contactId);
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
-  public StringRecordset loadProjectActivities(int projectId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("    ITR_ProjectCodes.*, ");
-    sb.append("    ITR_ProjectCode.Description, ");
-    sb.append("    ITR_ProjectCode.Code ");
-    sb.append("FROM ");
-    sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
-    sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
-    sb.append("WHERE ");
-    sb.append("    ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
-    sb.append("ORDER BY ");
-    sb.append("    ITR_ProjectCode.Code ");
+  public StringRecordset loadProjectActivitiesForProject(int projectId) throws Exception {
+    String cacheKey = "loadProjectActivitiesForProject_" + projectId;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("    ITR_ProjectCodes.*, ");
+        sb.append("    ITR_ProjectCode.Description, ");
+        sb.append("    ITR_ProjectCode.Code ");
+        sb.append("FROM ");
+        sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
+        sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
+        sb.append("WHERE ");
+        sb.append("    ITR_ProjectCodes.ITR_ProjectId = ").append(projectId).append(" ");
+        sb.append("ORDER BY ");
+        sb.append("    ITR_ProjectCode.Code ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadProjectActivity(int id) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("    ITR_ProjectCode.*, ");
-    sb.append("    ITR_ProjectCodes.ITR_ProjectId, ");
-    sb.append("    ITR_ProjectCodes.ITR_ProjectCodeId ");
-    sb.append("FROM ");
-    sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
-    sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
-    sb.append("WHERE ");
-    sb.append("    ITR_ProjectCode.Id = ").append(id).append(" ");
+    String cacheKey = "loadProjectActivity_" + id;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("SELECT ");
+        sb.append("    ITR_ProjectCode.*, ");
+        sb.append("    ITR_ProjectCodes.ITR_ProjectId, ");
+        sb.append("    ITR_ProjectCodes.ITR_ProjectCodeId ");
+        sb.append("FROM ");
+        sb.append("    ITR_ProjectCode INNER JOIN ITR_ProjectCodes ON ");
+        sb.append("    ITR_ProjectCode.Id = ITR_ProjectCodes.ITR_ProjectCodeId ");
+        sb.append("WHERE ");
+        sb.append("    ITR_ProjectCode.Id = ").append(id).append(" ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
   public StringRecordset loadProjectMember(int id) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append("    ITR_ProjectMembers.*, ");
-    sb.append("    ITR_User.FirstName, ");
-    sb.append("    ITR_User.LastName, ");
-    sb.append("    ITR_User.LoginId ");
-    sb.append("FROM ");
-    sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
-    sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
-    sb.append("WHERE ");
-    sb.append("    ITR_ProjectMembers.Id = ").append(id).append(" ");
+    String cacheKey = "loadProjectMember_" + id;
+    StringRecordset cachedObject = ItrCache.get(cacheKey);
 
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        sb.append("    ITR_ProjectMembers.*, ");
+        sb.append("    ITR_User.FirstName, ");
+        sb.append("    ITR_User.LastName, ");
+        sb.append("    ITR_User.LoginId ");
+        sb.append("FROM ");
+        sb.append("    ITR_User INNER JOIN ITR_ProjectMembers ON ");
+        sb.append("    ITR_User.Id = ITR_ProjectMembers.ITR_UserId ");
+        sb.append("WHERE ");
+        sb.append("    ITR_ProjectMembers.Id = ").append(id).append(" ");
+
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+        int tenHours = 3600 * 10;
+        ItrCache.put(cacheKey, rs, tenHours);
+      }
+    }
+
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+
+    return cachedObject;
   }
 
   @Override
@@ -1735,28 +1962,37 @@ public class DBQueries implements DBQueriesInterface, DBConstants {
 
   @Override
   public String getProperty(String key) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT `key`, value FROM ITR_PROPERTY WHERE UPPER(`key`) = UPPER('").append(key).append("')");
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    if(!rs.getEOF()) {      
-      return rs.getField("VALUE");
+    Map<String, String> map = getProperties();
+    if (map == null || map.isEmpty()) {
+      return null;
     }
-    return null;
+    return map.get(key);
   }
 
   @Override
   public Map<String, String> getProperties() throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT `key`, value FROM ITR_PROPERTY");
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    Map<String, String> retval = new HashMap<>();
-    while (!rs.getEOF()) {      
-      retval.put(rs.getField("KEY"), rs.getField("VALUE"));
-      rs.moveNext();
+    String cacheKey = "getProperties";
+    Map<String, String> cachedObject = ItrCache.get(cacheKey);
+    if (cachedObject == null) {
+      Object lock = LockHelper.getLockingObject(cacheKey);
+      synchronized (lock) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT `key`, value FROM ITR_PROPERTY");
+        DBConnect access = new DBConnect();
+        StringRecordset rs = access.executeQuery(sb);
+
+        Map<String, String> retval = new HashMap<>();
+        while (!rs.getEOF()) {
+          retval.put(rs.getField("KEY"), rs.getField("VALUE"));
+          rs.moveNext();
+        }
+        int tenMinutes = 10 * 60;
+        ItrCache.put(cacheKey, retval, tenMinutes);
+      }
     }
-    
-    return retval;
+    if (cachedObject == null) {
+      cachedObject = ItrCache.get(cacheKey);
+    }
+    return cachedObject;
   }
 }

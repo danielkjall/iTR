@@ -82,7 +82,7 @@ public class ProjectActivity {
     List<ProjectActivity> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadProjectActivities(projectId);
+      StringRecordset rs = DBQueries.getProxy().loadProjectActivitiesForProject(projectId);
 
       while (!rs.getEOF()) {
         ProjectActivity pa = new ProjectActivity();
