@@ -432,8 +432,8 @@ public class StringRecordset {
    */
   public void close() {
     moveFirst();
-    headerVec.clear();
-    rowVec.clear();
+    //headerVec.clear();
+    //rowVec.clear();
   }
 
   /**

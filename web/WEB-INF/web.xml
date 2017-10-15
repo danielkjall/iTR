@@ -5,6 +5,11 @@
         <jsp-file>/content/login/login.jsp</jsp-file>
     </servlet>
     <servlet>
+        <servlet-name>ITRInitServlet</servlet-name>
+        <servlet-class>com.intiro.itr.ITRInitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
         <servlet-name>LoginVerifier</servlet-name>
         <servlet-class>com.intiro.itr.ui.login.LoginVerifier</servlet-class>
     </servlet>

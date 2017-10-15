@@ -2,9 +2,10 @@ package com.intiro.itr.logic.project;
 
 import java.util.ArrayList;
 
-import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.db.vo.ProjectPropertyVO;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.ItrUtil;
@@ -315,7 +316,9 @@ public class Project extends DynamicXMLCarrier {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteProject(Integer.parseInt(getProjectId()));
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteProject(Integer.parseInt(getProjectId()));
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -330,7 +333,11 @@ public class Project extends DynamicXMLCarrier {
 
   public void load(String projId) throws XMLBuilderException {
     try {
-      ProjectPropertyVO vo = DBQueries.getProxy().getProjectProperty(projId);
+      String cacheKey = getClass().getName() + ".load_" + projId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      ProjectPropertyVO vo = DBQueriesConfig.getProxy(s).getProjectProperty(projId);
 
       if (vo != null && ItrUtil.isStrContainingValue(vo.getProjectId())) {
         setProjectId(vo.getProjectId());
@@ -361,12 +368,15 @@ public class Project extends DynamicXMLCarrier {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
     }
+    String statisticKey = getClass().getName() + ".save";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
     if (getProjectId() != null && !getProjectId().equalsIgnoreCase("-1")) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute.getProxy().updateProject(this);
+        DBExecute.getProxy(s).updateProject(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -376,7 +386,7 @@ public class Project extends DynamicXMLCarrier {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeProjectAndFetchId(this);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeProjectAndFetchId(this);
 
         if (!rs.getEOF()) {
           setProjectId(rs.getField("maxId"));

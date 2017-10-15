@@ -2,7 +2,8 @@ package com.intiro.itr.logic.company;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
@@ -112,8 +113,9 @@ public class Company {
       IntiroLog.detail(Company.class, "com.intiro.itr.logic.company.Company.load(): Entering");
     }
     try {
-      boolean retVal = DBExecute.getProxy().deleteCompany(companyId);
-
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      boolean retVal = DBExecute.getProxy(s).deleteCompany(companyId);
       return retVal;
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -136,7 +138,11 @@ public class Company {
         throw new Exception("Company.load(String companyId): Input has no meaningfull value.");
       }
 
-      StringRecordset rs = DBQueries.getProxy().loadCompany(Integer.toString(companyId));
+      String cacheKey = getClass().getName() + ".load_" + companyId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadCompany(Integer.toString(companyId));
       setCompanyId(Integer.parseInt(rs.getField(DBConstants.COMPANY_ID_PK)));
 
       //        setCompanyParentId(Integer.parseInt(rs.getField(DBConstants.COMPANYPARENT_ID_PK)));
@@ -162,10 +168,13 @@ public class Company {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
     }
+    String statisticKey = getClass().getName() + ".save";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
     // if a new company is created
     if (getCompanyId() == -1) {
       try {
-        StringRecordset rs = DBQueries.getProxy().addCompanyAndGetId(this);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).addCompanyAndGetId(this);
 
         if (!rs.getEOF()) {
           setCompanyId(Integer.parseInt(rs.getField("maxId")));
@@ -182,7 +191,7 @@ public class Company {
     } // if an existing company is updated
     else {
       try {
-        DBExecute.getProxy().updateCompany(this);
+        DBExecute.getProxy(s).updateCompany(this);
       } catch (Exception e) {
         IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new Exception(e.getMessage());

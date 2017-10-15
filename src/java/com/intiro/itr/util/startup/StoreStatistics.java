@@ -1,6 +1,7 @@
 package com.intiro.itr.util.startup;
 
 import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.log.IntiroLog;
 import com.intiro.itr.util.statistics.ItrStatistic;
 import com.intiro.itr.util.statistics.ItrStatistics;
@@ -18,7 +19,7 @@ public class StoreStatistics extends StartupThread {
     ItrStatistics.getInstance().setUse(true);
 
     sleep(SLEEP_IN_SECONDS_BEFORE_FIRST_TRY);
-    
+
     while (true) {
       sleep(SLEEP_IN_SECONDS_BETWEEN_TRIES);
 
@@ -44,17 +45,25 @@ public class StoreStatistics extends StartupThread {
       for (ItrStatistic stat : stats.keySet()) {
         StatisticVO vo = new StatisticVO();
         vo.setAction(stat.getAction());
+        vo.setMethodCalled(stat.getMethodCalled());
         vo.setStatus(stat.getStatus());
         vo.setHits(stats.get(stat));
         vo.setTimestamp(now);
         list.add(vo);
       }
 
+      if (list.isEmpty()) {
+        continue;
+      }
+
       try {
-        DBExecute.getProxy().saveStatistics(statistics);
+        String statisticKey = getClass().getName() + ".run";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).saveStatistics(statistics);
       } catch (Exception e) {
         // Swallow exception
-        IntiroLog.warning(this.getClass(), "MsStoreStatistics: Failed to store statistics! e: " + e);
+        IntiroLog.warning(this.getClass(), "ItrStoreStatistics: Failed to store statistics! e: " + e);
+        sleep(3600);
       }
     }
   }

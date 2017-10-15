@@ -2,7 +2,7 @@ package com.intiro.itr.util.xml;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import org.apache.xerces.parsers.DOMParser;
+//import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
 import com.intiro.itr.ITRResources;
 import com.intiro.itr.util.personalization.UserProfile;
@@ -29,6 +29,7 @@ public class StaticXMLCarrier extends XMLElement {
    * @exception Exception, if something goes wrong.
    */
   public synchronized Document getDocument() throws Exception {
+    /*
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getDocument(String xmlFile): getDocument entered");
     }
@@ -55,6 +56,8 @@ public class StaticXMLCarrier extends XMLElement {
     }
 
     return doc;
+     */
+    return null;
   }
 
   public StringBuffer getXMLFilePath() {

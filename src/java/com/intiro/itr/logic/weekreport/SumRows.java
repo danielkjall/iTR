@@ -3,7 +3,8 @@ package com.intiro.itr.logic.weekreport;
 import com.intiro.itr.db.vo.CalendarWeekVO;
 import java.util.ArrayList;
 
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.NumberFormatter;
 import com.intiro.itr.util.personalization.UserProfile;
@@ -179,7 +180,12 @@ public class SumRows {
 
     void load() throws XMLBuilderException {
       try {
-        CalendarWeekVO rs = DBQueries.getProxy().getCalendarWeek(getFromDate().getCalendarInStoreFormat());
+        String key = getFromDate().getCalendarInStoreFormat();
+        String cacheKey = "getCalendarWeek_" + key;
+        String statisticKey = getClass().getName() + ".load";
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        CalendarWeekVO rs = DBQueriesConfig.getProxy(s).getCalendarWeek(key);
 
         if (rs != null) {
           setMonday(rs.getMo());

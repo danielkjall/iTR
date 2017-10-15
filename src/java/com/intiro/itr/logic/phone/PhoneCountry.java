@@ -1,7 +1,8 @@
 package com.intiro.itr.logic.phone;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -94,7 +95,11 @@ public class PhoneCountry {
         throw new Exception(getClass().getName() + ".load(int countryId): At least one input has to be not null.");
       }
 
-      StringRecordset rs = DBQueries.getProxy().getPhoneCountry(countryId);
+      String cacheKey = getClass().getName() + ".load_" + countryId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getPhoneCountry(countryId);
 
       if (!rs.getEOF()) {
         setCountryCode(rs.getField(DBConstants.PHONECOUNTRYCODE_COUNTRYCODE));
@@ -116,12 +121,11 @@ public class PhoneCountry {
     Map<Integer, PhoneCountry> retval = new HashMap<>();
     try {
 
-      Map<Integer, PhoneCountry> cached = ItrCache.get(CACHE_ALL_PHONECOUNTRY);
-      if (cached != null) {
-        return cached;
-      }
-
-      StringRecordset rs = DBQueries.getProxy().getPhoneCountry(-1);
+      String cacheKey = PhoneCountry.class.getName() + "loadAllPhoneCountries";
+      String statisticKey = PhoneCountry.class.getName() + ".loadAllPhoneCountries";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getPhoneCountry(-1);
 
       if (!rs.getEOF()) {
         PhoneCountry pc = new PhoneCountry();
@@ -140,8 +144,6 @@ public class PhoneCountry {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_PHONECOUNTRY, retval, TenHours);
     return retval;
   }
 

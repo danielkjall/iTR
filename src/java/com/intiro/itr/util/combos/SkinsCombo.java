@@ -41,7 +41,11 @@ public class SkinsCombo extends XMLCombo {
   @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getSkins();
+      String cacheKey = getClass().getName() + ".getSkins";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getSkins();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.SKIN_ID_PK), rs.getField(DBConstants.SKIN_NAME));

@@ -1,7 +1,8 @@
 package com.intiro.itr;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 
 public class ITRResources {
@@ -101,7 +102,11 @@ public class ITRResources {
 
   public void load() {
     try {
-      StringRecordset rs = DBQueries.getProxy().getSettings();
+      String cacheKey = getClass().getName() + ".getSettings";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600*10 ;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getSettings();
 
       if (!rs.getEOF()) {
         setDefaultRealITRRootDir(rs.getField(DBConstants.SETTINGS_REALROOTDIR));

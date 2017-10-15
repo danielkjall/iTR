@@ -1,6 +1,7 @@
 package com.intiro.itr.logic.generatereport.monthly;
 
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import java.util.ArrayList;
 import com.intiro.itr.logic.activity.Activity;
 import com.intiro.itr.logic.project.Project;
@@ -120,7 +121,11 @@ public class MonthlyReport extends DynamicXMLCarrier {
    */
   public void load() throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getMonthlyReport(userId, projectId, projectCodeId, fromDate, toDate);
+      //String cacheKey = getClass().getName() + ".getMonthlyReport_" + userId + "_" + projectId + "_" + projectCodeId + "_" + fromDate + "_" + toDate;
+      String statisticKey = getClass().getName() + ".load";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).getMonthlyReport(userId, projectId, projectCodeId, fromDate, toDate);
       int index = 0;
 
       while (!rs.getEOF()) {

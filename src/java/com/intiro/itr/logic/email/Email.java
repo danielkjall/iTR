@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
-import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
 import java.util.HashMap;
@@ -110,7 +111,11 @@ public class Email {
         throw new Exception("Email.load(String userId, String contactId, String emailId): At least one input has to be not null.");
       }
 
-      StringRecordset rs = DBQueries.getProxy().getEmails(userId, contactId, emailId);
+      String cacheKey = Email.class.getName() + ".load_" + userId + "_" + contactId + "_" + emailId;
+      String statisticKey = Email.class.getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getEmails(userId, contactId, emailId);
       String tmpContact;
       String tmpUser;
 
@@ -146,12 +151,11 @@ public class Email {
     Map<Integer, ArrayList<Email>> retval = new HashMap<>();
 
     try {
-      Map<Integer, ArrayList<Email>> cached = ItrCache.get(CACHE_ALL_EMAILS);
-      if (cached != null) {
-        return cached;
-      }
-
-      StringRecordset rs = DBQueries.getProxy().getAllEmails();
+      String cacheKey = Email.class.getName() + ".getAllEmails";
+      String statisticKey = Email.class.getName() + ".loadAllEmails";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getAllEmails();
       String tmpContact;
       String tmpUser;
 
@@ -186,9 +190,6 @@ public class Email {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_EMAILS, retval, TenHours);
-
     return retval;
   }
 
@@ -210,7 +211,9 @@ public class Email {
   public void save() throws Exception {
     if (getId() == -1) {
       try {
-        StringRecordset rs = DBQueries.getProxy().addEmailAndGetId(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).addEmailAndGetId(this);
 
         if (!rs.getEOF()) {
           setId(Integer.parseInt(rs.getField("maxId")));
@@ -226,7 +229,9 @@ public class Email {
       }
     } else if (remove && getId() != -1) {
       try {
-        DBExecute.getProxy().deleteEmail(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).deleteEmail(this);
       } catch (Exception e) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -236,7 +241,9 @@ public class Email {
       }
     } else {
       try {
-        DBExecute.getProxy().updateEmail(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).updateEmail(this);
       } catch (Exception e) {
         IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new Exception(e.getMessage());

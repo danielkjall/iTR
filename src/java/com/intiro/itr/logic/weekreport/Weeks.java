@@ -1,7 +1,10 @@
 package com.intiro.itr.logic.weekreport;
 
-import com.intiro.itr.db.*;
-import com.intiro.itr.util.*;
+import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.InvocationHandlerSetting;
+import com.intiro.itr.util.ITRCalendar;
+import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.*;
 import com.intiro.itr.util.xml.*;
 import com.intiro.itr.util.log.IntiroLog;
@@ -152,7 +155,7 @@ public class Weeks extends DynamicXMLCarrier {
       /* next weekpart, it rolls to next week if needed. */
       currentDate.nextWeekPart();
 
-      /* break loop if when have passed nowPlusSizMonth. */
+      /* break loop if when have passed nowPlusSixMonth. */
       if (nowPlusSixMonth.before(currentDate)) {
         break;
       }
@@ -179,8 +182,11 @@ public class Weeks extends DynamicXMLCarrier {
     title = "Submitted";
 
     try {
-      //StringRecordset rs = dbQuery.getSubmittedWeeks(getUserProfile().getUserId(), year, false, false);
-      StringRecordset rs = DBQueries.getProxy().getSubmittedWeeksThick(getUserProfile().getUserId(), year, false, false);
+      String cacheKey = getClass().getName() + ".getSubmittedWeeksThick_" + getUserProfile().getUserId() + "_" + year;
+      String statisticKey = getClass().getName() + ".loadSubmitted";
+      int cacheTime = 3600*10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getSubmittedWeeksThick(getUserProfile().getUserId(), year);
       int lastCalendarWeekId = -1;
 
       while (!rs.getEOF()) {

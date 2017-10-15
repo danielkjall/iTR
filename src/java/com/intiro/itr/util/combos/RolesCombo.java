@@ -40,7 +40,11 @@ public class RolesCombo extends XMLCombo {
   @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getRoles();
+      String cacheKey = getClass().getName() + ".getRoles";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getRoles();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.ROLES_ID_PK), rs.getField(DBConstants.ROLES_NAME));

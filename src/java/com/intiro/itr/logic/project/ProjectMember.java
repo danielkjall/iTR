@@ -1,6 +1,8 @@
 package com.intiro.itr.logic.project;
 
-import com.intiro.itr.db.*;
+import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
@@ -126,7 +128,9 @@ public class ProjectMember {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteProjectMember(this.getId());
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteProjectMember(this.getId());
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -143,7 +147,11 @@ public class ProjectMember {
     boolean success = false;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadProjectMember(Integer.parseInt(id));
+      String cacheKey = getClass().getName() + ".load_" + id;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadProjectMember(Integer.parseInt(id));
 
       if (!rs.getEOF()) {
         setId(rs.getInt("Id"));
@@ -191,7 +199,11 @@ public class ProjectMember {
     List<ProjectMember> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadAssignedProjectMembers(projectId);
+      String cacheKey = ProjectMember.class.getName() + ".loadAssignedProjectMembers_" + projectId;
+      String statisticKey = ProjectMember.class.getName() + ".loadAssignedProjectMembers";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadAssignedProjectMembers(projectId);
 
       while (!rs.getEOF()) {
         ProjectMember pm = new ProjectMember();
@@ -201,7 +213,6 @@ public class ProjectMember {
         pm.setRate(rs.getInt("Rate"));
 
         String tmp = rs.getField("Active");
-
         if ((tmp != null && tmp.trim().equals("1")) || (tmp != null && tmp.trim().equalsIgnoreCase("true"))) {
           pm.setActive(true);
         } else {
@@ -209,7 +220,6 @@ public class ProjectMember {
         }
 
         tmp = rs.getField("ProjectAdmin");
-
         if ((tmp != null && tmp.trim().equals("1")) || (tmp != null && tmp.trim().equalsIgnoreCase("true"))) {
           pm.setProjectAdmin(true);
         } else {
@@ -243,7 +253,11 @@ public class ProjectMember {
     List<ProjectMember> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadAvailableProjectMembers(projectId);
+      String cacheKey = ProjectMember.class.getName() + ".loadAvailableProjectMembers_" + projectId;
+      String statisticKey = ProjectMember.class.getName() + ".loadAvailableProjectMembers";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadAvailableProjectMembers(projectId);
 
       while (!rs.getEOF()) {
         ProjectMember pm = new ProjectMember();
@@ -271,17 +285,19 @@ public class ProjectMember {
     return retval;
   }
 
-  public boolean save()
-          throws XMLBuilderException {
+  public boolean save() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
     }
+      String statisticKey = getClass().getName() + ".save";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
     if (getId() != 0) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute.getProxy().updateProjectMember(this);
+        DBExecute.getProxy(s).updateProjectMember(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -291,7 +307,7 @@ public class ProjectMember {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeNewProjectMemberAndFetchId(this);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeNewProjectMemberAndFetchId(this);
 
         if (!rs.getEOF()) {
           setId(rs.getInt("maxId"));

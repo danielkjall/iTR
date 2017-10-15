@@ -12,7 +12,8 @@ package com.intiro.itr.util.personalization;
 import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -54,12 +55,12 @@ public class Module {
   public static Map<Integer, ArrayList<Module>> loadAllModules() throws XMLBuilderException {
     Map<Integer, ArrayList<Module>> retval = new HashMap<>();
     try {
-      Map<Integer, ArrayList<Module>> cached = ItrCache.get(CACHE_ALL_MODULES);
-      if (cached != null) {
-        return cached;
-      }
-      
-      StringRecordset rs = DBQueries.getProxy().getModulesForRole(-1);
+
+      String cacheKey = Module.class.getName() + ".loadAllModules";
+      String statisticKey = Module.class.getName() + ".loadAllModules";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getModulesForRole(-1);
       while (!rs.getEOF()) {
         Module oneModule = new Module();
         oneModule.setModuleId(Integer.parseInt(rs.getField(DBConstants.MODULE_ID_PK)));
@@ -82,9 +83,6 @@ public class Module {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_MODULES, retval, TenHours);
-    
     return retval;
   }
 
@@ -92,7 +90,11 @@ public class Module {
     ArrayList<Module> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getModulesForRole(roleId);
+      String cacheKey = Module.class.getName() + ".load_" + roleId;
+      String statisticKey = Module.class.getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getModulesForRole(roleId);
 
       while (!rs.getEOF()) {
         Module oneModule = new Module();

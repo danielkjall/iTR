@@ -1,10 +1,10 @@
 package com.intiro.itr.util.xml;
 
 import java.io.Serializable;
-import java.io.StringReader;
-import org.apache.xerces.parsers.DOMParser;
+//import java.io.StringReader;
+//import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
+//import org.xml.sax.InputSource;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.log.IntiroLog;
 
@@ -38,6 +38,7 @@ public class DynamicXMLCarrier extends XMLElement implements Serializable {
    */
   @Override
   public synchronized Document getDocument() throws Exception {
+    /*
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".getDocument(): getDocument entered");
     }
@@ -65,6 +66,8 @@ public class DynamicXMLCarrier extends XMLElement implements Serializable {
     }
 
     return doc;
+    */
+    return null;
   }
 
   /**

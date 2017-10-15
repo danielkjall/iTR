@@ -15,7 +15,7 @@ response.addHeader("Cache-Control","no-store");
   <frame name="cornerFrame" scrolling="NO" noresize="yes" src="cornerFrame.jsp" />
   <frame name="top" id="top" scrolling="NO" noresize="yes" src="topFrame.jsp" />
   <frame name="navigation" id="navigation" frameborder="NO" scrolling="NO" src="navigationBar.jsp" />
-  <frame name="basefrm" id="content" src="mainFrame.jsp" />
+  <frame name="basefrm" id="content" src="viewWeeks.jsp?mode=todo" />
 </frameset>
 <noframes>
 <body bgcolor="#FFFFFF">

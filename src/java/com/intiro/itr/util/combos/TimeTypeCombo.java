@@ -41,7 +41,11 @@ public class TimeTypeCombo extends XMLCombo {
   @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getTimeTypes();
+      String cacheKey = getClass().getName() + ".load";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getTimeTypes();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.TIMETYPE_ID_PK), rs.getField(DBConstants.TIMETYPE_TYPE));

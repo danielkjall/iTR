@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.email.Email;
 import com.intiro.itr.logic.phone.PhoneNumber;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StringRecordset;
-import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
 import java.util.HashMap;
@@ -442,7 +443,9 @@ public class UserProfile {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteUser(Integer.parseInt(getUserId()));
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteUser(Integer.parseInt(getUserId()));
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -459,7 +462,11 @@ public class UserProfile {
     boolean success = false;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadUserProfile(userId);
+      String cacheKey = getClass().getName() + ".load_" + userId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).loadUserProfile(userId);
 
       if (!rs.getEOF()) {
         mapRsToObject(this, rs);
@@ -485,16 +492,14 @@ public class UserProfile {
     Map<String, UserProfile> retval = new HashMap<>();
 
     try {
-
-      Map<String, UserProfile> cached = ItrCache.get(CACHE_ALL_USERPROFILES);
-      if (cached != null) {
-        return cached;
-      }
-
       Map<Integer, ArrayList<Email>> mapEmails = Email.loadAllEmails();
       Map<Integer, ArrayList<PhoneNumber>> mapPhonenumbers = PhoneNumber.loadAllPhoneNumbers();
 
-      StringRecordset rs = DBQueries.getProxy().loadUserProfile(null);
+      String cacheKey = UserProfile.class.getName() + ".loadAllUserProfiles";
+      String statisticKey = UserProfile.class.getName() + ".loadAllUserProfiles";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).loadUserProfile(null);
       while (!rs.getEOF()) {
         UserProfile up = new UserProfile();
         mapRsToObject(up, rs);
@@ -519,9 +524,6 @@ public class UserProfile {
     if (IntiroLog.d()) {
       IntiroLog.detail(UserProfile.class, UserProfile.class.getName() + ".loadAllUserProfiles():	Leaving");
     }
-
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_USERPROFILES, retval, TenHours);
 
     return retval;
   }
@@ -624,12 +626,17 @@ public class UserProfile {
    * @param loginId
    * @param password
    * @return a boolean, true if success, else false.
+   * @throws java.lang.Exception
    */
   public boolean reload(String loginId, String password) throws Exception {
     boolean success = false;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().login(loginId, password);
+      String cacheKey = getClass().getName() + ".reload_" + loginId + "_" + password;
+      String statisticKey = getClass().getName() + ".reload";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).login(loginId, password);
 
       if (!rs.getEOF()) {
         mapRsToObject(this, rs);
@@ -663,7 +670,9 @@ public class UserProfile {
 
   private void insert() throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().makeNewUserAndFetchId(this);
+      String statisticKey = getClass().getName() + ".insert";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).makeNewUserAndFetchId(this);
 
       if (!rs.getEOF()) {
         setUserId(rs.getField("maxId"));
@@ -682,7 +691,9 @@ public class UserProfile {
 
   private void update() throws XMLBuilderException {
     try {
-      DBExecute.getProxy().updateUserProfile(this);
+      String statisticKey = getClass().getName() + ".update";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      DBExecute.getProxy(s).updateUserProfile(this);
 
       //update the user role connection
       if (getRole() != null) {

@@ -3,14 +3,15 @@ package com.intiro.itr.util.logger;
 import java.util.Date;
 
 public class LoggerVO {
-   private int userId;
-   private int anropstidInMs;
-   private String felmeddelande;
-   private String inParameter;
-   private String utParameter;
-   private String metodnamn;
-   private String sessionId;
-   private Date timestamp;
+
+  private int userId;
+  private int anropstidInMs;
+  private String felmeddelande;
+  private String inParameter;
+  private String utParameter;
+  private String metodnamn;
+  private String sessionId;
+  private Date timestamp;
 
   public int getUserId() {
     return userId;
@@ -29,6 +30,9 @@ public class LoggerVO {
   }
 
   public String getFelmeddelande() {
+    if (felmeddelande != null && felmeddelande.length() > 5999) {
+      felmeddelande = felmeddelande.substring(0, 5999);
+    }
     return felmeddelande;
   }
 
@@ -37,6 +41,9 @@ public class LoggerVO {
   }
 
   public String getInParameter() {
+    if (inParameter != null && inParameter.length() > 5999) {
+      inParameter = inParameter.substring(0, 5999);
+    }
     return inParameter;
   }
 
@@ -45,6 +52,9 @@ public class LoggerVO {
   }
 
   public String getUtParameter() {
+    if (utParameter != null && utParameter.length() > 5999) {
+      utParameter = utParameter.substring(0, 5999);
+    }
     return utParameter;
   }
 
@@ -75,5 +85,5 @@ public class LoggerVO {
   public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
-   
+
 }

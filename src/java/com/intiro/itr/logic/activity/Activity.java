@@ -3,7 +3,8 @@ package com.intiro.itr.logic.activity;
 import java.util.ArrayList;
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
@@ -53,7 +54,11 @@ public class Activity {
     ArrayList<Activity> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadActivitiesNotInProject(projectId);
+      String cacheKey = Activity.class.getName() + ".loadActivitiesNotInProject_" + projectId;
+      String statisticKey = Activity.class.getName() + ".loadActivitiesNotInProject";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadActivitiesNotInProject(projectId);
 
       while (!rs.getEOF()) {
         Activity pa = new Activity();
@@ -84,7 +89,9 @@ public class Activity {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteActivity(getId());
+      String statisticKey = Activity.class.getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteActivity(getId());
     } catch (Exception e) {
       IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -97,7 +104,11 @@ public class Activity {
     boolean success = false;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadActivity(Integer.parseInt(id));
+      String cacheKey = getClass().getName() + ".load_" + id;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadActivity(Integer.parseInt(id));
 
       if (!rs.getEOF()) {
         setId(rs.getInt("Id"));
@@ -122,12 +133,18 @@ public class Activity {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
     }
+
+    String statisticKey = getClass().getName() + ".save";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
     if (getId() != -1) {
+
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
+
       try {
-        DBExecute.getProxy().updateActivity(this);
+        DBExecute.getProxy(s).updateActivity(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -137,7 +154,7 @@ public class Activity {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeActivityAndFetchId(this);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeActivityAndFetchId(this);
 
         if (!rs.getEOF()) {
           setId(rs.getInt("maxId"));

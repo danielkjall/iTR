@@ -7,7 +7,7 @@ import com.intiro.itr.util.xml.*;
 import com.intiro.itr.util.log.IntiroLog;
 
 public class ProjectsCombo extends XMLCombo {
-
+  
   int userId = -1;
 
   /**
@@ -39,28 +39,33 @@ public class ProjectsCombo extends XMLCombo {
   public ProjectsCombo(UserProfile profile, String nameOnNullEntry) throws XMLBuilderException {
     super(profile, nameOnNullEntry);
   }
-
+  
   public void setUserId(int userId) {
     this.userId = userId;
   }
-
+  
   @Override
-  public void load(String valueToBeSelected)
-          throws XMLBuilderException {
+  public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
       StringRecordset rs = null;
-
-      DBQueriesInterface proxy = DBQueries.getProxy();
       if (userId == -1) {
-        rs = proxy.getAllProjects();
+        String cacheKey = getClass().getName() + ".getAllProjects";
+        String statisticKey = getClass().getName() + ".load";
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        rs = DBQueriesConfig.getProxy(s).getAllProjects();
       } else {
-        rs = proxy.getProjectsForUser(userId);
+        String cacheKey = getClass().getName() + ".getProjectsForUser_" + userId;
+        String statisticKey = getClass().getName() + ".load";
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        rs = DBQueriesConfig.getProxy(s).getProjectsForUser(userId);
       }
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.PROJECT_ID_PK), rs.getField(DBConstants.PROJECT_NAME));
         rs.moveNext();
       }
-
+      
       setSelectedValue(valueToBeSelected);
       rs.close();
     } catch (Exception e) {
@@ -68,7 +73,7 @@ public class ProjectsCombo extends XMLCombo {
         IntiroLog.info(getClass(),
                 getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
       }
-
+      
       throw new XMLBuilderException(e.getMessage());
     }
   }

@@ -151,7 +151,9 @@ public class Contacts {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteContact(this);
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteContact(this);
     } catch (Exception e) {
       IntiroLog.info(getClass(),
               getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -170,7 +172,11 @@ public class Contacts {
     boolean success = false;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadContact(Integer.parseInt(id));
+      String cacheKey = getClass().getName() + ".load_" + id;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadContact(Integer.parseInt(id));
 
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".load(String id): rs=" + rs);
@@ -223,7 +229,9 @@ public class Contacts {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute.getProxy().updateContacts(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).updateContacts(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -233,7 +241,9 @@ public class Contacts {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeNewContactAndFetchId(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeNewContactAndFetchId(this);
 
         if (!rs.getEOF()) {
           setId(rs.getInt("maxId"));

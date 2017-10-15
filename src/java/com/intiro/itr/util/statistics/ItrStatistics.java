@@ -6,92 +6,79 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ItrStatistics
-{
-   private static final ItrStatistics instance = new ItrStatistics();
-   private final static String DATA = "DATA";
-   public final static String TEXTKEY = "TRACK_TEXT";
-   public final static String SETTINGKEY = "TRACK_SETTING";
+public class ItrStatistics {
 
-   public static ItrStatistics getInstance()
-   {
-      return instance;
-   }
+  private static final ItrStatistics instance = new ItrStatistics();
+  public final static String STATUS_SUCCESS = "SUCCESS";
+  public final static String STATUS_CACHED_VALUE = "CACHED_VALUE";
+  public final static String STATUS_FAILED = "FAILED";
 
-   private final int listSize = 10;
-   private final Map<Integer, List<ItrStatistic>> lists = new HashMap<>();
+  public static ItrStatistics getInstance() {
+    return instance;
+  }
 
-   private boolean use;
+  private final int listSize = 10;
+  private final Map<Integer, List<ItrStatistic>> lists = new HashMap<>();
 
-   public boolean isUse()
-   {
-      return use;
-   }
+  private boolean use;
 
-   public void setUse( boolean use )
-   {
-      this.use = use;
-   }
+  public boolean isUse() {
+    return use;
+  }
 
-   public void addGeneric( String action, String status )
-   {
-      int listId = ( int ) Math.floor( Math.random() * listSize );
+  public void setUse(boolean use) {
+    this.use = use;
+  }
 
-      List<ItrStatistic> list = getList( listId );
-      
-      list.add( new ItrStatistic( action, status ) );
-   }
+  public void addGeneric(String action, String methodCalled, String status) {
+    int listId = (int) Math.floor(Math.random() * listSize);
 
-   private List<ItrStatistic> getList( int id )
-   {
-      List<ItrStatistic> list;
+    List<ItrStatistic> list = getList(listId);
 
-      list = lists.get( id );
-      if ( list != null )
-      {
-         return list;
-      }
-      synchronized ( lists )
-      {
-         list = lists.get( id );
-         if ( list != null )
-         {
-            return list;
-         }
+    list.add(new ItrStatistic(action, methodCalled, status));
+  }
 
-         list = Collections.synchronizedList( new ArrayList<>() );
-         lists.put( id, list );
-      }
+  private List<ItrStatistic> getList(int id) {
+    List<ItrStatistic> list;
 
+    list = lists.get(id);
+    if (list != null) {
       return list;
-
-   }
-
-   public Map<ItrStatistic, Integer> getResult()
-   {
-
-      Map<ItrStatistic, Integer> map = new HashMap<>();
-
-      List<List<ItrStatistic>> _lists = new ArrayList<>();
-
-      synchronized ( lists )
-      {
-         for ( List<ItrStatistic> list : lists.values() )
-         {
-            _lists.add( list );
-         }
-         lists.clear();
+    }
+    synchronized (lists) {
+      list = lists.get(id);
+      if (list != null) {
+        return list;
       }
 
-      for ( List<ItrStatistic> list : _lists )
-      {
-         for ( ItrStatistic stat : list )
-         {
-            int count = map.containsKey( stat ) ? map.get( stat ) : 0;
-            map.put( stat, ++count );
-         }
-      }
+      list = Collections.synchronizedList(new ArrayList<>());
+      lists.put(id, list);
+    }
 
-      return map;
-   }
+    return list;
+
+  }
+
+  public Map<ItrStatistic, Integer> getResult() {
+
+    Map<ItrStatistic, Integer> map = new HashMap<>();
+
+    List<List<ItrStatistic>> _lists = new ArrayList<>();
+
+    synchronized (lists) {
+      for (List<ItrStatistic> list : lists.values()) {
+        _lists.add(list);
+      }
+      lists.clear();
+    }
+
+    for (List<ItrStatistic> list : _lists) {
+      for (ItrStatistic stat : list) {
+        int count = map.containsKey(stat) ? map.get(stat) : 0;
+        map.put(stat, ++count);
+      }
+    }
+
+    return map;
+  }
 }

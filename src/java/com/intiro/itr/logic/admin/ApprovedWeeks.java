@@ -2,8 +2,7 @@ package com.intiro.itr.logic.admin;
 
 import java.util.ArrayList;
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
-import com.intiro.itr.db.DBQueriesInterface;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.weekreport.WeekReport;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StopWatch;
@@ -14,6 +13,7 @@ import com.intiro.itr.util.xml.XMLBuilder;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
 import java.util.Map;
+import com.intiro.itr.db.DBQueriesUser;
 
 public class ApprovedWeeks extends DynamicXMLCarrier {
 
@@ -46,7 +46,11 @@ public class ApprovedWeeks extends DynamicXMLCarrier {
     try {
       Map<String, UserProfile> mapUserProfiles = UserProfile.loadAllUserProfiles();
 
-      StringRecordset rs = DBQueries.getProxy().getAllApprovedWeeks(year);
+      //String cacheKey = getClass().getName() + ".loadPerformance_" + year;
+      String statisticKey = getClass().getName() + ".loadPerformance";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getAllApprovedWeeks(year);
       int lastCalendarWeekId = -1;
 
       StopWatch sw = new StopWatch();
@@ -88,12 +92,15 @@ public class ApprovedWeeks extends DynamicXMLCarrier {
   public ArrayList load(String year, String userId) throws XMLBuilderException {
 
     ArrayList<String> allUsers = new ArrayList<>();
-    DBQueriesInterface proxy = DBQueries.getProxy();
     if (userId.length() > 0) {
       allUsers.add(userId);
     } else {
       try {
-        StringRecordset rs = proxy.getUsersReportedYear(year);
+        //String cacheKey = getClass().getName() + ".load_" + year;
+        String statisticKey = getClass().getName() + ".load";
+        //int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesUser.getProxy(s).getUsersReportedYear(year);
         while (!rs.getEOF()) {
           allUsers.add(rs.getField("Id"));
           rs.moveNext();
@@ -116,7 +123,11 @@ public class ApprovedWeeks extends DynamicXMLCarrier {
       profile.setClientInfo(getUserProfile().getClientInfo());
 
       try {
-        StringRecordset rs = proxy.getApprovedWeeks(userId, year);
+        //String cacheKey = getClass().getName() + ".load_" + year + "_" + userId;
+        String statisticKey = getClass().getName() + ".load";
+        //int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesUser.getProxy(s).getApprovedWeeks(userId, year);
         int lastCalendarWeekId = -1;
 
         while (!rs.getEOF()) {

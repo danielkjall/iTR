@@ -1,6 +1,7 @@
 package com.intiro.itr.util.combos;
 
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -44,7 +45,11 @@ public class ContactCombo extends XMLCombo {
   @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getContacts();
+      String cacheKey = getClass().getName() + ".getContacts";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getContacts();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField("Id"), rs.getField("FirstName") + " " + rs.getField("LastName"));

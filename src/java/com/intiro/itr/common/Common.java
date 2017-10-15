@@ -1,6 +1,7 @@
 package com.intiro.itr.common;
 
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.*;
 import com.intiro.itr.util.personalization.*;
 import com.intiro.itr.util.xml.*;
@@ -17,14 +18,19 @@ public class Common extends DynamicXMLCarrier {
   }
 
   // Method to retreive years from published years
-  public List<String> getSubmitedYears(Boolean currentUser) throws XMLBuilderException {
+  public List<String> getSubmittedYears(Boolean currentUser) throws XMLBuilderException {
     List<String> retval = new ArrayList<>();
     String userId = "";
     if (currentUser) {
       userId = getUserProfile().getUserId();
     }
     try {
-      StringRecordset rs = DBQueries.getProxy().getSubmittedYears(userId);
+      // Since this only changes once per year we cache it...
+      String cacheKey = getClass().getName() + ".getSubmittedYears_"+userId;
+      String statisticKey = getClass().getName() + ".getSubmittedYears";
+      int cacheTime = 3600*10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getSubmittedYears(userId);
 
       while (!rs.getEOF()) {
         retval.add(rs.getField("theYear") + ";" + rs.getField("quantity"));
@@ -42,14 +48,18 @@ public class Common extends DynamicXMLCarrier {
   public ArrayList<String> getUsersList(String year) {
     ArrayList<String> usersList = new ArrayList<>();
     try {
-      StringRecordset rs = DBQueries.getProxy().getUsersReportedYear(year);
+      String cacheKey = getClass().getName() + ".getUsersReportedYear_"+year;
+      String statisticKey = getClass().getName() + ".getUsersList";
+      int cacheTime = 3600*10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getUsersReportedYear(year);
       while (!rs.getEOF()) {
         usersList.add(rs.getField("Id") + ";" + rs.getField("FullName"));
         rs.moveNext();
       }
     } catch (Exception e) {
       if (IntiroLog.d()) {
-        IntiroLog.detail(getClass(), getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
+        IntiroLog.detail(getClass(), getClass().getName() + ".getUsersList(): ERROR FROM DATABASE, exception = " + e.getMessage());
       }
     }
 

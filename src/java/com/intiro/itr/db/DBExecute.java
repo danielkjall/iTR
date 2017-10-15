@@ -11,6 +11,7 @@ import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.logic.project.ProjectActivity;
 import com.intiro.itr.logic.project.ProjectMember;
 import com.intiro.itr.logic.weekreport.Row;
+import com.intiro.itr.util.log.IntiroLog;
 import com.intiro.itr.util.personalization.Role;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.statistics.StatisticVO;
@@ -25,11 +26,37 @@ import java.util.List;
 
 public class DBExecute implements DBConstants, DbExecuteInterface {
 
+  private ThreadLocal<InvocationHandlerSetting> m_personalInvocationSetting = new ThreadLocal<>();
+
+  @Override
+  public void setCallSetup(InvocationHandlerSetting s) {
+    m_personalInvocationSetting.set(s);
+  }
+
+  @Override
+  public InvocationHandlerSetting getCallSetup() {
+    InvocationHandlerSetting retval = new InvocationHandlerSetting();
+
+    if (m_personalInvocationSetting.get() == null) {
+      IntiroLog.warning(DBExecute.class, "Call has NOT been setup from caller. No caching will be performed in invocationhandler");
+      return retval;
+    }
+
+    retval.setCacheKey(m_personalInvocationSetting.get().getCacheKey());
+    retval.setCacheTimeInSeconds(m_personalInvocationSetting.get().getCacheTimeInSeconds());
+    retval.setStatisticAction(m_personalInvocationSetting.get().getAction());
+    m_personalInvocationSetting.set(null);
+    m_personalInvocationSetting.remove();
+
+    return retval;
+  }
+
   private DBExecute() {
   }
 
-  public static DbExecuteInterface getProxy() {
+  public static DbExecuteInterface getProxy(InvocationHandlerSetting s) {
     DBExecute db = new DBExecute();
+    db.setCallSetup(s);
     return (DbExecuteInterface) Proxy.newProxyInstance(db.getClass().getClassLoader(), new Class<?>[]{DbExecuteInterface.class}, new ItrInvocationHandler(db));
   }
 
@@ -985,10 +1012,10 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
 
   @Override
   public void saveLog(List<LoggerVO> list) throws Exception {
-    if(list == null || list.isEmpty()){
+    if (list == null || list.isEmpty()) {
       return;
     }
-    
+
     String sqlQuery = "INSERT INTO ITR_LOG (itr_userid, anropstidims, felmeddelande, inparameter, utparameter, metodnamn, sessionid, timestamp) values (?,?,?,?,?,?,?,?)";
     Connection conn = null;
     PreparedStatement pstmt = null;
@@ -1025,12 +1052,12 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
 
   @Override
   public void saveStatistics(StatisticsVO statistics) throws Exception {
-    if(statistics == null || statistics.getStatistics() == null || statistics.getStatistics().isEmpty()){
+    if (statistics == null || statistics.getStatistics() == null || statistics.getStatistics().isEmpty()) {
       return;
     }
-    
-    String sqlQuery = "INSERT INTO itr_statistics(hits, action, status, timestamp) values (?,?,?,?)";
-    
+
+    String sqlQuery = "INSERT INTO itr_statistics(hits, action, methodcalled, status, timestamp) values (?,?,?,?,?)";
+
     Connection conn = null;
     PreparedStatement pstmt = null;
 
@@ -1042,6 +1069,7 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
         int i = 1;
         pstmt.setInt(i++, log.getHits());
         pstmt.setString(i++, log.getAction());
+        pstmt.setString(i++, log.getMethodCalled());
         pstmt.setString(i++, log.getStatus());
         java.sql.Timestamp t = new java.sql.Timestamp(log.getTimestamp().getTime());
         pstmt.setTimestamp(i++, t);

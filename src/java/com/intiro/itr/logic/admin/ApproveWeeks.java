@@ -1,6 +1,11 @@
 package com.intiro.itr.logic.admin;
 
-import com.intiro.itr.db.*;
+
+import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.weekreport.WeekReport;
 import com.intiro.itr.util.*;
 import com.intiro.itr.util.personalization.*;
@@ -46,7 +51,12 @@ public class ApproveWeeks extends DynamicXMLCarrier {
     String previousUserId = "-1";
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getUsersThatNeedApprovel(getUserProfile().getUserId());
+      String key = getUserProfile().getUserId();
+      //String cacheKey = getClass().getName() + ".getUsersThatNeedApprovel_" + key;
+      String statisticKey = getClass().getName() + ".getUsersThatNeedApprovel";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).getUsersThatNeedApprovel(key);
       String userId = null;
 
       while (!rs.getEOF()) {
@@ -64,17 +74,14 @@ public class ApproveWeeks extends DynamicXMLCarrier {
       rs.close();
     } catch (Exception e) {
       if (IntiroLog.d()) {
-        IntiroLog.detail(getClass(),
-                getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
+        IntiroLog.detail(getClass(), getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
       }
 
       throw new XMLBuilderException(e.getMessage());
     }
     for (int i = 0; i < usersThatNeedApprovel.size(); i++) {
       if (IntiroLog.d()) {
-        IntiroLog.detail(getClass(),
-                getClass().getName() + ".load(): usersThatNeedApprovel.get(i) = "
-                + usersThatNeedApprovel.get(i));
+        IntiroLog.detail(getClass(), getClass().getName() + ".load(): usersThatNeedApprovel.get(i) = " + usersThatNeedApprovel.get(i));
       }
     }
 
@@ -87,7 +94,11 @@ public class ApproveWeeks extends DynamicXMLCarrier {
       profile.setClientInfo(getUserProfile().getClientInfo());
 
       try {
-        StringRecordset rs = DBQueries.getProxy().getSubmittedWeeks(userId, false, true);
+        //String cacheKey = getClass().getName() + ".getSubmittedWeeks_" + userId + "_" + false + "_" + true;
+        String statisticKey = getClass().getName() + ".getSubmittedWeeks";
+        //int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesUser.getProxy(s).getSubmittedWeeks(userId, false, true);
         int lastCalendarWeekId = -1;
 
         while (!rs.getEOF()) {
@@ -112,8 +123,7 @@ public class ApproveWeeks extends DynamicXMLCarrier {
         rs.close();
       } catch (Exception e) {
         if (IntiroLog.d()) {
-          IntiroLog.detail(getClass(),
-                  getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
+          IntiroLog.detail(getClass(), getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
         }
 
         throw new XMLBuilderException(e.getMessage());

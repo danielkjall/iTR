@@ -2,7 +2,8 @@ package com.intiro.itr.logic;
 
 import java.util.ArrayList;
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.ColumnProperties;
@@ -68,7 +69,12 @@ public class ProjectsTable extends XMLInnerTable {
     StringRecordset retval = null;
 
     try {
-      retval = DBQueries.getProxy().getProjectsForUser(Integer.parseInt(getUserProfile().getUserId()));
+      int key = Integer.parseInt(getUserProfile().getUserId());
+      String cacheKey = getClass().getName() + ".getProjectsForUser_" + key;
+      String statisticKey = getClass().getName() + ".getProjectsForUser";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      retval = DBQueriesConfig.getProxy(s).getProjectsForUser(key);
     } catch (Exception e) {
       throw new XMLBuilderException(e.getMessage());
     }

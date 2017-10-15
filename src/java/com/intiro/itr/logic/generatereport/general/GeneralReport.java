@@ -103,7 +103,11 @@ public class GeneralReport extends DynamicXMLCarrier {
       IntiroLog.detail(getClass(), getClass().getName() + ".load() Entering");
     }
     try {
-      StringRecordset rs = DBQueries.getProxy().getGeneralReport(userId, projectId, projectCodeId, fromDate, toDate);
+      //String cacheKey = getClass().getName() + ".getGeneralReport_" + userId + "_" + projectId + "_" + projectCodeId + "_" + fromDate + "_" + toDate;
+      String statisticKey = getClass().getName() + ".load";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).getGeneralReport(userId, projectId, projectCodeId, fromDate, toDate);
       int index = 0;
 
       while (!rs.getEOF()) {

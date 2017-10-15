@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.xalan.xslt.XSLTInputSource;
-import org.apache.xalan.xslt.XSLTProcessor;
-import org.apache.xalan.xslt.XSLTProcessorFactory;
-import org.apache.xalan.xslt.XSLTResultTarget;
+//import org.apache.xalan.xslt.XSLTInputSource;
+//import org.apache.xalan.xslt.XSLTProcessor;
+//import org.apache.xalan.xslt.XSLTProcessorFactory;
+//import org.apache.xalan.xslt.XSLTResultTarget;
 import org.xml.sax.SAXException;
 import com.intiro.itr.ui.UIException;
 import com.intiro.itr.ui.constants.URLs;
@@ -83,6 +83,7 @@ public class Transform implements URLs {
   }
 
   protected void serverTransformation(XMLElement xmlElement, String realPathToXSL, List<XSLParameter> parameters, PrintWriter out) throws Exception {
+    /*
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".serverTransformation(): Creating XSLTProcessor");
     }
@@ -121,5 +122,7 @@ public class Transform implements URLs {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".serverTransform(): XML/XSL transformation done.");
     }
+     */
   }
+
 }

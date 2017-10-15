@@ -1,7 +1,8 @@
 package com.intiro.itr.util.combos;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -45,7 +46,6 @@ public class UsersCombo extends XMLCombo {
    * @param activatedUsers
    * @throws com.intiro.itr.util.xml.XMLBuilderException
    */
-
   public UsersCombo(UserProfile profile, String nameOnNullEntry, boolean activatedUsers) throws XMLBuilderException {
     super(profile, nameOnNullEntry);
     this.activated = activatedUsers;
@@ -53,12 +53,15 @@ public class UsersCombo extends XMLCombo {
 
   public void load(String valueToBeSelected, boolean forceShowAll) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getUsers(activated);
+      String cacheKey = getClass().getName() + ".getUsers_" + activated;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getUsers(activated);
 
       while (!rs.getEOF()) {
         if (forceShowAll || getUserProfile().getUserId().equals(rs.getField(DBConstants.USER_ID_PK)) || getUserProfile().getRole().isAdmin() || getUserProfile().getRole().isSuperAdmin()) {
-          addEntry(rs.getField(DBConstants.USER_ID_PK), rs.getField(DBConstants.USER_FIRSTNAME) + " " + rs.getField(DBConstants.USER_LASTNAME) + " ("
-                  + rs.getField(DBConstants.USER_LOGINID) + ")");
+          addEntry(rs.getField(DBConstants.USER_ID_PK), rs.getField(DBConstants.USER_FIRSTNAME) + " " + rs.getField(DBConstants.USER_LASTNAME) + " (" + rs.getField(DBConstants.USER_LOGINID) + ")");
         }
         rs.moveNext();
       }

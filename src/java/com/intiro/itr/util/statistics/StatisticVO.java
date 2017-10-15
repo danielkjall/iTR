@@ -6,6 +6,7 @@ public class StatisticVO {
 
   private String action;
   private String status;
+  private String methodCalled;
   private int hits;
   private Date timestamp;
 
@@ -15,6 +16,14 @@ public class StatisticVO {
 
   public void setAction(String action) {
     this.action = action;
+  }
+
+  public String getMethodCalled() {
+    return methodCalled;
+  }
+
+  public void setMethodCalled(String methodName) {
+    this.methodCalled = methodName;
   }
 
   public String getStatus() {

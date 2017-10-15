@@ -1,6 +1,7 @@
 package com.intiro.itr.logic.setting;
 
 import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.ResultDisplayer;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -22,7 +23,9 @@ public class PasswordSaverActivator extends ResultDisplayer {
   public void changePassword(String newLoginId, String newPassword) throws Exception {
 
     /*If we manage to change the password*/
-    success = DBExecute.getProxy().changePassword(getUserProfile().getUserId(), newLoginId, newPassword);
+    String statisticKey = getClass().getName() + ".changePassword";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+    success = DBExecute.getProxy(s).changePassword(getUserProfile().getUserId(), newLoginId, newPassword);
 
     if (success) {
       userProfile.setLoginId(newLoginId);

@@ -3,9 +3,9 @@ package com.intiro.itr.logic.weekreport;
 import com.intiro.itr.db.vo.CalendarWeekVO;
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
-import com.intiro.itr.db.DBQueriesInterface;
+import com.intiro.itr.db.DBQueriesConfig;
 import com.intiro.itr.db.DbExecuteInterface;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.NumberFormatter;
@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.intiro.itr.db.DBQueriesConfigInterface;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.DBQueriesUserInterface;
 
 public class WeekReport extends DynamicXMLCarrier {
 
@@ -238,7 +241,9 @@ public class WeekReport extends DynamicXMLCarrier {
 
   public void approve() throws XMLBuilderException {
     try {
-      DBExecute.getProxy().updateApprovedInWeek(getWeekReportId(), true);
+      String statisticKey = getClass().getName() + ".approve";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      DBExecute.getProxy(s).updateApprovedInWeek(getWeekReportId(), true);
       handleComment();
       // getUserProfile().save();
     } catch (Exception e) {
@@ -302,7 +307,11 @@ public class WeekReport extends DynamicXMLCarrier {
     List<WeekReport> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getAllRowsInUserWeek();
+      //String cacheKey = WeekReport.class.getName() + ".loadAllApproved";
+      String statisticKey = WeekReport.class.getName() + ".loadAllApproved";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getAllRowsInUserWeek();
 
       int currentUserId = -1;
 
@@ -312,7 +321,7 @@ public class WeekReport extends DynamicXMLCarrier {
       while (!rs.getEOF()) {
         int tmpUserId = rs.getInt(DBConstants.ENTRYROW_USERID_FK);
         if (tmpUserId != currentUserId) {
-          WeekReport temp = new WeekReport(mapUserProfiles.get(tmpUserId));
+          WeekReport temp = new WeekReport(mapUserProfiles.get(String.valueOf(tmpUserId)));
           retval.add(temp);
           wr = temp;
           currentUserId = tmpUserId;
@@ -338,10 +347,12 @@ public class WeekReport extends DynamicXMLCarrier {
 
   public void load() throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getRowsInUserWeek(getUserProfile().getUserId(), getFromDate().getCalendarInStoreFormat());
+      String userId = getUserProfile().getUserId();
+      String statisticKey = getClass().getName() + ".load";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getRowsInUserWeek(userId, getFromDate().getCalendarInStoreFormat());
 
       while (!rs.getEOF()) {
-
         /* Week have been saved, retrive submitted and weekcomment. */
         setLoaded();
         extractFromRS(this, getUserProfile(), getFromDate(), getToDate(), rs);
@@ -363,7 +374,11 @@ public class WeekReport extends DynamicXMLCarrier {
     Map<String, String> retval = new HashMap<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getWeeksAlreadySubmittedAsStartDate(inUserid);
+      //String cacheKey = getClass().getName() + ".alreadySubmittedWeeksAsHashmap_" + inUserid;
+      String statisticKey = getClass().getName() + ".alreadySubmittedWeeksAsHashmap";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getWeeksAlreadySubmittedAsStartDate(inUserid);
 
       while (!rs.getEOF()) {
         String dateStr = rs.getField("FromDate");
@@ -446,7 +461,12 @@ public class WeekReport extends DynamicXMLCarrier {
     WeekReport oneWeekReport = null;
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getSubmittedWeeks(getUserProfile().getUserId(), true, false);
+      String key = getUserProfile().getUserId();
+      //String cacheKey = getClass().getName() + ".loadWeekWithLatestSubmittedWeek_" + key + "_" + true + "_" + false;
+      String statisticKey = getClass().getName() + ".loadWeekWithLatestSubmittedWeek";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesUser.getProxy(s).getSubmittedWeeks(key, true, false);
 
       int lastCalendarWeekId = -1;
       boolean latestWeekFound = false;
@@ -495,9 +515,11 @@ public class WeekReport extends DynamicXMLCarrier {
 
   public void reject() throws XMLBuilderException {
     try {
-      DbExecuteInterface proxy = DBExecute.getProxy();
-      proxy.updateSubmitInWeek(getWeekReportId(), false);
-      proxy.updateApprovedInWeek(weekReportId, false);
+      String statisticKey = getClass().getName() + ".reject";
+      InvocationHandlerSetting weekSetting = InvocationHandlerSetting.create(statisticKey);
+      InvocationHandlerSetting approvedSetting = InvocationHandlerSetting.create(statisticKey);
+      DBExecute.getProxy(weekSetting).updateSubmitInWeek(getWeekReportId(), false);
+      DBExecute.getProxy(approvedSetting).updateApprovedInWeek(weekReportId, false);
 
       // Subtract the overtime hours from users profile.
       getUserProfile().subtractFromOvertimeVacationHours(getOvertimeVacationHoursForWeek());
@@ -519,10 +541,15 @@ public class WeekReport extends DynamicXMLCarrier {
     /* If we dont have a userweek we have to make one. */
     if (getWeekReportId() == -1) {
       try {
-        DBQueriesInterface proxy = DBQueries.getProxy();
-        // CALENDAR WEEK
-        CalendarWeekVO rsCalendarWeek = proxy.getCalendarWeek(getFromDate().getCalendarInStoreFormat());
+        String statisticKey = getClass().getName() + ".save";
+        String key = getFromDate().getCalendarInStoreFormat();
+        String cacheKey = "getCalendarWeek_" + key;
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting calendarWeekSetting = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        CalendarWeekVO rsCalendarWeek = DBQueriesConfig.getProxy(calendarWeekSetting).getCalendarWeek(key);
         String calendarWeekId = "-1";
+
+        InvocationHandlerSetting saveSetting = InvocationHandlerSetting.create(statisticKey);
 
         if (rsCalendarWeek != null) {
           calendarWeekId = String.valueOf(rsCalendarWeek.getId());
@@ -532,7 +559,8 @@ public class WeekReport extends DynamicXMLCarrier {
 
         // WEEKCOMMENT
         if (getWeekComment().length() != 0) {
-          StringRecordset rsWeekComment = proxy.makeNewCommmentAndRetriveTheId(getWeekComment());
+
+          StringRecordset rsWeekComment = DBQueriesUser.getProxy(saveSetting).makeNewCommmentAndRetriveTheId(getWeekComment());
 
           if (!rsWeekComment.getEOF()) {
             setWeekCommentId(Integer.parseInt(rsWeekComment.getField("maxId")));
@@ -541,7 +569,7 @@ public class WeekReport extends DynamicXMLCarrier {
           }
         }
         // USER WEEK
-        StringRecordset rsUserWeekId = proxy.makeNewUserWeekEntryAndRetriveTheId(calendarWeekId, getWeekCommentId());
+        StringRecordset rsUserWeekId = DBQueriesUser.getProxy(saveSetting).makeNewUserWeekEntryAndRetriveTheId(calendarWeekId, getWeekCommentId());
 
         if (!rsUserWeekId.getEOF()) {
           setWeekReportId(Integer.parseInt(rsUserWeekId.getField("maxId")));
@@ -575,19 +603,21 @@ public class WeekReport extends DynamicXMLCarrier {
    */
   private void handleComment() throws XMLBuilderException {
     try {
-
-      DbExecuteInterface proxy = DBExecute.getProxy();
+      String statisticKey = getClass().getName() + ".handleComment";
       if (getWeekCommentId() == 1 && getWeekComment().length() > 0) {
-        StringRecordset rsWeekComment = DBQueries.getProxy().makeNewCommmentAndRetriveTheId(getWeekComment());
+        InvocationHandlerSetting commentSetting = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rsWeekComment = DBQueriesUser.getProxy(commentSetting).makeNewCommmentAndRetriveTheId(getWeekComment());
         if (!rsWeekComment.getEOF()) {
           setWeekCommentId(Integer.parseInt(rsWeekComment.getField("maxId")));
         } else {
           throw new XMLBuilderException(WeekReport.class.getName() + ".save(): Could not make and find a new week comment");
         }
         // Update weekreport with the new comment.
-        proxy.updateUserWeekComment(getWeekReportId(), getWeekCommentId());
+        InvocationHandlerSetting weekSetting = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(weekSetting).updateUserWeekComment(getWeekReportId(), getWeekCommentId());
       } else {// else update the comment.
-        proxy.updateComment(getWeekCommentId(), getWeekComment());
+        InvocationHandlerSetting updateSetting = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(updateSetting).updateComment(getWeekCommentId(), getWeekComment());
       }
     } catch (Exception e) {
       IntiroLog.error(WeekReport.class, WeekReport.class.getName() + ".save(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -607,10 +637,13 @@ public class WeekReport extends DynamicXMLCarrier {
     save();
 
     if (getWeekReportId() != -1) {
-      DbExecuteInterface proxy = DBExecute.getProxy();
+      String statisticKey = getClass().getName() + ".submit";
+
       try {
-        proxy.updateSubmitInWeek(getWeekReportId(), true);
-        proxy.updateApprovedInWeek(weekReportId, false);
+        InvocationHandlerSetting submitSetting = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(submitSetting).updateSubmitInWeek(getWeekReportId(), true);
+        InvocationHandlerSetting updateSetting = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(updateSetting).updateApprovedInWeek(weekReportId, false);
 
         // Save overtime hours to users profile.
         getUserProfile().addToOvertimeVacationHours(getOvertimeVacationHoursForWeek());

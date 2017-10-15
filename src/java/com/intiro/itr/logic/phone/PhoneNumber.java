@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
-import com.intiro.itr.db.DbExecuteInterface;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
-import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
 import java.util.HashMap;
@@ -49,19 +49,18 @@ public class PhoneNumber {
   }
 
   public static Map<Integer, ArrayList<PhoneNumber>> loadAllPhoneNumbers() throws XMLBuilderException {
-    Map<Integer, ArrayList<PhoneNumber>> retval = new HashMap<Integer, ArrayList<PhoneNumber>>();
+    Map<Integer, ArrayList<PhoneNumber>> retval = new HashMap<>();
     try {
-      Map<Integer, ArrayList<PhoneNumber>> cached = ItrCache.get(CACHE_ALL_PHONENUMBER);
-      if (cached != null) {
-        return cached;
-      }
-
       Map<Integer, PhoneRegion> mapPhoneRegions = PhoneRegion.loadAllPhoneRegions();
 
-      StringRecordset rs = DBQueries.getProxy().getAllPhoneNumbers();
+      String cacheKey = PhoneNumber.class.getName() + ".loadAllPhoneNumbers";
+      String statisticKey = PhoneNumber.class.getName() + ".loadAllPhoneNumbers";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getAllPhoneNumbers();
+
       String tmpContact;
       String tmpUser;
-
       while (!rs.getEOF()) {
         PhoneNumber pn = new PhoneNumber();
         pn.setPhoneId(Integer.parseInt(rs.getField(DBConstants.PHONE_ID_PK)));
@@ -94,9 +93,6 @@ public class PhoneNumber {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_PHONENUMBER, retval, TenHours);
-
     return retval;
   }
 
@@ -117,7 +113,11 @@ public class PhoneNumber {
         throw new Exception("PhoneNumber.load(String userId, String contactId, String phoneId): At least one input has to be not null.");
       }
 
-      StringRecordset rs = DBQueries.getProxy().getPhoneNumbers(userId, contactId, phoneId);
+      String cacheKey = PhoneNumber.class.getName() + ".load_" + userId + "_" + contactId + "_" + phoneId;
+      String statisticKey = PhoneNumber.class.getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getPhoneNumbers(userId, contactId, phoneId);
       String tmpContact;
       String tmpUser;
 
@@ -249,7 +249,9 @@ public class PhoneNumber {
   public void save() throws Exception {
     if (getPhoneId() == -1) {
       try {
-        StringRecordset rs = DBQueries.getProxy().addPhoneNumberAndGetId(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).addPhoneNumberAndGetId(this);
 
         if (!rs.getEOF()) {
           setPhoneId(Integer.parseInt(rs.getField("maxId")));
@@ -265,7 +267,9 @@ public class PhoneNumber {
       }
     } else if (isRemoved() && getPhoneId() != -1) {
       try {
-        DBExecute.getProxy().deletePhoneNumber(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).deletePhoneNumber(this);
       } catch (Exception e) {
         if (IntiroLog.d()) {
           IntiroLog.detail(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -275,7 +279,9 @@ public class PhoneNumber {
       }
     } else {
       try {
-        DBExecute.getProxy().updatePhoneNumber(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).updatePhoneNumber(this);
       } catch (Exception e) {
         IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new Exception(e.getMessage());

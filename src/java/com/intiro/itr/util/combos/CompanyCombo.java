@@ -45,7 +45,11 @@ public class CompanyCombo extends XMLCombo {
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
       StringRecordset rs = null;
-      rs = DBQueries.getProxy().getAllCompanies();
+      String cacheKey = getClass().getName() + ".getAllCompanies";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      rs = DBQueriesConfig.getProxy(s).getAllCompanies();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.COMPANY_ID_PK), rs.getField(DBConstants.COMPANY_NAME));

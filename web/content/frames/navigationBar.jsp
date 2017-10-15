@@ -99,7 +99,7 @@
 
         <%
          Common common = new Common(userProfile);
-         List<String> submitYears = common.getSubmitedYears(true);
+         List<String> submitYears = common.getSubmittedYears(true);
          lnk = "";
          for (String year : submitYears) {
            lnk = "insDoc(aux2, gLnk(\"R\", \" " + year.substring(0, 4) + "  \", \"viewWeeks.jsp?mode=submitted&year=" + year.substring(0, 4) + "\"))";
@@ -117,7 +117,7 @@
         <%
               if (userProfile.getRole().isAdmin() || userProfile.getRole().isSuperAdmin()) {
                 //Ladda bara om det är admin - tar värdefull tid.
-                List<String> approvedYears = common.getSubmitedYears(false);
+                List<String> approvedYears = common.getSubmittedYears(false);
         %>
         // Administration
         aux1 = insFld(foldersTree, gFld("Admin", ""))
@@ -126,9 +126,15 @@
         aux2 = insFld(aux1, gFld("Approved Weeks", ""))
 
         <% lnk = "";
-         for (String year : approvedYears) {
+        boolean firstLoop = true; 
+        for (String year : approvedYears) {
+           if(firstLoop){
+             lnk = "insDoc(aux2, gLnk(\"R\", \"Last 2 months\", \"weeksApproved.jsp?year=" + year.substring(0, 4) + "01&userId=\"))";
+             out.println(lnk);
+           }
            lnk = "insDoc(aux2, gLnk(\"R\", \" " + year.substring(0, 4) + "  \", \"weeksApproved.jsp?year=" + year.substring(0, 4) + "&userId=\"))";
            out.println(lnk);
+           firstLoop = false;
          }
         %>
 

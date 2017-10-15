@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
-import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
 import java.util.HashMap;
@@ -105,14 +106,14 @@ public class Role {
     Map<Integer, ArrayList<Role>> retval = new HashMap<>();
 
     try {
-      Map<Integer, ArrayList<Role>> cached = ItrCache.get(CACHE_ALL_ROLE);
-      if (cached != null) {
-        return cached;
-      }
-
       Map<Integer, ArrayList<Module>> mapModules = Module.loadAllModules();
 
-      StringRecordset rs = DBQueries.getProxy().getRoleForUser(null);
+      String cacheKey = Role.class.getName() + ".loadAllRoles";
+      String statisticKey = Role.class.getName() + ".loadAllRoles";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getRoleForUser(null);
       while (!rs.getEOF()) {
         Role aRole = new Role();
         aRole.setName(rs.getField(DBConstants.ROLES_NAME));
@@ -145,8 +146,6 @@ public class Role {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_ROLE, retval, TenHours);
     return retval;
   }
 
@@ -159,7 +158,12 @@ public class Role {
     clear();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().getRoleForUser(userId);
+
+      String cacheKey = getClass().getName() + ".load_" + userId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getRoleForUser(userId);
 
       if (!rs.getEOF()) {
         setName(rs.getField(DBConstants.ROLES_NAME));
@@ -194,7 +198,9 @@ public class Role {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute.getProxy().updateUserRoleConnection(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).updateUserRoleConnection(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception	= " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -204,7 +210,9 @@ public class Role {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeNewUserRoleConnectionAndFetchId(this);
+        String statisticKey = getClass().getName() + ".save";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeNewUserRoleConnectionAndFetchId(this);
 
         if (!rs.getEOF()) {
           setId(Integer.parseInt(rs.getField("maxId")));

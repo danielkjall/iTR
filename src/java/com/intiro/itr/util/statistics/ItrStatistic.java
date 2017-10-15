@@ -3,6 +3,7 @@ package com.intiro.itr.util.statistics;
 public class ItrStatistic {
 
   private String status;
+  private String methodCalled;
   private String action;
 
   public String getStatus() {
@@ -21,8 +22,17 @@ public class ItrStatistic {
     this.action = action;
   }
 
-  public ItrStatistic(String action, String status) {
+  public String getMethodCalled() {
+    return methodCalled;
+  }
+
+  public void setMethodCalled(String methodCalled) {
+    this.methodCalled = methodCalled;
+  }
+
+  public ItrStatistic(String action, String methodCalled, String status) {
     this.action = action;
+    this.methodCalled = methodCalled;
     this.status = status;
   }
 
@@ -33,6 +43,6 @@ public class ItrStatistic {
 
   @Override
   public int hashCode() {
-    return (this.action + "|" + this.status).hashCode();
+    return (this.action + "|" + this.status + "|" + this.methodCalled).hashCode();
   }
 }

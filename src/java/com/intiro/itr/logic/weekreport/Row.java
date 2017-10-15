@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
 import com.intiro.itr.db.DbExecuteInterface;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StringRecordset;
@@ -415,7 +416,11 @@ public class Row extends DynamicXMLCarrier {
 
   public void loadTimeType(String timeTypeId) {
     try {
-      StringRecordset rs = DBQueries.getProxy().getTimeType(timeTypeId);
+      String cacheKey = getClass().getName() + ".loadTimeType_" + timeTypeId;
+      String statisticKey = getClass().getName() + ".loadTimeType";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getTimeType(timeTypeId);
 
       if (!rs.getEOF()) {
         if (IntiroLog.d()) {
@@ -449,17 +454,20 @@ public class Row extends DynamicXMLCarrier {
     try {
 
       //If this row is supposed to be added:
-      DbExecuteInterface proxy = DBExecute.getProxy();
+      String statisticKey = getClass().getName() + ".save";
       if (!removed) {
         /* If it has not existed before make a new row. */
         if (getRowEntryId() == -1) {
-          retval = proxy.insertRow(this, weekReportId);
+          InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+          retval = DBExecute.getProxy(s).insertRow(this, weekReportId);
         } else {
-          retval = proxy.updateRow(this, weekReportId);
+          InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+          retval = DBExecute.getProxy(s).updateRow(this, weekReportId);
         }
       } else {
         if (getRowEntryId() != -1) {
-          retval = proxy.deleteRow(this);
+          InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+          retval = DBExecute.getProxy(s).deleteRow(this);
         }
       }
     } catch (Exception e) {

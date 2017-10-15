@@ -47,22 +47,25 @@ public class ProjectCodesCombo extends XMLCombo {
   }
 
   @Override
-  public void load(String valueToBeSelected)
-          throws XMLBuilderException {
+  public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
       StringRecordset rs = null;
-
-      DBQueriesInterface proxy = DBQueries.getProxy();
       if (projectId == -1) {
-        rs = proxy.getAllProjectCodes();
+        String cacheKey = getClass().getName() + ".getAllProjectCodes";
+        String statisticKey = getClass().getName() + ".load";
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        rs = DBQueriesConfig.getProxy(s).getAllProjectCodes();
       } else {
-        rs = proxy.getProjectCodesForProject(projectId);
+        String cacheKey = getClass().getName() + ".getProjectCodesForProject_" + projectId;
+        String statisticKey = getClass().getName() + ".load";
+        int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+        rs = DBQueriesConfig.getProxy(s).getProjectCodesForProject(projectId);
       }
 
       while (!rs.getEOF()) {
-        addEntry(rs.getField(DBConstants.PROJECTCODE_ID_PK),
-                rs.getField(DBConstants.PROJECTCODE_CODE) + ", "
-                + rs.getField(DBConstants.PROJECTCODE_DESCRIPTION));
+        addEntry(rs.getField(DBConstants.PROJECTCODE_ID_PK), rs.getField(DBConstants.PROJECTCODE_CODE) + ", " + rs.getField(DBConstants.PROJECTCODE_DESCRIPTION));
         rs.moveNext();
       }
 

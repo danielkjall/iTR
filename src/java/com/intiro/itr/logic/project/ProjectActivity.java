@@ -1,13 +1,17 @@
 package com.intiro.itr.logic.project;
 
-import com.intiro.itr.db.*;
+import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.log.IntiroLog;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectActivity {
+public class ProjectActivity implements Serializable {
 
   public static final String XML_ENDTAG_CODE = "</code>";
   public static final String XML_ENDTAG_DESC = "</description>";
@@ -82,7 +86,11 @@ public class ProjectActivity {
     List<ProjectActivity> retval = new ArrayList<>();
 
     try {
-      StringRecordset rs = DBQueries.getProxy().loadProjectActivitiesForProject(projectId);
+      String cacheKey = ProjectActivity.class.getName() + ".loadProjectActivities_" + projectId;
+      String statisticKey = ProjectActivity.class.getName() + ".loadProjectActivities";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadProjectActivitiesForProject(projectId);
 
       while (!rs.getEOF()) {
         ProjectActivity pa = new ProjectActivity();
@@ -97,13 +105,11 @@ public class ProjectActivity {
 
       rs.close();
     } catch (Exception e) {
-      IntiroLog.criticalError(ProjectActivity.class,
-              ProjectActivity.class.getName() + ".load(): ERROR FROM DATABASE, exception = "
-              + e.getMessage());
-      throw new XMLBuilderException(ProjectActivity.class.getName() + ".load(): " + e.getMessage());
+      IntiroLog.criticalError(ProjectActivity.class, ProjectActivity.class.getName() + ".loadProjectActivities(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      throw new XMLBuilderException(ProjectActivity.class.getName() + ".loadProjectActivities(): " + e.getMessage());
     }
     if (IntiroLog.d()) {
-      IntiroLog.detail(ProjectActivity.class, ProjectActivity.class.getName() + ".load(): Leaving");
+      IntiroLog.detail(ProjectActivity.class, ProjectActivity.class.getName() + ".loadProjectActivities(): Leaving");
     }
 
     return retval;
@@ -117,25 +123,29 @@ public class ProjectActivity {
     boolean retVal = false;
 
     try {
-      retVal = DBExecute.getProxy().deleteProjectActivity(getId());
+      String statisticKey = getClass().getName() + ".delete";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      retVal = DBExecute.getProxy(s).deleteProjectActivity(getId());
     } catch (Exception e) {
-      IntiroLog.info(getClass(),
-              getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      IntiroLog.info(getClass(), getClass().getName() + ".delete(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
 
     return retVal;
   }
 
-  public boolean load(String id)
-          throws XMLBuilderException {
+  public boolean load(String id) throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".load(): Entering");
     }
 
     boolean success = false;
     try {
-      StringRecordset rs = DBQueries.getProxy().loadProjectActivity(Integer.parseInt(id));
+      String cacheKey = getClass().getName() + ".load_" + id;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).loadProjectActivity(Integer.parseInt(id));
 
       if (!rs.getEOF()) {
         setId(rs.getInt("Id"));
@@ -148,8 +158,7 @@ public class ProjectActivity {
 
       rs.close();
     } catch (Exception e) {
-      IntiroLog.criticalError(getClass(),
-              getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
+      IntiroLog.criticalError(getClass(), getClass().getName() + ".load(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(getClass().getName() + ".load(): " + e.getMessage());
     }
     if (IntiroLog.d()) {
@@ -159,17 +168,19 @@ public class ProjectActivity {
     return success;
   }
 
-  public void save()
-          throws XMLBuilderException {
+  public void save() throws XMLBuilderException {
     if (IntiroLog.d()) {
       IntiroLog.detail(getClass(), getClass().getName() + ".save(): Entering");
     }
+    String statisticKey = getClass().getName() + ".save";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
     if (getId() != 0) {
       if (IntiroLog.d()) {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): updating");
       }
       try {
-        DBExecute.getProxy().updateProjectActivity(this);
+        DBExecute.getProxy(s).updateProjectActivity(this);
       } catch (Exception e) {
         IntiroLog.criticalError(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
         throw new XMLBuilderException(e.getMessage());
@@ -179,7 +190,7 @@ public class ProjectActivity {
         IntiroLog.detail(getClass(), getClass().getName() + ".save(): creating new");
       }
       try {
-        StringRecordset rs = DBQueries.getProxy().makeNewProjectActivityAndFetchId(this);
+        StringRecordset rs = DBQueriesAdmin.getProxy(s).makeNewProjectActivityAndFetchId(this);
 
         if (!rs.getEOF()) {
           int tmp = rs.getInt("maxId");

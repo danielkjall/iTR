@@ -3,7 +3,9 @@ package com.intiro.itr.logic.admin;
 import java.util.ArrayList;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.DBQueriesUser;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.weekreport.WeekReport;
 import com.intiro.itr.util.ITRCalendar;
 import com.intiro.itr.util.StringRecordset;
@@ -46,8 +48,12 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
     String sDate;
     sDate = getEndPeriod(year, periodType);
     try {
-      StringRecordset rs = DBQueries.getProxy().getUsers(true);
-      String userId = null;
+      String cacheKey = getClass().getName() + ".getUsers_" + true;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getUsers(true);
+      String userId;
 
       while (!rs.getEOF()) {
         userId = rs.getField("Id");
@@ -73,7 +79,11 @@ public class WeeksNeedingSubmit extends DynamicXMLCarrier {
       profile.setClientInfo(getUserProfile().getClientInfo());
 
       try {
-        StringRecordset rs = DBQueries.getProxy().getWeeksNeedingSubmit(userId, profile.getActivatedDate(), year, sDate);
+        //String cacheKey = getClass().getName() + ".getWeeksNeedingSubmit_" + userId + "_" + profile.getActivatedDate() + "_" + year + "_" + sDate;
+        String statisticKey = getClass().getName() + ".load";
+        //int cacheTime = 3600 * 10;
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        StringRecordset rs = DBQueriesUser.getProxy(s).getWeeksNeedingSubmit(userId, profile.getActivatedDate(), year, sDate);
         int lastCalendarWeekId = -1;
 
         while (!rs.getEOF()) {

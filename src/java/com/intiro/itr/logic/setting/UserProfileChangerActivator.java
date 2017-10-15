@@ -1,6 +1,7 @@
 package com.intiro.itr.logic.setting;
 
 import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.ResultDisplayer;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -36,7 +37,9 @@ public class UserProfileChangerActivator extends ResultDisplayer {
     }
 
     //Execute update
-    DBExecute.getProxy().updateUserProfile(getUserProfile());
+    String statisticKey = getClass().getName() + ".changeUserProfile";
+    InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+    DBExecute.getProxy(s).updateUserProfile(getUserProfile());
 
     //Reload userProfile, is importent because it load a lot of good stuff.
     userProfile.reload();

@@ -2,7 +2,8 @@ package com.intiro.itr.logic.phone;
 
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.xml.XMLBuilderException;
@@ -110,8 +111,11 @@ public class PhoneRegion {
       if (regionId == -1) {
         throw new Exception(getClass().getName() + ".load(int regionId): At least one input has to be not null.");
       }
-
-      StringRecordset rs = DBQueries.getProxy().getPhoneRegion(regionId);
+      String cacheKey = getClass().getName() + ".load_" + regionId;
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getPhoneRegion(regionId);
 
       if (!rs.getEOF()) {
         setRegionCode(rs.getField(DBConstants.PHONEREGIONCODE_REGIONCODE));
@@ -136,14 +140,12 @@ public class PhoneRegion {
   public static Map<Integer, PhoneRegion> loadAllPhoneRegions() throws XMLBuilderException {
     Map<Integer, PhoneRegion> retval = new HashMap<>();
     try {
-
-      Map<Integer, PhoneRegion> cached = ItrCache.get(CACHE_ALL_PHONEREGION);
-      if (cached != null) {
-        return cached;
-      }
-
       Map<Integer, PhoneCountry> mapPhoneCountries = PhoneCountry.loadAllPhoneCountries();
-      StringRecordset rs = DBQueries.getProxy().getAllPhoneRegions();
+      String cacheKey = PhoneRegion.class.getName() + ".loadAllPhoneRegions";
+      String statisticKey = PhoneRegion.class.getName() + ".loadAllPhoneRegions";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getAllPhoneRegions();
 
       while (!rs.getEOF()) {
         PhoneRegion pr = new PhoneRegion();
@@ -164,9 +166,6 @@ public class PhoneRegion {
       throw new XMLBuilderException(e.getMessage());
     }
 
-    final int TenHours = 1 * 60 * 60 * 10;
-    ItrCache.put(CACHE_ALL_PHONEREGION, retval, TenHours);
-
     return retval;
   }
 
@@ -177,34 +176,11 @@ public class PhoneRegion {
    */
   public void save() throws Exception {
 
-    /*
-     if(getRegionId() == -1) {
-     try {
-     DBQueries dbQueries = new DBQueries();
-     StringRecordset rs = dbQueries.addPhoneRegion(this);
-     if(!rs.getEOF()) {
-     setRegionId( Integer.parseInt(rs.getField("maxId")) );
-     }
-     else {
-     throw new XMLBuilderException(getClass().getName()+".save(): Could not make and find a new phone region.");
-     }
-     } catch(Exception e) {
-     IntiroLog.detail(getClass().getName()+"save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-     throw new Exception(e.getMessage());
-     }
-     }
-     else if(isRemoved() && getRegionId() != -1) {
-     try {
-     DBExecute dbExecute = new DBExecute();
-     dbExecute.deletePhoneRegion(this);
-     } catch(Exception e) {
-     IntiroLog.detail(getClass().getName()+".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
-     throw new Exception(e.getMessage());
-     }
-     }
-     else {*/
     try {
-      DBExecute.getProxy().updatePhoneRegion(this);
+      String statisticKey = getClass().getName() + ".save";
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+
+      DBExecute.getProxy(s).updatePhoneRegion(this);
     } catch (Exception e) {
       IntiroLog.error(getClass(), getClass().getName() + ".save(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new Exception(e.getMessage());

@@ -1,6 +1,7 @@
 package com.intiro.itr.util.startup;
 
 import com.intiro.itr.db.DBExecute;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.log.IntiroLog;
 import com.intiro.itr.util.logger.ItrLogEntry;
 import com.intiro.itr.util.logger.ItrLogger;
@@ -15,7 +16,7 @@ public class StoreLogs extends StartupThread {
     ItrLogger.getInstance().setUse(true);
 
     sleep(SLEEP_IN_SECONDS_BEFORE_FIRST_TRY);
-    
+
     while (true) {
       sleep(SLEEP_IN_SECONDS_BETWEEN_TRIES);
 
@@ -37,15 +38,21 @@ public class StoreLogs extends StartupThread {
         LoggerVO vo = entry.getVO();
         toSave.add(vo);
       }
+      if (toSave.isEmpty()) {
+        continue;
+      }
 
       /**
        * Send them to database
        */
       try {
-        DBExecute.getProxy().saveLog(toSave);
+        String statisticKey = getClass().getName() + ".run";
+        InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+        DBExecute.getProxy(s).saveLog(toSave);
       } catch (Exception e) {
         // Swallow exception
         IntiroLog.warning(this.getClass(), ", Failed to save log! e: " + e);
+        sleep(3600);
       }
     }
   }

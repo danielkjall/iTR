@@ -1,7 +1,9 @@
 package com.intiro.itr.logic.generatereport.vacation;
 
-import com.intiro.itr.db.*;
-import com.intiro.itr.util.*;
+import com.intiro.itr.db.DBConstants;
+import com.intiro.itr.db.DBQueriesAdmin;
+import com.intiro.itr.db.InvocationHandlerSetting;
+import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.personalization.*;
 import com.intiro.itr.util.xml.*;
 import com.intiro.itr.util.log.IntiroLog;
@@ -111,7 +113,11 @@ public class VacationReport extends DynamicXMLCarrier {
       IntiroLog.detail(getClass(), getClass().getName() + ".load() Entering");
     }
     try {
-      StringRecordset rs = DBQueries.getProxy().getVacationReport(userId, projectId, companyId, year);
+      //String cacheKey = getClass().getName() + ".getVacationReport_" + userId + "_" + projectId + "_" + companyId + "_" + year;
+      String statisticKey = getClass().getName() + ".load";
+      //int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
+      StringRecordset rs = DBQueriesAdmin.getProxy(s).getVacationReport(userId, projectId, companyId, year);
       int rowIndex = 0;
       int tableIndex = 0;
       int userId = -1;

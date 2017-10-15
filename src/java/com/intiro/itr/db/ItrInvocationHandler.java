@@ -1,5 +1,8 @@
 package com.intiro.itr.db;
 
+import com.intiro.itr.util.StringRecordset;
+import com.intiro.itr.util.cache.ItrCache;
+import com.intiro.itr.util.cache.LockHelper;
 import com.intiro.itr.util.logger.ItrLogger;
 import com.intiro.itr.util.logger.ItrLogEntry;
 import com.intiro.itr.util.statistics.ItrStatistics;
@@ -7,16 +10,30 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ItrInvocationHandler implements InvocationHandler {
 
   private static ItrInvocationHandler m_instance;
   private static final Object LOCK = new Object();
   private final InvocationHandled m_invocationHandled;
+  private static Set<String> methodsNotTriggeringCleanCache = new HashSet<>();
 
   protected ItrInvocationHandler(InvocationHandled invocationHandled) {
     m_invocationHandled = invocationHandled;
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.makeNewComment");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.makeNewUserWeekId");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.deleteRow");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.insertRow");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.saveLog");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateApprovedInWeek");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateComment");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateRow");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateSubmitInWeek");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateUserWeekComment");
+    methodsNotTriggeringCleanCache.add("DbExecuteInterface.saveStatistics");
   }
 
   public static ItrInvocationHandler getInstance(InvocationHandled invocationHandled) {
@@ -39,15 +56,62 @@ public class ItrInvocationHandler implements InvocationHandler {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    // Special fall, vi anropar metoden och returnerar direkt.
-    //if ("MsDAO.setCallSetup".equals(interfaceNameAndMethodName)) {
-    //  return method.invoke(m_invocationHandled, args);
-    //}
-    Object result = fetchFromSystem(method, args);
-    return result;
+
+    String interfaceNameAndMethodName = getMethodName(method);
+
+    //Special fall, vi anropar metoden och returnerar direkt.
+    if (interfaceNameAndMethodName.startsWith("DBQueriesAdminInterface")
+            || (interfaceNameAndMethodName.startsWith("DbExecuteInterface") && !methodsNotTriggeringCleanCache.contains(interfaceNameAndMethodName))) {
+      ItrCache.clear();
+    }
+
+    InvocationHandlerSetting setting = m_invocationHandled.getCallSetup();
+
+    if (!setting.supportCaching()) {
+      return fetchFromSystem(method, args, setting);
+    }
+
+    String cacheKey = setting.getCacheKey();
+    Object cachedObject = ItrCache.get(cacheKey);
+    if (cachedObject != null) {
+      if (setting.supportStatistic()) {
+        ItrStatistics.getInstance().addGeneric(setting.getAction(), interfaceNameAndMethodName, ItrStatistics.STATUS_CACHED_VALUE);
+      }
+      if (cachedObject instanceof StringRecordset) {
+        ((StringRecordset) cachedObject).moveFirst();
+      }
+      return cachedObject;
+    }
+
+    // Fetch lock for cacheKey. Every type of cached object has its own lock.
+    Object lock = LockHelper.getLockingObject(cacheKey);
+    synchronized (lock) {
+      // for the second, third... threads waiting, we try fetch again
+      // from cache.
+      cachedObject = ItrCache.get(cacheKey);
+
+      // if cachedObject is found write to log
+      if (cachedObject != null) {
+        if (setting.supportStatistic()) {
+          ItrStatistics.getInstance().addGeneric(setting.getAction(), interfaceNameAndMethodName, ItrStatistics.STATUS_CACHED_VALUE);
+        }
+        if (cachedObject instanceof StringRecordset) {
+          ((StringRecordset) cachedObject).moveFirst();
+        }
+        return cachedObject;
+      }
+
+      Object result = fetchFromSystem(method, args, setting);
+
+      // Put object into cache for next caller.
+      if (result != null) {
+        ItrCache.put(setting.getCacheKey(), result, setting.getCacheTimeInSeconds());
+      }
+      return result;
+    }
   }
 
-  private Object fetchFromSystem(Method method, Object[] args) throws Throwable {
+  private Object fetchFromSystem(Method method, Object[] args, InvocationHandlerSetting setting) throws Throwable {
     String interfaceName = getInterfaceName(method);
     String interfaceNameAndMethodName = getMethodName(method);
 
@@ -64,13 +128,13 @@ public class ItrInvocationHandler implements InvocationHandler {
         entry.setOut(result);
         ItrLogger.getInstance().log(entry);
       }
-      ItrStatistics.getInstance().addGeneric(interfaceNameAndMethodName, "SUCCESS");
+      ItrStatistics.getInstance().addGeneric(setting.getAction(), interfaceNameAndMethodName, ItrStatistics.STATUS_SUCCESS);
     } catch (InvocationTargetException ex) {
       long afterCallInMs = System.currentTimeMillis();
       ItrLogEntry entry = getLogEntry(interfaceNameAndMethodName, args, beforeCallInMs, afterCallInMs, timestamp);
       entry.setError(ex.getCause());
       ItrLogger.getInstance().log(entry);
-      ItrStatistics.getInstance().addGeneric(interfaceNameAndMethodName, "FAILED");
+      ItrStatistics.getInstance().addGeneric(setting.getAction(), interfaceNameAndMethodName, ItrStatistics.STATUS_FAILED);
       throw ex;
     }
 
@@ -117,7 +181,7 @@ public class ItrInvocationHandler implements InvocationHandler {
   }
 
   private String getServiceString() throws Exception {
-    Map<String, String> map = new DBQueries().getProperties();
+    Map<String, String> map = new DBQueriesConfig().getProperties();
     return map.get("com.intiro.itr.logger.blacklist");
   }
 }

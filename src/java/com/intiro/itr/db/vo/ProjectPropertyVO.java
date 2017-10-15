@@ -68,7 +68,7 @@ public class ProjectPropertyVO {
       projectId = rs.getField(DBConstants.PROJECT_ID_PK);
       projectDescription = rs.getField(DBConstants.PROJECT_DESCRIPTION);
       String pc = rs.getField(DBConstants.PROJECT_MAINCODE);
-      if (projectCode != null) {
+      if (pc != null) {
         projectCode = pc;
       }
       projectName = rs.getField(DBConstants.PROJECT_NAME);

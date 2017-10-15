@@ -1,7 +1,8 @@
 package com.intiro.itr.util.combos;
 
 import com.intiro.itr.db.DBConstants;
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.StringRecordset;
 import com.intiro.itr.util.xml.XMLBuilderException;
 import com.intiro.itr.util.xml.XMLCombo;
@@ -41,7 +42,11 @@ public class PhoneRegionCombo extends XMLCombo {
   @Override
   public void load(String valueToBeSelected) throws XMLBuilderException {
     try {
-      StringRecordset rs = DBQueries.getProxy().getAllPhoneRegions();
+      String cacheKey = getClass().getName() + ".getAllPhoneRegions";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      StringRecordset rs = DBQueriesConfig.getProxy(s).getAllPhoneRegions();
 
       while (!rs.getEOF()) {
         addEntry(rs.getField(DBConstants.PHONEREGIONCODE_ID_PK), rs.getField(DBConstants.PHONEREGIONCODE_REGIONCODE) + " (" + rs.getField(DBConstants.PHONEREGIONCODE_REGIONNAME) + ")");

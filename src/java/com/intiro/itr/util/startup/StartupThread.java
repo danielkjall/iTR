@@ -1,6 +1,7 @@
 package com.intiro.itr.util.startup;
 
-import com.intiro.itr.db.DBQueries;
+import com.intiro.itr.db.DBQueriesConfig;
+import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.util.ItrUtil;
 import com.intiro.itr.util.cache.ItrCache;
 import com.intiro.itr.util.log.IntiroLog;
@@ -61,26 +62,13 @@ public abstract class StartupThread extends Thread {
     retval.setStartupClass(startupClass);
 
     try {
-      String cacheKey = "STARTUP_SETTINGS";
-      int cacheDuration = 300;
       Map<String, String> map;
 
-      // First check cache:
-      map = ItrCache.get(cacheKey);
-
-      if (map == null || map.isEmpty()) {
-        synchronized (LOCK) {
-          // for the second, third... threads waiting, we try fetch again
-          // from cache.
-          map = ItrCache.get(cacheKey);
-
-          // if cachedObject is found write to log
-          if (map == null) {
-            map = DBQueries.getProxy().getProperties();
-            ItrCache.put(cacheKey, map, cacheDuration);
-          }
-        }
-      }
+      String cacheKey = getClass().getName() + ".getProperties";
+      String statisticKey = getClass().getName() + ".load";
+      int cacheTime = 3600 * 10;
+      InvocationHandlerSetting s = InvocationHandlerSetting.create(cacheKey, cacheTime, statisticKey);
+      map = DBQueriesConfig.getProxy(s).getProperties();
 
       if (map == null || map.isEmpty()) {
         return retval;
