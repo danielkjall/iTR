@@ -421,6 +421,17 @@ public class ITRCalendar extends GregorianCalendar {
     return get(Calendar.YEAR);
   }
 
+   public int getYearDisplay() {
+    int year = get(Calendar.YEAR);
+    
+    // Check if this is last year, some times it spills over to next year.
+    if(getFromDate().get(Calendar.MONTH) == 0 && getFromDate().get(Calendar.DAY_OF_MONTH) == 1 && getWeekOfYear() > 51){
+      return year-1;
+    }
+    
+    return year;
+  }
+  
   /**
    * Call super.clear() and performs some cleaning in this class to.
    */

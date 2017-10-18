@@ -47,7 +47,7 @@
 						<tr>
 							<td nowrap="true" class="NormalBold" align="left">&#160;Date:</td>
 							<td nowrap="true" class="Normal" align="left">
-								<%=aWeek.getFromDate().getMonthNameShort()%> <%=aWeek.getFromDate().getYear()%>
+								<%=aWeek.getFromDate().getMonthNameShort()%> <%=aWeek.getFromDate().getYearDisplay()%>
 							</td>
 							<td nowrap="true" class="NormalBold" >&#160;Week:</td>
 							<td nowrap="true" class="Normal" align="left">

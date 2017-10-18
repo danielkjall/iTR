@@ -183,7 +183,7 @@
                             <table width="100%" border="0" cellspacing="0" cellpadding="1" bgcolor="#ffffff">
                                 <tr>
                                     <td align="left" class="NormalBold">&#160;Date:</td>
-                                    <td align="left" nowrap="true" class="Normal"><%=aWeek.getFromDate().getYear()%> <%=aWeek.getFromDate().getMonthNameShort()%></td>
+                                    <td align="left" nowrap="true" class="Normal"><%=aWeek.getFromDate().getYearDisplay()%> <%=aWeek.getFromDate().getMonthNameShort()%></td>
                                     <td align="left" class="NormalBold">&#160;Week:</td>
                                     <td align="left" nowrap="true" class="Normal"><%=aWeek.getFromDate().getWeekOfYear()%> (<%=aWeek.getFromDate().getWeekPart()%>)&#160;</td>
                                 </tr>

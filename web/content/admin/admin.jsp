@@ -74,7 +74,7 @@ response.addHeader("Cache-Control","no-store");
 						</td>
 						<td class="Normal">
 							<a href="editWeek.jsp?action=start&row=<%=i%>&mode=<%=aWeek.getMode()%>">
-							<%="(" + aWeek.getFromDate().getYear() + ") " + aWeek.getFromDate().getWeekOfYear()+ "_" +aWeek.getFromDate().getWeekPart()%>
+							<%="(" + aWeek.getFromDate().getYearDisplay()+ ") " + aWeek.getFromDate().getWeekOfYear()+ "_" +aWeek.getFromDate().getWeekPart()%>
 							</a>
 						</td>
 						<td class="Normal">

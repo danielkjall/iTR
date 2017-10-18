@@ -262,6 +262,13 @@ public class Weeks extends DynamicXMLCarrier {
     ITRCalendar now = new ITRCalendar();
     ITRCalendar usersActivationDate = getUserProfile().getActivatedDate();
     ITRCalendar currentDate = usersActivationDate.cloneCalendar();
+    
+    // Gå aldrig tillbaka mer än 2 år:
+    ITRCalendar twoYearsAgo = new ITRCalendar();
+    twoYearsAgo.roll(Calendar.YEAR, -2);
+    if(twoYearsAgo.after(currentDate)) {
+      currentDate = twoYearsAgo;
+    }
 
     WeekReport temp = new WeekReport(getUserProfile(), currentDate.getFromDateForWeekPart(), currentDate.getToDateForWeekPart(), "Edit");
     Map<String, String> alreadySubmittedWeeksHash = temp.alreadySubmittedWeeksAsHashmap(getUserProfile().getUserId());

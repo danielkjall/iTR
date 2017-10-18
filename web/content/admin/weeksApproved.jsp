@@ -120,7 +120,7 @@
                         </td>
                         <td class="Normal">
                             <a href="editWeek.jsp?action=start&row=<%=i%>&mode=<%=xmlCarrier.getMode()%>">
-                                <%="(" + aWeek.getFromDate().getYear() + ") " + aWeek.getFromDate().getWeekOfYear() + "_" + aWeek.getFromDate().getWeekPart()%>
+                                <%="(" + aWeek.getFromDate().getYearDisplay()+ ") " + aWeek.getFromDate().getWeekOfYear() + "_" + aWeek.getFromDate().getWeekPart()%>
                             </a>
                         </td>
                         <td class="Normal">

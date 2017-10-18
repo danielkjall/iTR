@@ -94,12 +94,12 @@
               String copyHref = "editWeek.jsp?action=start&row=" + i + "&mode=" + mode + "&copySubmitted=true";
 
               if (aYear != aWeek.getFromDate().getYear()) {%>
-        <tr><td colspan="<%=colspan%>" bgcolor="#FF2222" align="center" class="NormalBold"><%=aWeek.getFromDate().getYear()%></td></tr>
+        <tr><td colspan="<%=colspan%>" bgcolor="#FF2222" align="center" class="NormalBold"><%=aWeek.getFromDate().getYearDisplay()%></td></tr>
         <%	aYear = aWeek.getFromDate().getYear();
                     }%>
         <tr bgcolor="<%=bgColor%>">
           <td class="Normal">
-            <a href="<%=href%>"><%="(" + aWeek.getFromDate().getYear() + ") " + aWeek.getFromDate().getWeekOfYear() + "_" + aWeek.getFromDate().getWeekPart()%></a>
+            <a href="<%=href%>"><%="(" + aWeek.getFromDate().getYearDisplay()+ ") " + aWeek.getFromDate().getWeekOfYear() + "_" + aWeek.getFromDate().getWeekPart()%></a>
           </td>
           <%if (!mode.equalsIgnoreCase("Submitted")) {%>
           <td class="Normal">
