@@ -19,22 +19,20 @@ import javax.sql.DataSource;
 public class DBConnect {
 
   private static DataSource dataSource;
-
-  static {
-    try {
-      dataSource = (DataSource) new InitialContext().lookup("jdbc/itr");
-    } catch (NamingException e) {
-      throw new ExceptionInInitializerError(e);
-    }
-  }
+  private static boolean testMode = false;
 
   public static void testMode() {
-    if (!(dataSource instanceof TestDataSource)) {
-      dataSource = new TestDataSource();
-    }
+    testMode = true;
   }
 
-  public static Connection getConnection() throws SQLException {
+  public static Connection getConnection() throws Exception {
+    if (dataSource == null) {
+      if (testMode) {
+        dataSource = new TestDataSource();
+      } else {
+        dataSource = (DataSource) new InitialContext().lookup("jdbc/itr");
+      }
+    }
     return dataSource.getConnection();
   }
 

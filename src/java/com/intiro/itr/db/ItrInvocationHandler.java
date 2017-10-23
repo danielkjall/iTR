@@ -181,7 +181,14 @@ public class ItrInvocationHandler implements InvocationHandler {
   }
 
   private String getServiceString() throws Exception {
-    Map<String, String> map = new DBQueriesConfig().getProperties();
+    String cacheKey = "getServiceString_properties";
+    Map<String, String> map = ItrCache.get(cacheKey);
+    if (map == null) {
+      map = new DBQueriesConfig().getProperties();
+      if (map != null) {
+        ItrCache.put(cacheKey, map, 60 * 15);
+      }
+    }
     return map.get("com.intiro.itr.logger.blacklist");
   }
 }

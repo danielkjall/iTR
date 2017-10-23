@@ -26,7 +26,7 @@ import java.util.List;
 
 public class DBExecute implements DBConstants, DbExecuteInterface {
 
-  private ThreadLocal<InvocationHandlerSetting> m_personalInvocationSetting = new ThreadLocal<>();
+  private static ThreadLocal<InvocationHandlerSetting> m_personalInvocationSetting = new ThreadLocal<>();
 
   @Override
   public void setCallSetup(InvocationHandlerSetting s) {
