@@ -1,9 +1,10 @@
+<%@page import="com.intiro.itr.util.ItrUtil"%>
 <%@ page session="true"%>
 <%@ page import="com.intiro.itr.util.ITRCalendar, com.intiro.itr.ITRResources, com.intiro.itr.logic.superadmin.users.UserEdit"%>
 <%
-  	response.setHeader("Cache-Control", "no-cache");
-  	response.setHeader("Pragma", "no-cache");
-  	response.addHeader("Cache-Control","no-store");
+    response.setHeader("Cache-Control", "no-cache");
+    response.setHeader("Pragma", "no-cache");
+    response.addHeader("Cache-Control", "no-store");
 
     String firstName = null;
     String lastName = null;
@@ -26,72 +27,78 @@
     boolean bDelete = false;
 
     if (save != null && save.length() > 0) {
-      bSave = true;
-    }
-    else if (delete != null && delete.length() > 0) {
-      bDelete = true;
+        bSave = true;
+    } else if (delete != null && delete.length() > 0) {
+        bDelete = true;
     }
 
-      UserEdit userEditor = (UserEdit) session.getAttribute(ITRResources.ITR_MODIFIED_USER);
+    UserEdit userEditor = (UserEdit) session.getAttribute(ITRResources.ITR_MODIFIED_USER);
 
-      if (bDelete) {
+    if (bDelete) {
         boolean retVal = userEditor.getModifiedUser().delete();
 
         if (retVal == false) {
-          new Exception("Can not delete User with id = " + userEditor.getModifiedUser().getUserId() + ". ");
+            new Exception("Can not delete User with id = " + userEditor.getModifiedUser().getUserId() + ". ");
         }
-      }
-      else if (bSave) {
+    } else if (bSave) {
         if (request.getParameter("userid") != null && request.getParameter("userid").length() > 0) {
-          //userId = request.getParameter("userid");
+            //userId = request.getParameter("userid");
         }
         if (request.getParameter("firstname") != null && request.getParameter("firstname").length() > 0) {
-          firstName = request.getParameter("firstname");
+            firstName = request.getParameter("firstname");
         }
         if (request.getParameter("lastname") != null && request.getParameter("lastname").length() > 0) {
-          lastName = request.getParameter("lastname");
+            lastName = request.getParameter("lastname");
         }
         if (request.getParameter("language") != null && request.getParameter("language").length() > 0) {
-          languageId = request.getParameter("language");
+            languageId = request.getParameter("language");
         }
         if (request.getParameter("skin") != null && request.getParameter("skin").length() > 0) {
-          skinId = request.getParameter("skin");
+            skinId = request.getParameter("skin");
         }
         if (request.getParameter("company") != null && request.getParameter("company").length() > 0) {
-          companyId = request.getParameter("company");
+            companyId = request.getParameter("company");
         }
         if (request.getParameter("adminuser") != null && request.getParameter("adminuser").length() > 0) {
-          adminUserId = request.getParameter("adminuser");
+            adminUserId = request.getParameter("adminuser");
         }
         if (request.getParameter("newloginId") != null && request.getParameter("newloginId").length() > 0) {
-          loginId = request.getParameter("newloginId");
+            loginId = request.getParameter("newloginId");
         }
         if (request.getParameter("newpassword") != null && request.getParameter("newpassword").length() > 0) {
-          newPassword = request.getParameter("newpassword");
+            newPassword = request.getParameter("newpassword");
         }
         if (request.getParameter("confirmpassword") != null && request.getParameter("confirmpassword").length() > 0) {
-          //confirmPassword = request.getParameter("confirmpassword");
+            //confirmPassword = request.getParameter("confirmpassword");
         }
         if (request.getParameter("activated") != null && request.getParameter("activated").length() > 0) {
-          activated = request.getParameter("activated");
+            activated = request.getParameter("activated");
         }
         if (request.getParameter("yearlyvacation") != null && request.getParameter("yearlyvacation").length() > 0) {
-          yearlyVacation = request.getParameter("yearlyvacation");
+            yearlyVacation = request.getParameter("yearlyvacation");
         }
         if (request.getParameter("savedvacation") != null && request.getParameter("savedvacation").length() > 0) {
-          savedVacation = request.getParameter("savedvacation");
+            savedVacation = request.getParameter("savedvacation");
         }
         if (request.getParameter("usedvacation") != null && request.getParameter("usedvacation").length() > 0) {
-          usedVacation = request.getParameter("usedvacation");
+            usedVacation = request.getParameter("usedvacation");
         }
         if (request.getParameter("moneyovertime") != null && request.getParameter("moneyovertime").length() > 0) {
-          moneyovertime = request.getParameter("moneyovertime");
+            String tmpValue = request.getParameter("moneyovertime");
+            if (ItrUtil.isStrContainingValue(tmpValue)) {
+                tmpValue = tmpValue.replace(',', '.');
+            }
+            moneyovertime = tmpValue;
         }
         if (request.getParameter("vacationovertime") != null && request.getParameter("vacationovertime").length() > 0) {
-          vacationovertime = request.getParameter("vacationovertime");
+            String tmpValue = request.getParameter("vacationovertime");
+            if (ItrUtil.isStrContainingValue(tmpValue)) {
+                tmpValue = tmpValue.replace(',', '.');
+            }
+            vacationovertime = tmpValue;
         }
         if (request.getParameter("role") != null && request.getParameter("role").length() > 0) {
-          roleId = request.getParameter("role");
+            roleId = request.getParameter("role");
         }
 
         userEditor.getModifiedUser().setFirstName(firstName);
@@ -106,30 +113,29 @@
         //PASSWORD
         //only change password if something is changed
         if (newPassword != null && newPassword.length() > 0) {
-          userEditor.getModifiedUser().setPassword(newPassword);
+            userEditor.getModifiedUser().setPassword(newPassword);
         }
 
         //ACTIVATED
         boolean activateUser = false;
 
         if (activated != null && activated.equalsIgnoreCase("on")) {
-          activateUser = true;
+            activateUser = true;
         }
         //find out if status has changed.
         if (userEditor.getModifiedUser().getActivated() != activateUser) {
-          ITRCalendar now = new ITRCalendar();
+            ITRCalendar now = new ITRCalendar();
 
-          //Has user been activated
-          if (activateUser == true) {
+            //Has user been activated
+            if (activateUser == true) {
 
-            userEditor.getModifiedUser().setActivatedDate(now);
-          }
-          else { //User has been deactivated
+                userEditor.getModifiedUser().setActivatedDate(now);
+            } else { //User has been deactivated
 
-            userEditor.getModifiedUser().setDeActivatedDate(now);
-          }
+                userEditor.getModifiedUser().setDeActivatedDate(now);
+            }
 
-          userEditor.getModifiedUser().setActivated(String.valueOf(activateUser));
+            userEditor.getModifiedUser().setActivated(String.valueOf(activateUser));
         }
 
         userEditor.getModifiedUser().setDefaultVacationDays(Integer.parseInt(yearlyVacation));
@@ -140,7 +146,7 @@
 
         //Save the modified user to database.
         userEditor.getModifiedUser().save();
-      }
+    }
 
-      response.sendRedirect("changeUsersQuery.jsp");
+    response.sendRedirect("changeUsersQuery.jsp");
 %>

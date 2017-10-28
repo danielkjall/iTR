@@ -5,7 +5,7 @@ function isNumeric(field, msg) {
 
    for(intCounter=0; intCounter < tmp.length; intCounter++) {
       strChar = tmp.substring(intCounter, intCounter+1);
-      if (!((strChar >= "0" && strChar <= "9") || (strChar == "+") || (strChar == "-") || (strChar == "."))) {
+      if (!((strChar >= "0" && strChar <= "9") || (strChar === "+") || (strChar === "-") || (strChar === ".") || (strChar === ","))) {
          alert("The \"" + msg + "\" field is only allowed to contain digits and '.' or leading '+' and '-'!");
          field.focus();
          return(false);
@@ -15,7 +15,7 @@ function isNumeric(field, msg) {
 }
 
 function isValid(field, msg) {
-   if (field.value.lastIndexOf("'") != -1 || field.value.lastIndexOf("\"") != -1 || field.value.lastIndexOf("|") != -1 || field.value.lastIndexOf("<") != -1 || field.value.lastIndexOf(">") != -1) {
+   if (field.value.lastIndexOf("'") !== -1 || field.value.lastIndexOf("\"") !== -1 || field.value.lastIndexOf("|") !== -1 || field.value.lastIndexOf("<") !== -1 || field.value.lastIndexOf(">") !== -1) {
       alert("The \"" + msg + "\" field is not allowed to contain the following characters:  \'  \"  | < >");
       field.focus();
       return false;
@@ -24,7 +24,7 @@ function isValid(field, msg) {
 }
 
 function isNotEmpty(field, msg) {
-   if (field.value == "") {
+   if (field.value === "") {
       alert("The \"" + msg + "\" field is not allowed to be empty!");
       field.focus();
       return false;
@@ -33,7 +33,7 @@ function isNotEmpty(field, msg) {
 }
 
 function isSelected(field, msg) {
-   if (field.options[field.selectedIndex].value == "null") {
+   if (field.options[field.selectedIndex].value === "null") {
       alert("There must be a selection in the \"" + msg + "\" drop down box.");
       field.focus();
       return false;

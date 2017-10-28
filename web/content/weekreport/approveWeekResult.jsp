@@ -7,146 +7,146 @@
 
 
 <%
-  response.setHeader("Cache-Control", "no-cache");
-  response.setHeader("Pragma", "no-cache");
-  response.addHeader("Cache-Control", "no-store");
-  UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
-  WeekReport aWeek = (WeekReport) session.getAttribute(ITRResources.ITR_WEEK_REPORT);
-  String mode = (String) request.getAttribute("mode");
+    response.setHeader("Cache-Control", "no-cache");
+    response.setHeader("Pragma", "no-cache");
+    response.addHeader("Cache-Control", "no-store");
+    UserProfile userProfile = (UserProfile) session.getAttribute(ITRResources.ITR_USER_PROFILE);
+    WeekReport aWeek = (WeekReport) session.getAttribute(ITRResources.ITR_WEEK_REPORT);
+    String mode = (String) request.getAttribute("mode");
 %>
 
 <%
-  String weekComment = "";
+    String weekComment = "";
 
-  //START ACTION, Find out what action is called and perform it
-  String save = request.getParameter("btnSave");
-  String submit = request.getParameter("btnSubmit");
-  String approve = request.getParameter("btnApprove");
-  String reject = request.getParameter("btnReject");
-  String action = request.getParameter("action");
+    //START ACTION, Find out what action is called and perform it
+    String save = request.getParameter("btnSave");
+    String submit = request.getParameter("btnSubmit");
+    String approve = request.getParameter("btnApprove");
+    String reject = request.getParameter("btnReject");
+    String action = request.getParameter("action");
 
-  // if weekComment is not set. Read it from request object and set it
-  if (request.getParameter("comments") != null && request.getParameter("comments").length() > 0) {
-    weekComment = request.getParameter("comments");
-    aWeek.setWeekComment(weekComment);
-  }
-
-  //SAVE THE WEEKREPORT
-  if (save != null) {
-
-    //mode = "save";
-    aWeek.save();
-
-    //redirect user to todo page:
-    StringBuffer redirectURLPath = new StringBuffer("");
-    StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
-    for (int i = 4; i < tokens.countTokens(); i++) {
-      redirectURLPath.append("../");
+    // if weekComment is not set. Read it from request object and set it
+    if (request.getParameter("comments") != null && request.getParameter("comments").length() > 0) {
+        weekComment = request.getParameter("comments");
+        aWeek.setWeekComment(weekComment);
     }
-    redirectURLPath.append("viewWeeks.jsp?mode=todo");
-    response.sendRedirect(redirectURLPath.toString());
 
-    return;
-  } //SUBMIT THE WEEKREPORT
-  else if (submit != null) {
-    if (aWeek.checkIfOkToSubmit()) {
+    //SAVE THE WEEKREPORT
+    if (save != null) {
 
-      /*Submit the week report*/
-      aWeek.submit();
+        //mode = "save";
+        aWeek.save();
 
-      //redirect user to todo page:
-      StringBuffer redirectURLPath = new StringBuffer("");
-      StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
-      for (int i = 4; i < tokens.countTokens(); i++) {
-        redirectURLPath.append("../");
-      }
-      redirectURLPath.append("viewWeeks.jsp?mode=todo");
-      response.sendRedirect(redirectURLPath.toString());
-
-      return;
-    }
-  } //FORCE SUBMIT OF THE WEEKREPORT
-  else if (action != null && action.equalsIgnoreCase("forceSubmit")) {
-
-    //Stuid check to force:
-    aWeek.checkIfOkToSubmit();
-
-    //Submit the week report
-    aWeek.submit();
-
-    //redirect user to todo page:
-    StringBuffer redirectURLPath = new StringBuffer("");
-    StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
-    for (int i = 4; i < tokens.countTokens(); i++) {
-      redirectURLPath.append("../");
-    }
-    redirectURLPath.append("viewWeeks.jsp?mode=todo");
-    response.sendRedirect(redirectURLPath.toString());
-
-    return;
-  } // Reject a WeekReport
-  else if (reject != null && reject.trim().equalsIgnoreCase("Reject")) {
-
-    //Reject the week report
-    aWeek.reject();
-
-    //UserProfile currUser = aWeek.getUserProfile();
-    //com.intiro.itr.logic.email.Email mail = currUser.getEmail(0);
-    //String adress = mail.getAddress();
-    //String body = "Felaktig vecka: " + aWeek.getFromDate().getWeekOfYear() + "\nKommentar: "  + aWeek.getWeekComment();
-    //JavaMail m = new JavaMail();
-    //From, to, subject, message as string
-    //m.SendSimpleMail("itr@intiro.se", adress, "WEEK REJECTED!", body);
-    //redirect admin to weeks to approve.
-    StringBuffer redirectURLPath = new StringBuffer("");
-    StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
-    for (int i = 4; i < tokens.countTokens(); i++) {
-      redirectURLPath.append("../");
-    }
-    redirectURLPath.append("admin.jsp");
-    response.sendRedirect(redirectURLPath.toString());
-
-    return;
-  } //Approve a WeekReport
-  else if (approve != null && approve.trim().equalsIgnoreCase("Approve")) {
-
-    //Approve a week report*/
-    aWeek.approve();
-
-    //redirect admin to weeks to approve.
-    StringBuffer redirectURLPath = new StringBuffer("");
-    StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
-    for (int i = 4; i < tokens.countTokens(); i++) {
-      redirectURLPath.append("../");
-    }
-    redirectURLPath.append("admin.jsp");
-    response.sendRedirect(redirectURLPath.toString());
-
-    return;
-  } else {
-    IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): ACTION NOT FOUND");
-
-    int log = IntiroLog.getInstance().getLoggingLevel();
-    IntiroLog.getInstance().setLoggingLevel(6);
-
-    Enumeration names = request.getParameterNames();
-
-    while (names.hasMoreElements()) {
-      String oneName = (String) names.nextElement();
-      String oneValue = request.getParameter(oneName);
-
-      if (oneValue != null) {
-        if (IntiroLog.d()) {
-          IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): " + oneName + " = " + oneValue);
+        //redirect user to todo page:
+        StringBuffer redirectURLPath = new StringBuffer("");
+        StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
+        for (int i = 4; i < tokens.countTokens(); i++) {
+            redirectURLPath.append("../");
         }
-      }
+        redirectURLPath.append("viewWeeks.jsp?mode=todo");
+        response.sendRedirect(redirectURLPath.toString());
+
+        return;
+    } //SUBMIT THE WEEKREPORT
+    else if (submit != null) {
+        if (aWeek.checkIfOkToSubmit()) {
+
+            /*Submit the week report*/
+            aWeek.submit();
+
+            //redirect user to todo page:
+            StringBuffer redirectURLPath = new StringBuffer("");
+            StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
+            for (int i = 4; i < tokens.countTokens(); i++) {
+                redirectURLPath.append("../");
+            }
+            redirectURLPath.append("viewWeeks.jsp?mode=todo");
+            response.sendRedirect(redirectURLPath.toString());
+
+            return;
+        }
+    } //FORCE SUBMIT OF THE WEEKREPORT
+    else if (action != null && action.equalsIgnoreCase("forceSubmit")) {
+
+        //Stuid check to force:
+        aWeek.checkIfOkToSubmit();
+
+        //Submit the week report
+        aWeek.submit();
+
+        //redirect user to todo page:
+        StringBuffer redirectURLPath = new StringBuffer("");
+        StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
+        for (int i = 4; i < tokens.countTokens(); i++) {
+            redirectURLPath.append("../");
+        }
+        redirectURLPath.append("viewWeeks.jsp?mode=todo");
+        response.sendRedirect(redirectURLPath.toString());
+
+        return;
+    } // Reject a WeekReport
+    else if (reject != null && reject.trim().equalsIgnoreCase("Reject")) {
+
+        //Reject the week report
+        aWeek.reject();
+
+        //UserProfile currUser = aWeek.getUserProfile();
+        //com.intiro.itr.logic.email.Email mail = currUser.getEmail(0);
+        //String adress = mail.getAddress();
+        //String body = "Felaktig vecka: " + aWeek.getFromDate().getWeekOfYear() + "\nKommentar: "  + aWeek.getWeekComment();
+        //JavaMail m = new JavaMail();
+        //From, to, subject, message as string
+        //m.SendSimpleMail("itr@intiro.se", adress, "WEEK REJECTED!", body);
+        //redirect admin to weeks to approve.
+        StringBuffer redirectURLPath = new StringBuffer("");
+        StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
+        for (int i = 4; i < tokens.countTokens(); i++) {
+            redirectURLPath.append("../");
+        }
+        redirectURLPath.append("admin.jsp");
+        response.sendRedirect(redirectURLPath.toString());
+
+        return;
+    } //Approve a WeekReport
+    else if (approve != null && approve.trim().equalsIgnoreCase("Approve")) {
+
+        //Approve a week report*/
+        aWeek.approve();
+
+        //redirect admin to weeks to approve.
+        StringBuffer redirectURLPath = new StringBuffer("");
+        StringTokenizer tokens = new StringTokenizer(request.getRequestURL().toString(), "/");
+        for (int i = 4; i < tokens.countTokens(); i++) {
+            redirectURLPath.append("../");
+        }
+        redirectURLPath.append("admin.jsp");
+        response.sendRedirect(redirectURLPath.toString());
+
+        return;
+    } else {
+        IntiroLog.criticalError(getClass(), getClass().getName() + ".doGet(): ACTION NOT FOUND");
+
+        int log = IntiroLog.getInstance().getLoggingLevel();
+        IntiroLog.getInstance().setLoggingLevel(6);
+
+        Enumeration names = request.getParameterNames();
+
+        while (names.hasMoreElements()) {
+            String oneName = (String) names.nextElement();
+            String oneValue = request.getParameter(oneName);
+
+            if (oneValue != null) {
+                if (IntiroLog.d()) {
+                    IntiroLog.detail(getClass(), getClass().getName() + ".doGet(): " + oneName + " = " + oneValue);
+                }
+            }
+        }
+
+        IntiroLog.getInstance().setLoggingLevel(log);
     }
 
-    IntiroLog.getInstance().setLoggingLevel(log);
-  }
-
-  /*END ACTION*/
-  // If this code is reached we must show a warning page
+    /*END ACTION*/
+    // If this code is reached we must show a warning page
 %>		
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">

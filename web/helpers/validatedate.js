@@ -1,7 +1,7 @@
 <SCRIPT LANGUAGE=JavaScript>
-var gstrREF_CHAR_STRING = "abcdefghijklmnopqrstuvwxyzåäö";
+var gstrREF_CHAR_STRING = "abcdefghijklmnopqrstuvwxyzï¿½ï¿½ï¿½";
 var gstrREF_INT_STRING = "1234567890";
-var gstrREF_CHAR_INT_STRING = "1234567890abcdefghijklmnopqrstuvwxyzåäö";
+var gstrREF_CHAR_INT_STRING = "1234567890abcdefghijklmnopqrstuvwxyzï¿½ï¿½ï¿½";
 var gstrWHITESPACE = " \t\n\r"; // whitespace characters
 
 //-----------------------------------------------------------------------
@@ -39,7 +39,7 @@ Return value: The date in the format YYYYMMDD
       modifiedDate = FormatDate(2,retValue);
    }
          
-   return(modifiedDate)
+   return(modifiedDate);
 }
 //-----------------------------------------------------------------------
 function isStrValidToMask(rstrValue, rstrMask)  

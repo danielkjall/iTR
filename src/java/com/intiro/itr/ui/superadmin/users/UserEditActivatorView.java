@@ -12,6 +12,7 @@ import com.intiro.itr.ui.constants.URLs;
 import com.intiro.itr.ui.error.NoSessionException;
 import com.intiro.itr.util.ErrorHandler;
 import com.intiro.itr.util.ITRCalendar;
+import com.intiro.itr.util.ItrUtil;
 import com.intiro.itr.util.personalization.UserProfile;
 import com.intiro.itr.util.log.IntiroLog;
 
@@ -137,9 +138,15 @@ public class UserEditActivatorView extends ITRServlet implements URLs, Commands 
         }
         if (request.getParameter("moneyovertime") != null && request.getParameter("moneyovertime").length() > 0) {
           moneyovertime = request.getParameter("moneyovertime");
+          if(ItrUtil.isStrContainingValue(moneyovertime) ){
+            moneyovertime = moneyovertime.replace(',','.');
+          }
         }
         if (request.getParameter("vacationovertime") != null && request.getParameter("vacationovertime").length() > 0) {
           vacationovertime = request.getParameter("vacationovertime");
+          if(ItrUtil.isStrContainingValue(vacationovertime) ){
+            vacationovertime = vacationovertime.replace(',','.');
+          }
         }
         if (request.getParameter("role") != null && request.getParameter("role").length() > 0) {
           roleId = request.getParameter("role");
