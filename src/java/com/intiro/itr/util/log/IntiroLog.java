@@ -61,14 +61,14 @@ public class IntiroLog {
   }
 
   public static Object getLogAsStringBuffer() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return "getLogAsStringBuffer";
   }
 
   public void setLoggingLevel(int i) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
   }
 
   public int getLoggingLevel() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+   return 1;
   }
 }
