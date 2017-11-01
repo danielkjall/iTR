@@ -440,7 +440,7 @@ public class ItrUtil {
     }
 
     // If open time is after close time it means we have to move date for close to next day
-    closedCal.roll(Calendar.DAY_OF_MONTH, true);
+    closedCal.add(Calendar.DAY_OF_YEAR, 1);
     boolean nowAfterOpening = now.after(openedCal);
     boolean nowBeforeClose = now.before(closedCal);
     boolean openingTime = nowAfterOpening && nowBeforeClose;
