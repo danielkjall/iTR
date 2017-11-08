@@ -221,7 +221,7 @@ public class DBQueriesAdmin implements DBQueriesAdminInterface, DBConstants {
 
     // Order by weekno and weekpart
     sb.append(") ORDER BY ");
-    sb.append(TABLE_USER_DOT + USER_ID_PK);
+    sb.append(TABLE_USER_DOT + USER_FIRSTNAME);
 
     DBConnect access = new DBConnect();
     StringRecordset rs = access.executeQuery(sb);

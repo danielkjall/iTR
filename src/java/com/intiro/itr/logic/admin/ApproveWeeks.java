@@ -79,12 +79,7 @@ public class ApproveWeeks extends DynamicXMLCarrier {
 
       throw new XMLBuilderException(e.getMessage());
     }
-    for (int i = 0; i < usersThatNeedApprovel.size(); i++) {
-      if (IntiroLog.d()) {
-        IntiroLog.detail(getClass(), getClass().getName() + ".load(): usersThatNeedApprovel.get(i) = " + usersThatNeedApprovel.get(i));
-      }
-    }
-
+    
     UserProfile profile;
 
     for (int i = 0; i < usersThatNeedApprovel.size(); i++) {
