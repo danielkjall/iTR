@@ -9,8 +9,6 @@ import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.logic.project.ProjectActivity;
 import com.intiro.itr.logic.project.ProjectMember;
 import com.intiro.itr.util.StringRecordset;
-import com.intiro.itr.util.cache.ItrCache;
-import com.intiro.itr.util.cache.LockHelper;
 import com.intiro.itr.util.log.IntiroLog;
 import com.intiro.itr.util.personalization.Role;
 import com.intiro.itr.util.personalization.UserProfile;
