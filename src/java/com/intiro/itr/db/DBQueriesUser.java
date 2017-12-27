@@ -98,12 +98,10 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
     sb.append(TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK + COMMA);
     sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_TYPE + COMMA);
     sb.append(TABLE_USERWEEK_DOT + "*" + COMMA);
-    sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE + COMMA);
-    sb.append(TABLE_COMMENT_DOT + COMMENT_COMMENT);
+    sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE);
     sb.append(" FROM ");
     sb.append(TABLE_USERWEEK + COMMA);
     sb.append(TABLE_CALENDARWEEK + COMMA);
-    sb.append(TABLE_COMMENT + COMMA);
     sb.append(TABLE_TIMETYPE + COMMA);
     sb.append(TABLE_PROJECTCODE + COMMA);
     sb.append(TABLE_ENTRYROW);
@@ -127,10 +125,6 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
       sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + " = '").append(fromDate).append("'");
       sb.append(" AND ");
     }
-
-    /* the week must have a from date that is = supplied fromDate */
-    sb.append(TABLE_COMMENT_DOT + COMMENT_ID_PK + " = " + TABLE_USERWEEK_DOT + USERWEEK_COMMENTID_FK);
-    sb.append(" AND ");
 
     /* the timetypeid is the same */
     sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_TIMETYPEID_FK);
@@ -166,12 +160,10 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
     sb.append(TABLE_TIMETYPE_DOT + TIMETYPE_TYPE + COMMA);
     sb.append(TABLE_USERWEEK_DOT + "*" + COMMA);
     sb.append(TABLE_PROJECTCODE_DOT + PROJECTCODE_CODE + COMMA);
-    sb.append(TABLE_COMMENT_DOT + COMMENT_COMMENT + COMMA);
     sb.append(TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE);
     sb.append(" FROM ");
     sb.append(TABLE_USERWEEK + COMMA);
     sb.append(TABLE_CALENDARWEEK + COMMA);
-    sb.append(TABLE_COMMENT + COMMA);
     sb.append(TABLE_TIMETYPE + COMMA);
     sb.append(TABLE_PROJECTCODE + COMMA);
     sb.append(TABLE_ENTRYROW);
@@ -184,9 +176,6 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
 
     /* Connect userweek and entryrow */
     sb.append(TABLE_USERWEEK_DOT + USERWEEK_ID_PK + " = " + TABLE_ENTRYROW_DOT + ENTRYROW_USERWEEKID_FK);
-    sb.append(" AND ");
-
-    sb.append(TABLE_COMMENT_DOT + COMMENT_ID_PK + " = " + TABLE_USERWEEK_DOT + USERWEEK_COMMENTID_FK);
     sb.append(" AND ");
 
     /* the timetypeid is the same */
@@ -318,11 +307,9 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
     sb.append(", ITR_EntryRow.ITR_ProjectId ");
     sb.append(", ITR_EntryRow.ITR_TimeTypeId ");
     sb.append(", ITR_EntryRow.ITR_UserId ");
-    //sb.append(", ITR_EntryRow.* ");
     sb.append(", ITR_TimeType.Type ");
     sb.append(", ITR_UserWeek.* ");
     sb.append(", ITR_ProjectCode.Code ");
-    sb.append(", ITR_Comment.Comment  ");
     sb.append(", ITR_CalendarWeek.FromDate ");
     sb.append(", ITR_CalendarWeek.ToDate ");
     sb.append("FROM  ");
@@ -331,32 +318,24 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
     sb.append(", ITR_EntryRow  ");
     sb.append(", ITR_TimeType ");
     sb.append(", ITR_ProjectCode ");
-    sb.append(", ITR_Comment ");
     sb.append("WHERE  ");
     sb.append("    ITR_UserWeek.ITR_CalendarWeekId = ITR_CalendarWeek.Id  ");
     sb.append("AND ITR_UserWeek.Id = ITR_EntryRow.ITR_UserWeekId  ");
-    //if (checkIfTheyAreNotApproved) {
-    //  sb.append(" AND ");
-    //  sb.append(TABLE_USERWEEK_DOT + USERWEEK_APPROVED + " = " + FALSE_ACCESS);
-    //}
+    
     if (ItrUtil.isStrContainingValue(year)) {
       /* select specified year */
-      sb.append(" AND ");
-      sb.append("YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("'");
+      sb.append("AND YEAR(" + TABLE_CALENDARWEEK_DOT + CALENDARWEEK_FROM_DATE + ") = '").append(year).append("' ");
     }
-    sb.append(" AND ITR_EntryRow.ITR_UserId = ").append(userId);
-    sb.append(" AND ITR_Comment.Id = ITR_UserWeek.ITR_CommentId  ");
+
+    sb.append("AND ITR_EntryRow.ITR_UserId = ").append(userId).append(" ");
     sb.append("AND ITR_TimeType.Id = ITR_EntryRow.ITR_TimeTypeId  ");
     sb.append("AND ITR_EntryRow.ITR_ProjectCodeId = ITR_ProjectCode.Id ");
     sb.append("AND ITR_UserWeek.Submitted =  True ");
 
     /* Order by weekno and weekpart */
-    sb.append(" ORDER BY ");
+    sb.append("ORDER BY ");
     sb.append("itr_userweekid ");
 
-    //if (descendingSortOrder) {
-    //  sb.append(" DESC ");
-    //}
     DBConnect access = new DBConnect();
     StringRecordset rs = access.executeQuery(sb);
     return rs;
@@ -628,34 +607,13 @@ public class DBQueriesUser implements DBQueriesUserInterface, DBConstants {
   }
 
   @Override
-  public synchronized StringRecordset makeNewCommmentAndRetriveTheId(String comment) throws Exception {
-    try {
-      String statisticKey = getClass().getName() + ".makeNewCommentAndRetriveTheId";
-      InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
-      DBExecute.getProxy(s).makeNewComment(comment);
-    } catch (Exception e) {
-      throw new Exception(getClass().getName() + ".makeNewCommmentAndRetriveTheId(String comment): Could not make a new Comment: " + e.getMessage());
-    }
-
-    StringBuffer sb = new StringBuffer();
-    sb.append("SELECT ");
-    sb.append(" max(" + COMMENT_ID_PK + ") maxId");
-    sb.append(" FROM ");
-    sb.append(TABLE_COMMENT);
-
-    DBConnect access = new DBConnect();
-    StringRecordset rs = access.executeQuery(sb);
-    return rs;
-  }
-
-  @Override
-  public synchronized StringRecordset makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, int weekCommentId) throws Exception {
+  public synchronized StringRecordset makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, String comment) throws Exception {
     try {
       String statisticKey = getClass().getName() + ".makeNewUserWeekEntryAndRetriveTheId";
       InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
-      DBExecute.getProxy(s).makeNewUserWeekId(calendarWeekId, weekCommentId);
+      DBExecute.getProxy(s).makeNewUserWeekId(calendarWeekId, comment);
     } catch (Exception e) {
-      throw new Exception(getClass().getName() + ".makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, int weekCommentId): Could not make a new UserWeekId");
+      throw new Exception(getClass().getName() + ".makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, String comment): Could not make a new UserWeekId");
     }
 
     StringBuffer sb = new StringBuffer();

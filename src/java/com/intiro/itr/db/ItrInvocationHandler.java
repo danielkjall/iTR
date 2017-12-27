@@ -23,16 +23,13 @@ public class ItrInvocationHandler implements InvocationHandler {
 
   protected ItrInvocationHandler(InvocationHandled invocationHandled) {
     m_invocationHandled = invocationHandled;
-    methodsNotTriggeringCleanCache.add("DbExecuteInterface.makeNewComment");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.makeNewUserWeekId");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.deleteRow");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.insertRow");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.saveLog");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateApprovedInWeek");
-    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateComment");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateRow");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateSubmitInWeek");
-    methodsNotTriggeringCleanCache.add("DbExecuteInterface.updateUserWeekComment");
     methodsNotTriggeringCleanCache.add("DbExecuteInterface.saveStatistics");
   }
 

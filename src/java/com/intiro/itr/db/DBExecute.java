@@ -60,6 +60,22 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     return (DbExecuteInterface) Proxy.newProxyInstance(db.getClass().getClassLoader(), new Class<?>[]{DbExecuteInterface.class}, new ItrInvocationHandler(db));
   }
 
+  
+  @Override
+  public boolean updateUserWeekComment(int userWeekId, String comment) throws Exception {
+    StringBuffer sb = new StringBuffer();
+    sb.append("UPDATE ");
+    sb.append(TABLE_USERWEEK);
+    sb.append(" SET ");
+    sb.append(USERWEEK_COMMENT + " = " + SINGLE_QUOTE).append(comment).append(SINGLE_QUOTE);
+    sb.append(" WHERE ");
+    sb.append(USERWEEK_ID_PK + " = ").append(userWeekId);
+
+    DBConnect access = new DBConnect();
+    boolean retval = access.executeUpdate(sb);
+    return retval;
+  }
+          
   @Override
   public boolean changePassword(String userId, String newLoginId, String newPassword) throws Exception {
     StringBuffer sb = new StringBuffer();
@@ -409,21 +425,6 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
   }
 
   @Override
-  public boolean updateComment(int commentId, String comment) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("UPDATE ");
-    sb.append(TABLE_COMMENT);
-    sb.append(" SET ");
-    sb.append(COMMENT_COMMENT + " = " + SINGLE_QUOTE).append(comment).append(SINGLE_QUOTE);
-    sb.append(" WHERE ");
-    sb.append(COMMENT_ID_PK + " = ").append(commentId);
-
-    DBConnect access = new DBConnect();
-    boolean retval = access.executeUpdate(sb);
-    return retval;
-  }
-
-  @Override
   public boolean updateCompany(Company company) throws Exception {
     // Create sql query
     StringBuffer sb = new StringBuffer();
@@ -565,19 +566,6 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     sb.append("ITR_ProjectCodeId = ").append(projectActivity.getProjectCodeId()).append(" ");
     sb.append("WHERE ");
     sb.append("id = ").append(projectActivity.getId());
-
-    DBConnect access = new DBConnect();
-    boolean retval = access.executeUpdate(sb);
-    return retval;
-  }
-
-  @Override
-  public boolean updateUserWeekComment(int inWeekReportId, int inWeekCommentId) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("UPDATE ITR_UserWeek SET");
-    sb.append(" ITR_CommentId = ").append(inWeekCommentId);
-    sb.append(" WHERE ");
-    sb.append(" Id = ").append(inWeekReportId);
 
     DBConnect access = new DBConnect();
     boolean retval = access.executeUpdate(sb);
@@ -889,20 +877,6 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
   }
 
   @Override
-  public boolean makeNewComment(String comment) throws Exception {
-    StringBuffer sb = new StringBuffer();
-    sb.append("INSERT INTO ");
-    sb.append(TABLE_COMMENT);
-    sb.append(" (" + COMMENT_COMMENT + ") ");
-    sb.append(" VALUES ");
-    sb.append("(" + SINGLE_QUOTE).append(comment).append(SINGLE_QUOTE + ")");
-
-    DBConnect access = new DBConnect();
-    boolean retval = access.executeUpdate(sb);
-    return retval;
-  }
-
-  @Override
   public boolean makeNewProject(Project project) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("INSERT INTO ITR_Project ( \n");
@@ -991,18 +965,21 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
   }
 
   @Override
-  public boolean makeNewUserWeekId(String calendarWeekId, int weekCommentId) throws Exception {
+  public boolean makeNewUserWeekId(String calendarWeekId, String comment) throws Exception {
     StringBuffer sb = new StringBuffer();
     sb.append("INSERT INTO ");
     sb.append(TABLE_USERWEEK);
     sb.append(" ( ");
-    sb.append(USERWEEK_CALENDARWEEK_ID_FK + COMMA);
-    sb.append(USERWEEK_COMMENTID_FK);
+    sb.append(USERWEEK_CALENDARWEEK_ID_FK);
+    sb.append(COMMA);
+    sb.append(USERWEEK_COMMENT);
     sb.append(" ) ");
     sb.append(" VALUES ");
     sb.append(" ( ");
-    sb.append(calendarWeekId).append(COMMA);
-    sb.append(weekCommentId);
+    sb.append(calendarWeekId);
+    sb.append(", '");
+    sb.append(comment);
+    sb.append("'");
     sb.append(" ) ");
 
     DBConnect access = new DBConnect();

@@ -4,7 +4,6 @@ import com.intiro.itr.db.vo.CalendarWeekVO;
 import com.intiro.itr.db.DBConstants;
 import com.intiro.itr.db.DBExecute;
 import com.intiro.itr.db.DBQueriesConfig;
-import com.intiro.itr.db.DbExecuteInterface;
 import com.intiro.itr.db.InvocationHandlerSetting;
 import com.intiro.itr.logic.project.Project;
 import com.intiro.itr.util.ITRCalendar;
@@ -19,9 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.intiro.itr.db.DBQueriesConfigInterface;
 import com.intiro.itr.db.DBQueriesUser;
-import com.intiro.itr.db.DBQueriesUserInterface;
+import com.intiro.itr.util.ItrUtil;
 
 public class WeekReport extends DynamicXMLCarrier {
 
@@ -76,7 +74,6 @@ public class WeekReport extends DynamicXMLCarrier {
   SumRows sumRows = null;
   ITRCalendar toDate = null;
   String weekComment = "";
-  int weekCommentId = 1;
   int weekReportId = -1;
 
   /**
@@ -156,7 +153,7 @@ public class WeekReport extends DynamicXMLCarrier {
   }
 
   public void setWeekComment(String comment) {
-    if (comment != null) {
+    if (ItrUtil.isStrContainingValue(comment)) {
       weekComment = comment;
     }
   }
@@ -172,14 +169,6 @@ public class WeekReport extends DynamicXMLCarrier {
     } else {
       return weekComment.substring(0, 100) + "...";
     }
-  }
-
-  public void setWeekCommentId(int id) {
-    weekCommentId = id;
-  }
-
-  public int getWeekCommentId() {
-    return weekCommentId;
   }
 
   public void setWeekReportId(int id) {
@@ -244,7 +233,7 @@ public class WeekReport extends DynamicXMLCarrier {
       String statisticKey = getClass().getName() + ".approve";
       InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
       DBExecute.getProxy(s).updateApprovedInWeek(getWeekReportId(), true);
-      handleComment();
+      updateComment();
       // getUserProfile().save();
     } catch (Exception e) {
       IntiroLog.error(WeekReport.class, WeekReport.class.getName() + ".load(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
@@ -374,9 +363,7 @@ public class WeekReport extends DynamicXMLCarrier {
     Map<String, String> retval = new HashMap<>();
 
     try {
-      //String cacheKey = getClass().getName() + ".alreadySubmittedWeeksAsHashmap_" + inUserid;
       String statisticKey = getClass().getName() + ".alreadySubmittedWeeksAsHashmap";
-      //int cacheTime = 3600 * 10;
       InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
       StringRecordset rs = DBQueriesUser.getProxy(s).getWeeksAlreadySubmittedAsStartDate(inUserid);
 
@@ -425,7 +412,7 @@ public class WeekReport extends DynamicXMLCarrier {
 
   private static void extractFromRS(WeekReport wr, UserProfile up, ITRCalendar fromDate, ITRCalendar toDate, StringRecordset rs) throws XMLBuilderException, Exception {
     wr.setSubmittedFromDB(rs.getField(DBConstants.USERWEEK_SUBMITTED));
-    wr.setWeekComment(rs.getField(DBConstants.COMMENT_COMMENT));
+    wr.setWeekComment(rs.getField(DBConstants.USERWEEK_COMMENT));
     wr.setWeekReportId(Integer.parseInt(rs.getField(DBConstants.ENTRYROW_USERWEEKID_FK)));
     double mo = Double.parseDouble(rs.getField(DBConstants.ENTRYROW_MO_HOURS));
     double tu = Double.parseDouble(rs.getField(DBConstants.ENTRYROW_TU_HOURS));
@@ -450,9 +437,6 @@ public class WeekReport extends DynamicXMLCarrier {
     oneProject.load(rs.getField(DBConstants.ENTRYROW_PROJECTID_FK));
     oneRow.setProject(oneProject);
     oneRow.getProject().setProjectActivityId(rs.getField(DBConstants.ENTRYROW_PROJECTCODEID_FK));
-    // oneRow.getProject().setProjectSubId(rs.getField(DBConstants.ENTRYROW_PROJECTCODEID_FK));
-    // oneRow.getProject().setProjectSubCode(rs.getField(DBConstants.PROJECTCODE_CODE));
-    // oneRow.getProject().setProjectSubDesc(rs.getField(DBConstants.PROJECTCODE_DESCRIPTION));
     oneRow.setRowSum();
     wr.rows.add(oneRow);
   }
@@ -462,9 +446,7 @@ public class WeekReport extends DynamicXMLCarrier {
 
     try {
       String key = getUserProfile().getUserId();
-      //String cacheKey = getClass().getName() + ".loadWeekWithLatestSubmittedWeek_" + key + "_" + true + "_" + false;
       String statisticKey = getClass().getName() + ".loadWeekWithLatestSubmittedWeek";
-      //int cacheTime = 3600 * 10;
       InvocationHandlerSetting s = InvocationHandlerSetting.create(statisticKey);
       StringRecordset rs = DBQueriesUser.getProxy(s).getSubmittedWeeks(key, true, false);
 
@@ -525,7 +507,7 @@ public class WeekReport extends DynamicXMLCarrier {
       getUserProfile().subtractFromOvertimeVacationHours(getOvertimeVacationHoursForWeek());
       getUserProfile().subtractFromOvertimeMoneyHours(getOvertimeMoneyHoursForWeek());
       getUserProfile().save();
-      handleComment();
+      updateComment();
     } catch (Exception e) {
       IntiroLog.error(WeekReport.class, WeekReport.class.getName() + ".load(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
@@ -557,19 +539,8 @@ public class WeekReport extends DynamicXMLCarrier {
           throw new XMLBuilderException(WeekReport.class.getName() + ".save(): Could not find a CalendarWeekId");
         }
 
-        // WEEKCOMMENT
-        if (getWeekComment().length() != 0) {
-
-          StringRecordset rsWeekComment = DBQueriesUser.getProxy(saveSetting).makeNewCommmentAndRetriveTheId(getWeekComment());
-
-          if (!rsWeekComment.getEOF()) {
-            setWeekCommentId(Integer.parseInt(rsWeekComment.getField("maxId")));
-          } else {
-            throw new XMLBuilderException(WeekReport.class.getName() + ".save(): Could not make and find a new week comment");
-          }
-        }
         // USER WEEK
-        StringRecordset rsUserWeekId = DBQueriesUser.getProxy(saveSetting).makeNewUserWeekEntryAndRetriveTheId(calendarWeekId, getWeekCommentId());
+        StringRecordset rsUserWeekId = DBQueriesUser.getProxy(saveSetting).makeNewUserWeekEntryAndRetriveTheId(calendarWeekId, getWeekComment());
 
         if (!rsUserWeekId.getEOF()) {
           setWeekReportId(Integer.parseInt(rsUserWeekId.getField("maxId")));
@@ -581,7 +552,7 @@ public class WeekReport extends DynamicXMLCarrier {
         throw new XMLBuilderException(e.getMessage());
       }
     } else { // UPDATE WEEKREPORT.
-      handleComment();
+      updateComment();
     }
 
     Row oneRow;
@@ -597,30 +568,15 @@ public class WeekReport extends DynamicXMLCarrier {
     setSaved();
   }
 
-  /**
-   * If we have a default comment with commmentid = 1. Instead of updating the comment, we have to make a new one and connect it to this
-   * weekreport.
-   */
-  private void handleComment() throws XMLBuilderException {
+  private void updateComment() throws XMLBuilderException {
     try {
-      String statisticKey = getClass().getName() + ".handleComment";
-      if (getWeekCommentId() == 1 && getWeekComment().length() > 0) {
-        InvocationHandlerSetting commentSetting = InvocationHandlerSetting.create(statisticKey);
-        StringRecordset rsWeekComment = DBQueriesUser.getProxy(commentSetting).makeNewCommmentAndRetriveTheId(getWeekComment());
-        if (!rsWeekComment.getEOF()) {
-          setWeekCommentId(Integer.parseInt(rsWeekComment.getField("maxId")));
-        } else {
-          throw new XMLBuilderException(WeekReport.class.getName() + ".save(): Could not make and find a new week comment");
-        }
-        // Update weekreport with the new comment.
+      String statisticKey = getClass().getName() + ".updateComment";
+      if (ItrUtil.isStrContainingValue(getWeekComment())) {
         InvocationHandlerSetting weekSetting = InvocationHandlerSetting.create(statisticKey);
-        DBExecute.getProxy(weekSetting).updateUserWeekComment(getWeekReportId(), getWeekCommentId());
-      } else {// else update the comment.
-        InvocationHandlerSetting updateSetting = InvocationHandlerSetting.create(statisticKey);
-        DBExecute.getProxy(updateSetting).updateComment(getWeekCommentId(), getWeekComment());
+        DBExecute.getProxy(weekSetting).updateUserWeekComment(getWeekReportId(), getWeekComment());
       }
     } catch (Exception e) {
-      IntiroLog.error(WeekReport.class, WeekReport.class.getName() + ".save(String weekId): ERROR FROM DATABASE, exception = " + e.getMessage());
+      IntiroLog.error(WeekReport.class, WeekReport.class.getName() + ".updateComment(): ERROR FROM DATABASE, exception = " + e.getMessage());
       throw new XMLBuilderException(e.getMessage());
     }
   }

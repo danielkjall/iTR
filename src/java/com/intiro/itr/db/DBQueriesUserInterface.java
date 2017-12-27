@@ -33,8 +33,6 @@ public interface DBQueriesUserInterface extends InvocationHandled {
 
   StringRecordset login(String loginId, String password) throws Exception;
 
-  StringRecordset makeNewCommmentAndRetriveTheId(String comment) throws Exception;
-
-  StringRecordset makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, int weekCommentId) throws Exception;
+  StringRecordset makeNewUserWeekEntryAndRetriveTheId(String calendarWeekId, String comment) throws Exception;
 
 }

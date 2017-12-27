@@ -23,8 +23,6 @@ public class Row extends DynamicXMLCarrier {
   protected static final String XML_MON_START = "<mo>";
   protected static final String XML_ROWINDEX_END = "</i>";
   protected static final String XML_ROWINDEX_START = "<i>";
-  protected static final String XML_ROW_COMMENT_END = "</comment>";
-  protected static final String XML_ROW_COMMENT_START = "<comment>";
   protected static final String XML_ROW_END = "</row>";
   protected static final String XML_ROW_EXIST_END = "</exist>";
   protected static final String XML_ROW_EXIST_START = "<exist>";
@@ -51,13 +49,11 @@ public class Row extends DynamicXMLCarrier {
   protected static final String XML_WED_END = "</we>";
   protected static final String XML_WED_START = "<we>";
   /* Friday */
-  protected String friComment = "";
   protected boolean friExist = false;
   protected double friHours = 0;
   protected boolean friWeekend = false;
   protected ITRCalendar fromDate = null;
   /* Monday */
-  protected String monComment = "";
   protected boolean monExist = false;
   protected double monHours = 0;
   protected boolean monWeekend = false;
@@ -66,17 +62,14 @@ public class Row extends DynamicXMLCarrier {
   protected int rowEntryId = -1;
   protected double rowSum = 0;
   /* Satday */
-  protected String satComment = "";
   protected boolean satExist = false;
   protected double satHours = 0;
   protected boolean satWeekend = false;
   /* Sunday */
-  protected String sunComment = "";
   protected boolean sunExist = false;
   protected double sunHours = 0;
   protected boolean sunWeekend = false;
   /* Thursday */
-  protected String thuComment = "";
   protected boolean thuExist = false;
   protected double thuHours = 0;
   protected boolean thuWeekend = false;
@@ -84,12 +77,10 @@ public class Row extends DynamicXMLCarrier {
   protected String timeTypeId = "";
   protected ITRCalendar toDate = null;
   /* Tuesday */
-  protected String tueComment = "";
   protected boolean tueExist = false;
   protected double tueHours = 0;
   protected boolean tueWeekend = false;
   /* Wednesday */
-  protected String wedComment = "";
   protected boolean wedExist = false;
   protected double wedHours = 0;
   protected boolean wedWeekend = false;
@@ -569,9 +560,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(monHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(monComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(monExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -585,9 +573,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(tueHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(tueComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(tueExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -601,9 +586,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(wedHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(wedComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(wedExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -617,9 +599,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(thuHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(thuComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(thuExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -633,9 +612,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(friHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(friComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(friExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -649,9 +625,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(satHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(satComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(satExist);
       xmlDoc.append(XML_ROW_EXIST_END);
@@ -665,9 +638,6 @@ public class Row extends DynamicXMLCarrier {
       xmlDoc.append(XML_ROW_HOURS_START);
       xmlDoc.append(sunHours);
       xmlDoc.append(XML_ROW_HOURS_END);
-      xmlDoc.append(XML_ROW_COMMENT_START);
-      xmlDoc.append(sunComment);
-      xmlDoc.append(XML_ROW_COMMENT_END);
       xmlDoc.append(XML_ROW_EXIST_START);
       xmlDoc.append(sunExist);
       xmlDoc.append(XML_ROW_EXIST_END);

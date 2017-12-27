@@ -25,8 +25,6 @@ public interface DBConstants {
   public static final String CALENDARWEEK_WEEKNO = "WeekNo";
   public static final String CALENDARWEEK_WEEKPART = "WeekPart";
   public static final String COMMA = ", ";
-  public static final String COMMENT_COMMENT = "Comment";
-  public static final String COMMENT_ID_PK = "Id";
   public static final String COMPANYSTRUCTURE_CHILDID_PK = "ITR_CompanyId_Child";
   public static final String COMPANYSTRUCTURE_ID_PK = "Id";
   public static final String COMPANYSTRUCTURE_PARENTID_PK = "ITR_CompanyId_Parent";
@@ -48,26 +46,19 @@ public interface DBConstants {
   public static final String EMAIL_EMAIL = "Email";
   public static final String EMAIL_ID_PK = "Id";
   public static final String EMAIL_USERID_FK = "ITR_UserId";
-  public static final String ENTRYROW_FR_COMMENTID_FK = "ITR_CommentId_Fr";
   public static final String ENTRYROW_FR_HOURS = "HoursFr";
   public static final String ENTRYROW_HOURS_SUM = "HoursSum";
   public static final String ENTRYROW_ID_PK = "Id";
-  public static final String ENTRYROW_MO_COMMENTID_FK = "ITR_CommentId_Mo";
   public static final String ENTRYROW_MO_HOURS = "HoursMo";
   public static final String ENTRYROW_PROJECTCODEID_FK = "ITR_ProjectCodeId";
   public static final String ENTRYROW_PROJECTID_FK = "ITR_ProjectId";
-  public static final String ENTRYROW_SA_COMMENTID_FK = "ITR_CommentId_Sa";
   public static final String ENTRYROW_SA_HOURS = "HoursSa";
-  public static final String ENTRYROW_SU_COMMENTID_FK = "ITR_CommentId_Su";
   public static final String ENTRYROW_SU_HOURS = "HoursSu";
-  public static final String ENTRYROW_TH_COMMENTID_FK = "ITR_CommentId_Th";
   public static final String ENTRYROW_TH_HOURS = "HoursTh";
   public static final String ENTRYROW_TIMETYPEID_FK = "ITR_TimeTypeId";
-  public static final String ENTRYROW_TU_COMMENTID_FK = "ITR_CommentId_Tu";
   public static final String ENTRYROW_TU_HOURS = "HoursTu";
   public static final String ENTRYROW_USERID_FK = "ITR_UserId";
   public static final String ENTRYROW_USERWEEKID_FK = "ITR_UserWeekId";
-  public static final String ENTRYROW_WE_COMMENTID_FK = "ITR_CommentId_We";
   public static final String ENTRYROW_WE_HOURS = "HoursWe";
   public static final String FALSE_ACCESS = " False ";
   public static final String LANGUAGE_CODE = "Code";
@@ -133,10 +124,6 @@ public interface DBConstants {
   /*ITR_CALENDARWEEK table*/
   public static final String TABLE_CALENDARWEEK = "ITR_CalendarWeek";
   public static final String TABLE_CALENDARWEEK_DOT = "ITR_CalendarWeek.";
-
-  /*ITR_COMMENT table*/
-  public static final String TABLE_COMMENT = "ITR_Comment";
-  public static final String TABLE_COMMENT_DOT = "ITR_Comment.";
 
   /*ITR_COMPANY table*/
   public static final String TABLE_COMPANY = "ITR_Company";
@@ -231,7 +218,7 @@ public interface DBConstants {
   public static final String USERWEEK_APPROVED = "Approved";
   public static final String USERWEEK_APPROVEDDATE = "ApprovedDate";
   public static final String USERWEEK_CALENDARWEEK_ID_FK = "ITR_CalendarWeekId";
-  public static final String USERWEEK_COMMENTID_FK = "ITR_CommentId";
+  public static final String USERWEEK_COMMENT = "Comment";
   public static final String USERWEEK_ID_PK = "Id";
   public static final String USERWEEK_SUBMITTED = "Submitted";
   public static final String USERWEEK_SUBMITTEDDATE = "SubmittedDate";

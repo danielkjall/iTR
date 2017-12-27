@@ -66,22 +66,6 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
         xmlCarrier.setWeekComment(weekComment);
       }
 
-      /*
-       //set weeek comment
-       // NOTE, BUG: If user writes a comment and click submit, then clicks cancel in the forceSubmit page and
-       // changes the comment. The new week comment will not be saved, the old one will remain
-       // The bug comes from that request.getParameter("comments") only can be read once
-       if ( ( xmlCarrier.getWeekComment() == null ) || ( xmlCarrier.getWeekComment().length() == 0 ) ) {
-
-       // if weekComment is not set. Read it from request object and set it
-       if ( request.getParameter( "comments" ) != null && request.getParameter( "comments" ).length() > 0 ) {
-       weekComment = request.getParameter( "comments" );
-       }
-
-       System.out.println( "SaveSubmitWeekReport::" + weekComment );
-       xmlCarrier.setWeekComment( weekComment );
-       }
-       */
       //SAVE THE WEEKREPORT
       if (save != null) {
         if (IntiroLog.d()) {
@@ -176,7 +160,7 @@ public class SaveSubmitWeekReport extends ITRServlet implements URLs, Commands {
 
       /*END ACTION*/
 
- /*Create an XSLFormatedArea and add it to the page*/
+      /*Create an XSLFormatedArea and add it to the page*/
       // If this code is reached we must show a warning page
       XSLFormatedArea xslAnswer = new XSLFormatedArea(xmlCarrier, RESULT_SAVE_SUBMIT_WEEK_XSL);
       page.add(xslAnswer);

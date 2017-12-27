@@ -18,6 +18,8 @@ import java.util.List;
 
 public interface DbExecuteInterface extends InvocationHandled {
 
+  boolean updateUserWeekComment(int userWeekId, String comment) throws Exception;
+
   boolean addActivity(Activity activity) throws Exception;
 
   boolean addCompany(Company company) throws Exception;
@@ -34,13 +36,11 @@ public interface DbExecuteInterface extends InvocationHandled {
 
   boolean addUserRoleConnection(Role role) throws Exception;
 
-  boolean makeNewComment(String comment) throws Exception;
-
   boolean makeNewProject(Project project) throws Exception;
 
   boolean makeNewUserProfile(UserProfile profile) throws Exception;
 
-  boolean makeNewUserWeekId(String calendarWeekId, int weekCommentId) throws Exception;
+  boolean makeNewUserWeekId(String calendarWeekId, String comment) throws Exception;
 
   boolean changePassword(String userId, String newLoginId, String newPassword) throws Exception;
 
@@ -74,8 +74,6 @@ public interface DbExecuteInterface extends InvocationHandled {
 
   boolean updateApprovedInWeek(int userWeekId, boolean status) throws Exception;
 
-  boolean updateComment(int commentId, String comment) throws Exception;
-
   boolean updateCompany(Company company) throws Exception;
 
   boolean updateContacts(Contacts contacts) throws Exception;
@@ -99,8 +97,6 @@ public interface DbExecuteInterface extends InvocationHandled {
   boolean updateUserProfile(UserProfile profile) throws Exception;
 
   boolean updateUserRoleConnection(Role role) throws Exception;
-
-  boolean updateUserWeekComment(int inWeekReportId, int inWeekCommentId) throws Exception;
 
   void saveStatistics(StatisticsVO statistics) throws Exception;
 }
