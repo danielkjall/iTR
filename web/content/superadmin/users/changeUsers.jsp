@@ -633,8 +633,7 @@
 									</tr>
 
                                                                         <tr>
-										<td align="left" width="25%"> Want point mail </td>
-										<td align="left" width="75%">
+										<td align="left" width="100%">
 											<%
 											checked = "";
 											readonly = "";
@@ -645,7 +644,7 @@
 												readonly = "disabled";
 											}
 											%>
-											<input type="checkbox" name="cbPointMail" class="input" <%=checked%> <%=readonly%> />
+											<label><input type="checkbox" name="cbPointMail" class="input" <%=checked%> <%=readonly%> />Want point mail</label>
 										</td>
 									</tr>
                                                                                 

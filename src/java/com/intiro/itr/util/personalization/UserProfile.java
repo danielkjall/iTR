@@ -575,12 +575,10 @@ public class UserProfile {
     
     // Gamification
     up.getGamificationSetting().setEmail(rs.getField("email"));
-    up.getGamificationSetting().setEmail(rs.getField("email"));
-    up.getGamificationSetting().setEmail(rs.getField("email"));
-    up.getGamificationSetting().setEmail(rs.getField("email"));
-    up.getGamificationSetting().setEmail(rs.getField("email"));
-    
-    
+    up.getGamificationSetting().setWantAchievementMail(rs.getField("WantAchievementMail"));
+    up.getGamificationSetting().setWantLateMail(rs.getField("WantLateMail"));
+    up.getGamificationSetting().setWantPointMail(rs.getField("WantPointMail"));
+    up.getGamificationSetting().setWantReminderMail(rs.getField("WantReminderMail"));
     
     
     rs.moveNext();
