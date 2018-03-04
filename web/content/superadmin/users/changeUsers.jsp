@@ -589,7 +589,7 @@
                                     </tr>
                                     <tr>
                                         <td align="left" width="100%">
-                                            Email: <input type="text" name="txtEmail" size="30" maxlength="200" class="input" value="<%=xmlCarrier.getModifiedUser().getGamificationSetting()%>"/>&#160;
+                                            Email: <input type="text" name="txtEmail" size="30" maxlength="200" class="input" value="<%=xmlCarrier.getModifiedUser().getGamificationSetting().getEmail()%>"/>&#160;
                                         </td>
                                     </tr>
 
