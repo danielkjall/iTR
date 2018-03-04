@@ -108,26 +108,17 @@
       roleId = request.getParameter("role");
     }
 
-    if (request.getParameter("cbAchievementMail") != null && request.getParameter("cbAchievementMail").length() > 0) {
-      wantAchievementEmail = request.getParameter("cbAchievementMail");
-      userEditor.getModifiedUser().getGamificationSetting().setWantAchievementMail(wantAchievementEmail);
-    }
-    if (request.getParameter("cbLateMail") != null && request.getParameter("cbLateMail").length() > 0) {
-      wantLateEmail = request.getParameter("cbLateMail");
-      userEditor.getModifiedUser().getGamificationSetting().setWantLateMail(wantLateEmail);
-    }
-    if (request.getParameter("cbPointMail") != null && request.getParameter("cbPointMail").length() > 0) {
-      wantPointEmail = request.getParameter("cbPointMail");
-      userEditor.getModifiedUser().getGamificationSetting().setWantPointMail(wantPointEmail);
-    }
-    if (request.getParameter("cbReminderMail") != null && request.getParameter("cbReminderMail").length() > 0) {
-      wantReminderEmail = request.getParameter("cbReminderMail");
-      userEditor.getModifiedUser().getGamificationSetting().setWantReminderMail(wantReminderEmail);
-    }
-    if (request.getParameter("txtEmail") != null && request.getParameter("txtEmail").length() > 0) {
-      email = request.getParameter("txtEmail");
-      userEditor.getModifiedUser().getGamificationSetting().setEmail(email);
-    }
+    wantAchievementEmail = request.getParameter("cbAchievementMail");
+    wantLateEmail = request.getParameter("cbLateMail");
+    wantPointEmail = request.getParameter("cbPointMail");
+    wantReminderEmail = request.getParameter("cbReminderMail");
+    email = request.getParameter("txtEmail");
+    
+    userEditor.getModifiedUser().getGamificationSetting().setWantAchievementMail(wantAchievementEmail);
+    userEditor.getModifiedUser().getGamificationSetting().setWantLateMail(wantLateEmail);
+    userEditor.getModifiedUser().getGamificationSetting().setWantPointMail(wantPointEmail);
+    userEditor.getModifiedUser().getGamificationSetting().setWantReminderMail(wantReminderEmail);
+    userEditor.getModifiedUser().getGamificationSetting().setEmail(email);
 
     userEditor.getModifiedUser().setFirstName(firstName);
     userEditor.getModifiedUser().setLastName(lastName);
