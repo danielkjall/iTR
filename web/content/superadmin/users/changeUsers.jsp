@@ -583,8 +583,7 @@
 										<td align="center" colspan="2">&#160;</td>
 									</tr>
 									<tr>
-										<td align="left" width="25%"> Want reminder mail </td>
-										<td align="left" width="75%">
+										<td align="left" width="100%">
 											<%
 											checked = "";
 											readonly = "";
@@ -595,12 +594,11 @@
 												readonly = "disabled";
 											}
 											%>
-											<input type="checkbox" name="cbReminderMail" class="input" <%=checked%> <%=readonly%> />
+                                                                                        <label><input type="checkbox" name="cbReminderMail" class="input" <%=checked%> <%=readonly%> />Want reminder mail</label>
 										</td>
 									</tr>
                                                                         <tr>
-										<td align="left" width="25%"> Want late mail </td>
-										<td align="left" width="75%">
+										<td align="left" width="100%">
 											<%
 											checked = "";
 											readonly = "";
@@ -611,13 +609,12 @@
 												readonly = "disabled";
 											}
 											%>
-											<input type="checkbox" name="cbLateMail" class="input" <%=checked%> <%=readonly%> />
+											<label><input type="checkbox" name="cbLateMail" class="input" <%=checked%> <%=readonly%> />Want late mail</label>
 										</td>
 									</tr>
 
                                                                         <tr>
-										<td align="left" width="25%"> Want achievement mail </td>
-										<td align="left" width="75%">
+										<td align="left" width="100%">
 											<%
 											checked = "";
 											readonly = "";
@@ -628,7 +625,7 @@
 												readonly = "disabled";
 											}
 											%>
-											<input type="checkbox" name="cbAchievementMail" class="input" <%=checked%> <%=readonly%> />
+                                                                                        <label><input type="checkbox" name="cbAchievementMail" class="input" <%=checked%> <%=readonly%> />Want achievement mail</label>
 										</td>
 									</tr>
 
@@ -661,20 +658,16 @@
 										<td align="center" colspan="2">&#160;</td>
 									</tr>
 									<%
-									for(int i=0; i<xmlCarrier.getModifiedUser().getEmails().size();i++) {
-										Email anEmail = xmlCarrier.getModifiedUser().getEmail(i);
+										String anEmail = xmlCarrier.getModifiedUser().getGamificationSetting().getEmail();
 									%>
 									<tr>
 										<td align="left" width="25%">
-											<%=anEmail.getDescription()%>
+											email
 										</td>
 										<td align="left" width="75%">
-											<%=anEmail.getAddress()%>&#160;
+											<%=anEmail%>&#160;
 										</td>
 									</tr>
-									<%
-									}
-									%>
 									<tr><td colspan="2">&#160;</td></tr>
 									<tr><td align="center" colspan="2">&#160;</td></tr>
 								</table>
