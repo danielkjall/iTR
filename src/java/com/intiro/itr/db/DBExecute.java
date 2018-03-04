@@ -674,8 +674,13 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     sb.append("WantLateMail = ").append(profile.getGamificationSetting().isWantLateMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
     sb.append("WantPointMail = ").append(profile.getGamificationSetting().isWantPointMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
     sb.append("WantReminderMail = ").append(profile.getGamificationSetting().isWantReminderMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
-    sb.append("Email = ").append(profile.getGamificationSetting().getEmail());
-
+    sb.append("Email = ");
+    if (profile.getGamificationSetting().getEmail() != null) {
+      sb.append(SINGLE_QUOTE).append(profile.getGamificationSetting().getEmail()).append(SINGLE_QUOTE);
+    }
+    else {
+      sb.append("null");
+    }
     sb.append(" WHERE ");
     sb.append(USER_ID_PK + " = ").append(profile.getUserId());
 
