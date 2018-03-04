@@ -60,7 +60,6 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     return (DbExecuteInterface) Proxy.newProxyInstance(db.getClass().getClassLoader(), new Class<?>[]{DbExecuteInterface.class}, new ItrInvocationHandler(db));
   }
 
-  
   @Override
   public boolean updateUserWeekComment(int userWeekId, String comment) throws Exception {
     StringBuffer sb = new StringBuffer();
@@ -75,7 +74,7 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     boolean retval = access.executeUpdate(sb);
     return retval;
   }
-          
+
   @Override
   public boolean changePassword(String userId, String newLoginId, String newPassword) throws Exception {
     StringBuffer sb = new StringBuffer();
@@ -663,18 +662,20 @@ public class DBExecute implements DBConstants, DbExecuteInterface {
     sb.append(USER_VACATION_SAVED_DAYS + " = ").append(profile.getSavedVacationDays()).append(COMMA);
     sb.append(USER_OVERTIME_VACATION_HOURS + " = ").append(profile.getOvertimeVacationHours()).append(COMMA);
     sb.append(USER_OVERTIME_MONEY_HOURS + " = ").append(profile.getOvertimeMoneyHours()).append(COMMA);
-
-    if (profile.getActivated()) {
-      sb.append(USER_ACTIVATED + " = " + TRUE_ACCESS + COMMA);
-    } else {
-      sb.append(USER_ACTIVATED + " = " + FALSE_ACCESS + COMMA);
-    }
+    sb.append(USER_ACTIVATED + " = ").append(profile.getActivated() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
 
     sb.append(USER_ACTIVATED_DATE + " = '").append(profile.getActivatedDate().getCalendarInStoreFormat()).append("'" + COMMA);
     sb.append(USER_DEACTIVATED_DATE + " = '").append(profile.getDeActivatedDate().getCalendarInStoreFormat()).append("'" + COMMA);
     sb.append(USER_CREATED_DATE + " = '").append(profile.getCreatedDate().getCalendarInStoreFormat()).append("'" + COMMA);
     sb.append(USER_REPORT_APPROVERID_FK + " = ").append(profile.getReportApproverId()).append(COMMA);
-    sb.append(USER_SKINID_FK + " = ").append(profile.getSkinId());
+    sb.append(USER_SKINID_FK + " = ").append(profile.getSkinId()).append(COMMA);
+
+    sb.append("WantAchievementMail = ").append(profile.getGamificationSetting().isWantAchievementMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
+    sb.append("WantLateMail = ").append(profile.getGamificationSetting().isWantLateMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
+    sb.append("WantPointMail = ").append(profile.getGamificationSetting().isWantPointMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
+    sb.append("WantReminderMail = ").append(profile.getGamificationSetting().isWantReminderMail() ? TRUE_ACCESS : FALSE_ACCESS).append(COMMA);
+    sb.append("Email = ").append(profile.getGamificationSetting().getEmail());
+
     sb.append(" WHERE ");
     sb.append(USER_ID_PK + " = ").append(profile.getUserId());
 
