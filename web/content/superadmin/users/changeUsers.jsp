@@ -644,6 +644,12 @@
 											<label><input type="checkbox" name="cbPointMail" class="input" <%=checked%> <%=readonly%> />Want point mail</label>
 										</td>
 									</tr>
+                                                        
+                                                                        <tr>
+										<td align="left" width="100%">
+											Email: <input type="text" name="txtEmail" size="100" maxlength="200" class="input" value="<%=xmlCarrier.getModifiedUser().getGamificationSetting().getEmail()%>"/>&#160;
+										</td>
+									</tr>
                                                                                 
                                                                         <tr><td colspan="2">&#160;</td></tr>
 									
@@ -651,24 +657,6 @@
 							</td>
 							<td valign="top">
 								<table cellspancing="0" cellpadding="0" border="0" width="400">
-									<tr>
-										<td align="left" colspan="2" class="NormalBold">iTRGamification email</td>
-									</tr>
-									<tr>
-										<td align="center" colspan="2">&#160;</td>
-									</tr>
-									<%
-										String anEmail = xmlCarrier.getModifiedUser().getGamificationSetting().getEmail();
-									%>
-									<tr>
-										<td align="left" width="25%">
-											email
-										</td>
-										<td align="left" width="75%">
-											<%=anEmail%>&#160;
-										</td>
-									</tr>
-									<tr><td colspan="2">&#160;</td></tr>
 									<tr><td align="center" colspan="2">&#160;</td></tr>
 								</table>
 							</td>
