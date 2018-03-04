@@ -21,6 +21,13 @@
     String usedVacation = "0";
     String moneyovertime = "0";
     String vacationovertime = "0";
+        
+    String wantReminderEmail = null;
+    String wantLateEmail = null;
+    String wantPointEmail = null;
+    String wantAchievementEmail = null;
+    String email = null;
+    
     String save = request.getParameter("btnSave");
     String delete = request.getParameter("btnDelete");
     boolean bSave = false;
@@ -100,7 +107,48 @@
         if (request.getParameter("role") != null && request.getParameter("role").length() > 0) {
             roleId = request.getParameter("role");
         }
-
+        
+        if (request.getParameter("cbAchievementMail") != null && request.getParameter("cbAchievementMail").length() > 0) {
+            wantAchievementEmail = request.getParameter("cbAchievementMail");
+            if (wantAchievementEmail != null && wantAchievementEmail.equalsIgnoreCase("on")) {
+                userEditor.getModifiedUser().getGamificationSetting().setWantAchievementMail(true);
+            }
+            else {
+              userEditor.getModifiedUser().getGamificationSetting().setWantAchievementMail(false);
+            }
+        }
+        if (request.getParameter("cbLateMail") != null && request.getParameter("cbLateMail").length() > 0) {
+            wantLateEmail = request.getParameter("cbLateMail");
+            if (wantLateEmail != null && wantLateEmail.equalsIgnoreCase("on")) {
+                userEditor.getModifiedUser().getGamificationSetting().setWantLateMail(true);
+            }
+            else {
+              userEditor.getModifiedUser().getGamificationSetting().setWantLateMail(false);
+            }
+        }
+        if (request.getParameter("cbPointMail") != null && request.getParameter("cbPointMail").length() > 0) {
+            wantPointEmail = request.getParameter("cbPointMail");
+            if (wantPointEmail != null && wantPointEmail.equalsIgnoreCase("on")) {
+                userEditor.getModifiedUser().getGamificationSetting().setWantPointMail(true);
+            }
+            else {
+              userEditor.getModifiedUser().getGamificationSetting().setWantPointMail(false);
+            }
+        }
+        if (request.getParameter("cbReminderMail") != null && request.getParameter("cbReminderMail").length() > 0) {
+            wantReminderEmail = request.getParameter("cbReminderMail");
+            if (wantReminderEmail != null && wantReminderEmail.equalsIgnoreCase("on")) {
+                userEditor.getModifiedUser().getGamificationSetting().setWantReminderMail(true);
+            }
+            else {
+              userEditor.getModifiedUser().getGamificationSetting().setWantReminderMail(false);
+            }
+        }
+        if (request.getParameter("txtEmail") != null && request.getParameter("txtEmail").length() > 0) {
+            email = request.getParameter("txtEmail");
+            userEditor.getModifiedUser().getGamificationSetting().setEmail(email);
+        }
+                
         userEditor.getModifiedUser().setFirstName(firstName);
         userEditor.getModifiedUser().setLastName(lastName);
         userEditor.getModifiedUser().getRole().setRoleId(Integer.parseInt(roleId));
@@ -109,7 +157,7 @@
         userEditor.getModifiedUser().setCompanyId(companyId);
         userEditor.getModifiedUser().setReportApproverId(adminUserId);
         userEditor.getModifiedUser().setLoginId(loginId);
-
+        
         //PASSWORD
         //only change password if something is changed
         if (newPassword != null && newPassword.length() > 0) {
