@@ -13,7 +13,7 @@ public class GamificationSetting {
   }
 
   public void setWantReminderMail(String status) {
-    if ((status != null && status.trim().equals("1")) || (status != null && status.trim().equalsIgnoreCase("True"))) {
+    if (statusIsTrue(status)) {
       this.wantReminderMail = true;
     } else {
       this.wantReminderMail = false;
@@ -25,7 +25,7 @@ public class GamificationSetting {
   }
 
   public void setWantAchievementMail(String status) {
-    if ((status != null && status.trim().equals("1")) || (status != null && status.trim().equalsIgnoreCase("True"))) {
+    if (statusIsTrue(status)) {
       this.wantAchievementMail = true;
     } else {
       this.wantAchievementMail = false;
@@ -37,7 +37,7 @@ public class GamificationSetting {
   }
 
   public void setWantLateMail(String status) {
-    if ((status != null && status.trim().equals("1")) || (status != null && status.trim().equalsIgnoreCase("True"))) {
+    if (statusIsTrue(status)) {
       this.wantLateMail = true;
     } else {
       this.wantLateMail = false;
@@ -49,7 +49,7 @@ public class GamificationSetting {
   }
 
   public void setWantPointMail(String status) {
-    if ((status != null && status.trim().equals("1")) || (status != null && status.trim().equalsIgnoreCase("True"))) {
+    if (statusIsTrue(status)) {
       this.wantPointMail = true;
     } else {
       this.wantPointMail = false;
@@ -62,6 +62,10 @@ public class GamificationSetting {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  private boolean statusIsTrue(String status) {
+    return (status != null && status.trim().equals("1")) || (status != null && status.trim().equalsIgnoreCase("True")) || (status != null && status.trim().equalsIgnoreCase("on"));
   }
 
 }
