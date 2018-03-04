@@ -561,6 +561,134 @@
 							</td>
 						</tr>
 
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                <!--Start grey line-->
+						<tr><td colspan="2"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#cccccc"><img src="images/sp.gif" height="1" width="1"/></td></tr></table></td></tr>
+						<!--End grey line -->
+
+						<tr>
+							<td valign="top">
+								<table cellspancing="0" cellpadding="0" border="0" width="400">
+									<tr>
+										<td align="left" colspan="2" class="NormalBold">iTRGamification options</td>
+									</tr>
+									<tr>
+										<td align="center" colspan="2">&#160;</td>
+									</tr>
+									<tr>
+										<td align="left" width="25%"> Want reminder mail </td>
+										<td align="left" width="75%">
+											<%
+											checked = "";
+											readonly = "";
+											if(xmlCarrier.getModifiedUser().getGamificationSetting().isWantReminderMail()) {
+												checked = "checked";
+											}
+											if(xmlCarrier.isInViewMode() || xmlCarrier.isInDeleteMode()) {
+												readonly = "disabled";
+											}
+											%>
+											<input type="checkbox" name="cbReminderMail" class="input" <%=checked%> <%=readonly%> />
+										</td>
+									</tr>
+                                                                        <tr>
+										<td align="left" width="25%"> Want late mail </td>
+										<td align="left" width="75%">
+											<%
+											checked = "";
+											readonly = "";
+											if(xmlCarrier.getModifiedUser().getGamificationSetting().isWantLateMail()) {
+												checked = "checked";
+											}
+											if(xmlCarrier.isInViewMode() || xmlCarrier.isInDeleteMode()) {
+												readonly = "disabled";
+											}
+											%>
+											<input type="checkbox" name="cbLateMail" class="input" <%=checked%> <%=readonly%> />
+										</td>
+									</tr>
+
+                                                                        <tr>
+										<td align="left" width="25%"> Want achievement mail </td>
+										<td align="left" width="75%">
+											<%
+											checked = "";
+											readonly = "";
+											if(xmlCarrier.getModifiedUser().getGamificationSetting().isWantAchievementMail()) {
+												checked = "checked";
+											}
+											if(xmlCarrier.isInViewMode() || xmlCarrier.isInDeleteMode()) {
+												readonly = "disabled";
+											}
+											%>
+											<input type="checkbox" name="cbAchievementMail" class="input" <%=checked%> <%=readonly%> />
+										</td>
+									</tr>
+
+                                                                        <tr>
+										<td align="left" width="25%"> Want point mail </td>
+										<td align="left" width="75%">
+											<%
+											checked = "";
+											readonly = "";
+											if(xmlCarrier.getModifiedUser().getGamificationSetting().isWantPointMail()) {
+												checked = "checked";
+											}
+											if(xmlCarrier.isInViewMode() || xmlCarrier.isInDeleteMode()) {
+												readonly = "disabled";
+											}
+											%>
+											<input type="checkbox" name="cbPointMail" class="input" <%=checked%> <%=readonly%> />
+										</td>
+									</tr>
+                                                                                
+                                                                        <tr><td colspan="2">&#160;</td></tr>
+									
+								</table>
+							</td>
+							<td valign="top">
+								<table cellspancing="0" cellpadding="0" border="0" width="400">
+									<tr>
+										<td align="left" colspan="2" class="NormalBold">iTRGamification email</td>
+									</tr>
+									<tr>
+										<td align="center" colspan="2">&#160;</td>
+									</tr>
+									<%
+									for(int i=0; i<xmlCarrier.getModifiedUser().getEmails().size();i++) {
+										Email anEmail = xmlCarrier.getModifiedUser().getEmail(i);
+									%>
+									<tr>
+										<td align="left" width="25%">
+											<%=anEmail.getDescription()%>
+										</td>
+										<td align="left" width="75%">
+											<%=anEmail.getAddress()%>&#160;
+										</td>
+									</tr>
+									<%
+									}
+									%>
+									<tr><td colspan="2">&#160;</td></tr>
+									<tr><td align="center" colspan="2">&#160;</td></tr>
+								</table>
+							</td>
+						</tr>
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
 						<!--Start grey line-->
 						<tr><td colspan="2"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#cccccc"><img src="images/sp.gif" height="1" width="1"/></td></tr></table></td></tr>
 						<!--End grey line -->

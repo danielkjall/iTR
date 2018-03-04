@@ -96,6 +96,8 @@ public class UserProfile {
   private int usedVacationDays = 0;
   private String userId = null;
 
+  private GamificationSetting gamificationSetting = new GamificationSetting();
+  
   /**
    * Constructor I for UserProfile.
    */
@@ -104,6 +106,14 @@ public class UserProfile {
     setCreatedDate(now);
     setDeActivatedDate(now);
     setActivatedDate(now);
+  }
+
+  public GamificationSetting getGamificationSetting() {
+    return gamificationSetting;
+  }
+
+  public void setGamificationSetting(GamificationSetting gamificationSetting) {
+    this.gamificationSetting = gamificationSetting;
   }
 
   public void setActivated(String status) {
@@ -562,6 +572,17 @@ public class UserProfile {
 
     ITRCalendar createdDate = new ITRCalendar(rs.getField(DBConstants.USER_CREATED_DATE));
     up.setCreatedDate(createdDate);
+    
+    // Gamification
+    up.getGamificationSetting().setEmail(rs.getField("email"));
+    up.getGamificationSetting().setEmail(rs.getField("email"));
+    up.getGamificationSetting().setEmail(rs.getField("email"));
+    up.getGamificationSetting().setEmail(rs.getField("email"));
+    up.getGamificationSetting().setEmail(rs.getField("email"));
+    
+    
+    
+    
     rs.moveNext();
   }
 
